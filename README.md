@@ -1,6 +1,6 @@
 # GalGuard
 
-I want to be 100% transparent and let everyone know that this project is 100% vibe-coded. I'm just a man with an idea. I do not know how to code. AI did all of the work. 
+🍖 I want to be 100% transparent and let everyone know that this project is 100% vibe-coded. I'm just a man with an idea. I do not know how to code. AI did all of the work. 🍖
 
 A barcode scanner that checks food ingredients for people with **alpha-gal syndrome (AGS)**. Scan a product, and GalGuard shows its ingredient list with problem ingredients highlighted in red or yellow, plus a one-glance rating.
 

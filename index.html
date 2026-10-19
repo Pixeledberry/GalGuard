@@ -45,19 +45,24 @@ nav button{padding:10px 4px;font-size:15px}
 .photo{display:block;text-align:center;padding:11px;border:1px solid var(--line);background:var(--card);border-radius:10px;font-weight:600;margin:8px 0;cursor:pointer}
 details input[type=text]{width:100%;margin:6px 0}
 #toast{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));background:var(--acc);color:var(--accink);padding:10px 14px;border-radius:10px;text-align:center}
+.why{border-left:6px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;margin:0 0 12px;font-size:15px}.why.r{border-color:var(--hr)}.why.m{border-color:var(--hy)}.why p{margin:6px 0 0}.why span{color:var(--mut);font-size:14px}
+mark[data-i]{cursor:pointer}mark[data-i]:focus-visible{outline:3px solid var(--ink)}
+.cam::after{content:"";position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border:2px solid rgba(255,255,255,.75);border-radius:12px;pointer-events:none}
+#zm{position:absolute;left:12px;right:12px;bottom:10px;width:calc(100% - 24px);z-index:2}
+#sens label{display:block;margin:6px 0}
 </style></head><body>
 <header><h1>GalGuard</h1><p>Scan a barcode. See how risky it is for alpha-gal.</p></header>
 <main>
 <nav><button id="t1" class="on">Scan</button><button id="t3">History</button><button id="t2">Favorites <span id="fc"></span></button></nav>
 <section id="v1">
- <div class="cam off" id="cam"><video id="vid" playsinline muted></video><div id="reader"></div></div>
+ <div class="cam off" id="cam"><video id="vid" playsinline muted></video><div id="reader"></div><input type="range" id="zm" hidden aria-label="Zoom"></div>
  <button class="pri" id="scan">Start camera</button>
  <label class="photo" id="phl">Photo of barcode<input type="file" id="ph" accept="image/*" capture="environment" hidden></label>
- <div class="row"><input id="code" inputmode="numeric" placeholder="Or type the barcode digits" aria-label="Barcode digits"><button id="go">Check</button></div>
+ <div class="row"><input id="code" inputmode="numeric" placeholder="Or type the barcode digits" aria-label="Barcode digits"><button id="go">Check</button><button id="cl" aria-label="Clear barcode">Clear</button></div>
  <details><summary>Paste an ingredient list</summary><input type="text" id="pn" placeholder="Product name (optional)" aria-label="Product name"><textarea id="pt" placeholder="Paste ingredients from the label"></textarea><button id="pa">Analyze</button> <button id="ps">Try a sample</button></details>
  <details><summary>My settings</summary>
-  <label><input type="checkbox" id="cs"> Strict: treat yellow (possible animal-derived) additives as red, do not eat</label>
-  <label><input type="checkbox" id="cd"> I react to dairy (flag it yellow)</label>
+  <p class="legend">Sensitivities: things some people with AGS react to and others don’t. Anything you check is flagged red (do not eat).</p>
+  <div id="sens"></div>
   <input type="text" id="ca" placeholder="Always flag red / do not eat (comma separated)" aria-label="Always avoid">
   <input type="text" id="cc" placeholder="Always flag yellow / avoid (comma separated)" aria-label="Always caution"></details>
  <div id="result"></div>
@@ -65,22 +70,35 @@ details input[type=text]{width:100%;margin:6px 0}
 <section id="v2" hidden><div id="favs"></div></section>
 <section id="v3" hidden><div id="hist"></div></section>
 </main>
-<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>Web v1.5</footer>
+<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>Web v1.6</footer>
 <div id="toast" hidden></div>
 <script>
 const $=s=>document.querySelector(s);
 const ls={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-let favs=ls.get('gg_favs',[]),hist=ls.get('gg_hist',[]),ovr=ls.get('gg_ovr',{}),cfg=Object.assign({strict:false,dairy:false,avoid:'',caution:''},ls.get('gg_cfg',{})),cur=null,stream=null,timer=null,h5=null,h5p=null;
-// r = red / do not eat (mammal-derived), m = yellow / avoid (possibly animal-derived), d = dairy (yellow only if you react to it)
-const T=[['r','beef|pork|lamb|mutton|veal|venison|bison|goat|rabbit|elk|moose|horse|kangaroo|bovine|porcine|ovine|ham|bacon|sausages?|pepperoni|salami|prosciutto|pancetta|chorizo|bologna|mortadella|hot dogs?|jerky|brisket|steaks?|ribs|liver|kidney|tripe|oxtail|pork rinds?|bone broth|bone marrow|beef extract|meat extract|animal (?:fat|shortening|protein)|hydrolyzed animal \\w+|lard|tallow|suet|gelatin|gelatine|pepsin|collagen|mammal\\w*|meat|boeuf|bœuf|porc|agneau|veau|jambon|saindoux|suif|viande|gélatine|gelatina|carne|cerdo|puerco|cordero|ternera|jamón|tocino|manteca de cerdo|sebo|rindfleisch|schweinefleisch|schwein|schinken|schmalz|talg|fleisch|manzo|maiale|agnello|strutto'],
-['m','rennet|glycerin|glycerine|glycerol|mono-? ?(?:and|&)? ?diglycerides|monoglycerides|diglycerides|stearic acid|(?:magnesium|calcium|sodium) stearate|stearoyl\\s+\\w+|l-cysteine|cysteine|lanolin|cholecalciferol|vitamin d3|glucosamine|pancreatin|lipase|bone char|shortening|bouillon|natural flavou?rs?|glycérine|glicerina|arômes? naturels?|aromas? naturales?|natürliche aromen'],
-['d','milk|butter|buttermilk|cheese|cream|whey|casein|caseinate|lactose|ghee|yogh?urt|curds?|dairy|lait|leche|milch|latte|beurre|mantequilla|fromage|queso|käse|crème|sahne|lactosa|petit-lait|suero']];
-const EX=/\b(?:vegetable|plant[- ]based|vegan|palm|soy|sunflower|canola)\s+(?:glycerin\w*|glycerol|shortening|stearic acid|(?:mono-? ?(?:and|&)? ?)?(?:di|mono)glycerides|(?:magnesium|calcium) stearate)|\b(?:cocoa|shea|peanut|almond|nut|apple|coconut)\s+butter|\b(?:coconut|almond|oat|soy|rice|cashew)\s+(?:milk|cream|yogh?urt)|cream of tartar|meat[- ]?(?:free|less|alternatives?)|plant[- ]based meat|kidney beans?/gi;
-const W=[[/gelatin/,'made from animal collagen, usually pork or beef'],[/lard|tallow|suet|animal fat/,'rendered mammal fat'],[/collagen|pepsin|bone|extract/,'comes from mammal tissue'],[/glycerin|glycerol/,'can be plant or animal-fat derived'],[/stear/,'can be made from animal fat'],[/glycerides|shortening/,'fat-based, sometimes animal-derived'],[/rennet/,'enzyme from calf stomach in some cheeses'],[/flavo/,'source not disclosed'],[/cysteine/,'sometimes made from animal hair or feathers'],[/lanolin|cholecalciferol|d3/,'often from sheep wool'],[/bouillon/,'often beef-based'],[/pancreatin|lipase/,'enzymes, often from pig or cow'],[/glucosamine/,'often from animal cartilage or shellfish'],[/bone char/,'bone-filtered sugar'],[/milk|butter|cheese|cream|whey|casein|lactose|ghee|yogh?urt|curd|dairy/,'dairy: mammal milk, some people with AGS react']];
-const why=h=>h.custom?'on your list':(W.find(w=>w[0].test(h.t))||[0,h.k=='r'?'mammal meat or a mammal-derived ingredient':'may be animal-derived; source not stated'])[1];
+let favs=ls.get('gg_favs',[]),hist=ls.get('gg_hist',[]),ovr=ls.get('gg_ovr',{}),cfg=(c=>{c=Object.assign({sens:{},avoid:'',caution:''},c);if(c.dairy)c.sens.dairy=true;delete c.dairy;delete c.strict;return c})(ls.get('gg_cfg',{})),LA=null,cur=null,stream=null,timer=null,h5=null,h5p=null;
+// Groups: [id, default color (null = flag only if you marked it), pattern, sensitivity key, reason]
+// red = mammal-derived (do not eat). yellow = mammal by-product or may be processed with mammal products (avoid).
+const MEAT='beef|pork|lamb|mutton|veal|venison|bison|goat|rabbit|elk|moose|horse|kangaroo|bovine|porcine|ovine|caprine|ham|bacon|sausages?|pepperoni|salami|prosciutto|pancetta|chorizo|bologna|mortadella|hot dogs?|jerky|brisket|steaks?|ribs|liver|kidney|tripe|oxtail|pork rinds?|bone broth|bone marrow|beef extract|meat extract|lard|tallow|tallowate|suet|mammal\\w*|meat|natural casings?|hog casings?|sheep casings?|boeuf|bœuf|porc|agneau|veau|jambon|saindoux|suif|viande|carne|cerdo|puerco|cordero|ternera|jamón|tocino|manteca de cerdo|sebo|rindfleisch|schweinefleisch|schwein|schinken|schmalz|talg|fleisch|manzo|maiale|agnello|strutto';
+const G=[
+['meat','r',MEAT,null,'Mammal meat, fat or tissue. It carries alpha-gal directly, which is what triggers AGS reactions.'],
+['gel','m','gelatin|gelatine|gélatine|gelatina|e-? ?441','gelatin','Gelatin is made from the skin, bones or connective tissue of mammals (usually pigs or cows), so it can contain alpha-gal.'],
+['tissue','m','collagen|chondroitin|cartilage|bone phosphate|bone meal|bone char|glucosamine|e-? ?542',null,'Made from mammal bones, cartilage or connective tissue, or filtered through bone char. These can carry alpha-gal.'],
+['hidden','m','animal (?:fat|shortening|protein|derived \\w+)|hydrolyzed (?:animal )?protein|hydrolysed (?:animal )?protein|shortening|bouillon|ribonucleotides|inosinate|e-? ?(?:627|631|635)',null,'May be animal-derived, and the label does not name the animal, so it could be a mammal such as a pig or cow.'],
+['cyst','m','l-cysteine|cysteine|cystine',null,'Often made from animal hair, feathers or hooves, which can include mammal sources.'],
+['enz','m','pepsin|pancreatin|lipase|trypsin|chymosin|enzymes?|rennet','rennet','Rennet and many food enzymes come from the stomachs or pancreas of calves, pigs or cows. Microbial versions exist, but labels rarely say which was used.'],
+['gly','m','glycerin|glycerine|glycerol|glicerina|glycérine|e-? ?422|mono-? ?(?:and|&)? ?diglycerides|monoglycerides|diglycerides|e-? ?47\\d[a-f]?','glycerin','Glycerin and glycerides are made from plant oils or from animal fat such as tallow. The label usually does not say which.'],
+['stear','m','stearic acid|(?:magnesium|calcium|sodium) stearate|stearoyl\\s+\\w+|stearin|glyceryl \\w*stearate|sorbitan \\w+|polysorbate \\d+|oleic acid|oleo\\w*|fatty acids?|e-? ?(?:48[1-3]|49[1-5]|57[0-2])','stearates','Fatty acids and stearates are made from plant oils or from animal fat (tallow). The label usually does not say which.'],
+['flav','m','natural (?:and artificial )?flavou?rs?|natural flavou?rings?|arômes? naturels?|aromas? naturales?|natürliche aromen','flavors','The source of natural flavors is not disclosed. They can include meat-derived or other animal-derived ingredients.'],
+['lan','m','lanolin|cholecalciferol|vitamin d3','lanolin','Lanolin comes from sheep wool, and vitamin D3 is commonly made from it.'],
+['cheese','m','cheeses?|whey|casein|caseinate|curds?|fromage|queso|käse','dairy','Cheese and whey products are often made with animal rennet taken from calf stomachs.'],
+['dairy',null,'milk|butter|buttermilk|cream|lactose|ghee|yogh?urt|dairy|lait|leche|milch|latte|beurre|mantequilla|crème|sahne|lactosa|suero|petit-lait','dairy','Dairy comes from mammal milk. Some people with AGS react to it and others do not.']];
+const SENS={dairy:'Dairy (milk, butter, cream, cheese, whey, casein)',gelatin:'Gelatin',glycerin:'Glycerin and mono/diglycerides',stearates:'Stearic acid, stearates and fatty-acid emulsifiers',flavors:'Natural flavors',lanolin:'Lanolin and vitamin D3',rennet:'Rennet and animal enzymes'};
+const GR=Object.fromEntries(G.map(g=>[g[0],g[4]]));
+const GL={meat:'mammal meat or fat',gel:'gelatin (mammal collagen)',tissue:'mammal tissue or bone',hidden:'animal source not named',cyst:'animal-derived amino acid',enz:'animal enzymes or rennet',gly:'glycerin or glycerides',stear:'fatty acids or stearates',flav:'source not disclosed',lan:'sheep wool derived',cheese:'cheese or whey (rennet)',dairy:'dairy',cust:'on your list'};
+const EX=/\b(?:vegetable|plant[- ]based|vegan|palm|soy|sunflower|canola)\s+(?:glycerin\w*|glycerol|shortening|stearic acid|(?:mono-? ?(?:and|&)? ?)?(?:di|mono)glycerides|(?:magnesium|calcium) stearate)|\b(?:cocoa|shea|peanut|almond|nut|apple|coconut)\s+butter|\b(?:coconut|almond|oat|soy|rice|cashew)\s+(?:milk|cream|yogh?urt)|cream of tartar|meat[- ]?(?:free|less|alternatives?)|plant[- ]based meat|kidney beans?|(?:cod|fish|chicken|turkey|duck|goose)\s+liver/gi;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const LBL={a:'Do not eat',c:'Avoid',o:'Likely OK',u:"Can't tell"};
-const MSG={a:'Contains mammal-derived ingredients. Do not eat this.',c:'Contains ingredients that may be animal-derived. Avoid unless the source is confirmed.',o:'No mammal-derived ingredients found in the listed ingredients.',u:'No ingredient list available for this product.'};
+const MSG={a:'Contains red-flagged ingredients. Do not eat this.',c:'Contains yellow-flagged ingredients that may be animal-derived. Avoid unless the source is confirmed.',o:'No mammal-derived ingredients found in the listed ingredients.',u:'No ingredient list available for this product.'};
 const note=t=>{$('#result').innerHTML='<p class="empty">'+t+'</p>'};
 function toast(t){const e=$('#toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,3500)}
 function analyze(text){
@@ -89,32 +107,41 @@ function analyze(text){
  const masked=text.replace(EX,m=>'\u0001'.repeat(m.length));
  const cl=s=>s.split(',').map(x=>x.trim()).filter(Boolean).map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
  const sets=[],ca=cl(cfg.avoid),cc=cl(cfg.caution);
- if(ca)sets.push(['r',ca,1]);if(cc)sets.push(['m',cc,1]);T.forEach(x=>sets.push([...x,0]));
+ if(ca)sets.push({g:'cust',k:'r',src:ca,custom:1});if(cc)sets.push({g:'cust',k:'m',src:cc,custom:1});
+ G.forEach(([g,base,src,key])=>{const sens=!!(key&&cfg.sens[key]),k=sens?'r':base;if(k)sets.push({g,k,src,key,sens})});
  let hits=[];
- sets.forEach(([c,src,custom],pri)=>{
-  if(c=='d'&&!cfg.dairy)return;const k=c=='d'?'m':(c=='m'&&cfg.strict&&!custom?'r':c);
-  const re=new RegExp('(^|[^\\p{L}\\p{N}])('+src+')(?![\\p{L}\\p{N}])','giu');let m;
-  while((m=re.exec(masked))){const s0=m.index+m[1].length;hits.push({s:s0,e:s0+m[2].length,k,pri,custom,t:m[2].toLowerCase()})}});
+ sets.forEach((S,pri)=>{const re=new RegExp('(^|[^\\p{L}\\p{N}])('+S.src+')(?![\\p{L}\\p{N}])','giu');let m;
+  while((m=re.exec(masked))){const s0=m.index+m[1].length;hits.push({...S,pri,s:s0,e:s0+m[2].length,t:m[2].toLowerCase()})}});
  hits.sort((a,b)=>a.s-b.s||a.pri-b.pri);let end=-1;hits=hits.filter(h=>h.s>=end&&(end=h.e,true));
  const bad=hits.filter(h=>h.k=='r').length,maybe=hits.length-bad,v=bad?'a':maybe?'c':'o';
  const meter=bad?Math.min(100,80+bad*5):maybe?Math.min(70,35+maybe*8):8;
- let html='',p=0;hits.forEach(h=>{html+=esc(text.slice(p,h.s))+'<mark class="'+h.k+'">'+esc(text.slice(h.s,h.e))+'</mark>';p=h.e});html+=esc(text.slice(p));
+ let html='',p=0;hits.forEach((h,i)=>{html+=esc(text.slice(p,h.s))+'<mark class="'+h.k+'" data-i="'+i+'" tabindex="0" role="button">'+esc(text.slice(h.s,h.e))+'</mark>';p=h.e});html+=esc(text.slice(p));
  return{v,hits,html,meter};
 }
 function rating(it){const a=analyze(it.text),o=ovr[it.code];if(o){a.v=o;a.meter=o=='a'?100:8;a.over=1}return a}
 const badge=v=>'<span class="badge v-'+v+'">'+LBL[v]+'</span>';
 function render(){
- if(!cur)return;const a=rating(cur),isFav=favs.some(f=>f.code==cur.code),man=String(cur.code).startsWith('manual');
- const seen={},rs=a.hits.filter(h=>!seen[h.t]&&(seen[h.t]=1)).map(h=>'<li><mark class="'+h.k+'">'+esc(h.t)+'</mark> '+esc(why(h))+'</li>').join('');
+ if(!cur)return;const a=rating(cur),isFav=favs.some(f=>f.code==cur.code),man=String(cur.code).startsWith('manual');LA=a;
+ const seen={},rs=a.hits.map((h,i)=>[h,i]).filter(([h])=>!seen[h.t]&&(seen[h.t]=1)).map(([h,i])=>'<li><mark class="'+h.k+'" data-i="'+i+'" tabindex="0" role="button">'+esc(h.t)+'</mark> '+esc(GL[h.g])+'</li>').join('');
+ const nr=a.hits.filter(h=>h.k=='r').length;
  $('#result').innerHTML='<div class="res"><div class="top">'+(cur.img?'<img src="'+esc(cur.img)+'" alt="">':'')+'<div><b>'+esc(cur.name)+'</b><span>'+esc(cur.brand)+'</span></div></div>'+
  '<div class="verdict v-'+a.v+'"><h2>'+LBL[a.v]+'</h2><p>'+(a.over?'You set this rating yourself. Highlights below are unchanged.':MSG[a.v])+'</p><div class="meter" role="img" aria-label="Restriction level '+a.meter+' of 100"><i style="width:'+a.meter+'%"></i></div></div>'+
- '<div class="body"><h3>Ingredients</h3>'+(a.html?'<p class="ing">'+a.html+'</p><p class="legend"><b>'+(a.hits.length?a.hits.filter(h=>h.k=="r").length+' red, '+a.hits.filter(h=>h.k=="m").length+' yellow':'Nothing flagged')+'.</b> &nbsp; <mark class="r">Red</mark> do not eat &nbsp; <mark class="m">Yellow</mark> avoid</p>':'<p class="ing">No ingredient list found. Paste one above to check it.</p>')+(rs?'<ul class="reasons">'+rs+'</ul>':'')+
+ '<div class="body"><h3>Ingredients</h3>'+(a.html?'<p class="ing">'+a.html+'</p><p class="legend"><b>'+(a.hits.length?nr+' red, '+(a.hits.length-nr)+' yellow':'Nothing flagged')+'.</b> '+(a.hits.length?'Tap a highlight to see why. ':'')+'<mark class="r">Red</mark> do not eat &nbsp; <mark class="m">Yellow</mark> avoid</p><div id="why" class="why" hidden></div>':'<p class="ing">No ingredient list found. Paste one above to check it.</p>')+(rs?'<ul class="reasons">'+rs+'</ul>':'')+
  '<button class="fav'+(isFav?' on':'')+'" id="fv">'+(isFav?'★ In favorites':'☆ Add to favorites')+'</button>'+
  '<details><summary>Rating wrong?</summary><div class="links"><button data-o="o">Mark safe</button><button data-o="a">Mark do not eat</button><button data-o="x">Reset</button></div>'+(man?'':'<div class="links"><a href="https://world.openfoodfacts.org/cgi/product.pl?type=edit&amp;code='+esc(cur.code)+'" target="_blank" rel="noopener">Fix the ingredients on Open Food Facts</a></div>')+'</details></div></div>';
  $('#fv').onclick=()=>{if(isFav)favs=favs.filter(f=>f.code!=cur.code);else favs.unshift({...cur});ls.set('gg_favs',favs);render();lists()};
  $('#result').scrollIntoView({behavior:'smooth',block:'start'});
 }
-$('#result').onclick=e=>{const b=e.target.closest('[data-o]');if(!b||!cur)return;if(b.dataset.o=='x')delete ovr[cur.code];else ovr[cur.code]=b.dataset.o;ls.set('gg_ovr',ovr);render();lists()};
+function showWhy(i){
+ const h=LA&&LA.hits[i],w=$('#why');if(!h||!w)return;const red=h.k=='r';
+ const status=red?(h.sens?'You marked “'+SENS[h.key]+'” as a sensitivity, so it is flagged red: do not eat.':h.custom?'This is on your always-red list: do not eat.':'Red means do not eat. This is a mammal-derived ingredient.'):(h.custom?'This is on your always-yellow list: avoid.':'Yellow means avoid. It may be made from, or processed with, mammal products, and the label does not say. Contact the maker, or look for a version labeled vegan or plant-based.');
+ const tip=!red&&h.key?'<p>If you react to this, turn it on under My settings to flag it red.</p>':'';
+ w.className='why '+h.k;w.innerHTML='<b>'+esc(h.t)+'</b> <span>'+(red?'Red · Do not eat':'Yellow · Avoid')+'</span><p>'+esc(h.custom?'Added by you.':GR[h.g])+'</p><p>'+esc(status)+'</p>'+tip;w.hidden=false;
+ w.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+$('#result').onclick=e=>{const mk=e.target.closest('mark[data-i]');if(mk){showWhy(+mk.dataset.i);return}
+ const b=e.target.closest('[data-o]');if(!b||!cur)return;if(b.dataset.o=='x')delete ovr[cur.code];else ovr[cur.code]=b.dataset.o;ls.set('gg_ovr',ovr);render();lists()};
+$('#result').onkeydown=e=>{if((e.key=='Enter'||e.key==' ')&&e.target.matches('mark[data-i]')){e.preventDefault();showWhy(+e.target.dataset.i)}};
 function items(arr,fav,empty){return arr.length?arr.map((f,i)=>'<div class="item" data-i="'+i+'" tabindex="0">'+(f.img?'<img src="'+esc(f.img)+'" alt="">':'')+'<div><b>'+esc(f.name)+'</b><span style="color:var(--mut);font-size:14px">'+esc(f.brand)+'</span></div>'+badge(rating(f).v)+(fav?'<button class="x" data-x="'+i+'" aria-label="Remove '+esc(f.name)+'">×</button>':'')+'</div>').join(''):'<p class="empty">'+empty+'</p>'}
 function lists(){
  $('#fc').textContent=favs.length?'('+favs.length+')':'';
@@ -135,7 +162,7 @@ $('#t1').onclick=()=>tab(1);$('#t2').onclick=()=>{stopScan();tab(2);lists()};$('
 async function lookup(code){
  code=(code||'').replace(/\D/g,'');if(!code)return;
  note('Scanned <b>'+code+'</b>. Searching the database…');$('#result').scrollIntoView({behavior:'smooth',block:'start'});
- const tries=[code];if(code.length==12)tries.push('0'+code);if(code.length==13&&code[0]=='0')tries.push(code.slice(1));
+ const tries=[code];if(code.length==14&&code[0]=='0')tries.unshift(code.slice(1));if(code.length==12)tries.push('0'+code);if(code.length==13&&code[0]=='0')tries.push(code.slice(1));
  let failed=false;
  for(const c of tries){
   try{const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),12000);
@@ -150,37 +177,60 @@ async function lookup(code){
 $('#go').onclick=()=>lookup($('#code').value);$('#code').onkeydown=e=>{if(e.key=='Enter')lookup(e.target.value)};
 $('#ps').onclick=()=>{$('#pn').value='Sample gummies';$('#pt').value='Sugar, glucose syrup, beef gelatin, glycerin, natural flavors, citric acid, milk';$('#pa').click()};
 $('#pa').onclick=()=>{const t=$('#pt').value;if(t.trim().length<3)return;cur={code:'manual-'+Date.now(),name:$('#pn').value.trim()||'Pasted ingredients',brand:'',img:'',text:t};render()};
-$('#cs').checked=cfg.strict;$('#cd').checked=cfg.dairy;$('#ca').value=cfg.avoid;$('#cc').value=cfg.caution;
-['#cs','#cd','#ca','#cc'].forEach(s=>$(s).onchange=()=>{cfg={strict:$('#cs').checked,dairy:$('#cd').checked,avoid:$('#ca').value,caution:$('#cc').value};ls.set('gg_cfg',cfg);render();lists()});
-let busy=false;
-function found(code){if(busy)return;busy=true;setTimeout(()=>busy=false,2500);navigator.vibrate&&navigator.vibrate(80);stopScan();$('#code').value=code;lookup(code)}
-function stopScan(){clearInterval(timer);if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}if(h5){const x=h5;h5=null;x.stop().then(()=>x.clear()).catch(()=>{})}$('#cam').className='cam off';$('#scan').textContent=window.Android?'Scan barcode':'Start camera'}
+$('#sens').innerHTML=Object.entries(SENS).map(([k,l])=>'<label><input type="checkbox" data-s="'+k+'"'+(cfg.sens[k]?' checked':'')+'> '+esc(l)+'</label>').join('');
+$('#ca').value=cfg.avoid;$('#cc').value=cfg.caution;
+const saveCfg=()=>{cfg.sens={};document.querySelectorAll('#sens input').forEach(i=>{if(i.checked)cfg.sens[i.dataset.s]=true});cfg.avoid=$('#ca').value;cfg.caution=$('#cc').value;ls.set('gg_cfg',cfg);render();lists()};
+$('#sens').onchange=saveCfg;$('#ca').onchange=$('#cc').onchange=saveCfg;
+$('#cl').onclick=()=>{$('#code').value='';$('#result').innerHTML='';$('#code').focus()};
+// ---- scanning: barcodes and QR codes, nearest-to-center first ----
+const FM=['qr_code','ean_13','ean_8','upc_a','upc_e','code_128','code_39'];
+let busy=false,track=null,scanning=false;
+function extractCode(v){v=String(v||'').trim();if(/^\d{8,14}$/.test(v))return v;const m=v.match(/(?:\/01\/|[?&]gtin=)(\d{8,14})\b/i)||v.match(/(?:^|\D)(\d{12,14})(?:\D|$)/);return m?m[1]:''}
+function found(value){
+ const code=extractCode(value);
+ if(!code){if(!found.t||Date.now()-found.t>3000){found.t=Date.now();toast('Read “'+String(value).slice(0,50)+'”, but it has no product barcode number')}return}
+ if(busy)return;busy=true;setTimeout(()=>busy=false,2500);navigator.vibrate&&navigator.vibrate(80);stopScan();$('#code').value=code;lookup(code)}
+const dist=(c,w,h)=>{const b=c.boundingBox||{x:0,y:0,width:0,height:0};return Math.hypot(b.x+b.width/2-w/2,b.y+b.height/2-h/2)};
+async function best(det,src,w,h){const r=await det.detect(src);if(!r.length)return'';r.sort((a,b)=>dist(a,w,h)-dist(b,w,h));return(r.find(c=>extractCode(c.rawValue))||r[0]).rawValue}
+function stopScan(){clearInterval(timer);if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}track=null;$('#zm').hidden=true;if(h5){const x=h5;h5=null;x.stop().then(()=>x.clear()).catch(()=>{})}$('#cam').className='cam off';$('#scan').textContent=window.Android?'Scan barcode':'Start camera'}
 function loadH5(){return h5p||(h5p=window.Html5Qrcode?Promise.resolve():new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js';s.onload=ok;s.onerror=()=>{h5p=null;no(new Error('scanner library failed to load; check your connection'))};document.head.appendChild(s)}))}
 async function startWeb(){
  if($('#cam').className=='cam'){stopScan();return}
  if(!window.isSecureContext||!navigator.mediaDevices){note('The camera only works on a secure (https) page. Use “Photo of barcode” or type the digits.');return}
- $('#cam').className='cam';$('#scan').textContent='Stop camera';toast('Point the camera at a barcode. It searches automatically.');
+ $('#cam').className='cam';$('#scan').textContent='Stop camera';toast('Point the camera at a barcode or QR code. It searches automatically.');
  try{
-  let native=false;
-  if('BarcodeDetector' in window){try{const f=await BarcodeDetector.getSupportedFormats();native=f.includes('ean_13')&&f.includes('upc_a')}catch(e){}}
-  if(native){
-   stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720},advanced:[{focusMode:'continuous'}]}});const v=$('#vid');v.hidden=false;v.srcObject=stream;await v.play();
-   const det=new BarcodeDetector({formats:['ean_13','ean_8','upc_a','upc_e']});
-   timer=setInterval(async()=>{try{const c=await det.detect(v);if(c.length)found(c[0].rawValue)}catch(e){}},250);
+  let sup=[];if('BarcodeDetector' in window){try{sup=await BarcodeDetector.getSupportedFormats()}catch(e){}}
+  const vc={facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080},advanced:[{focusMode:'continuous'}]};
+  if(sup.includes('ean_13')&&sup.includes('upc_a')){
+   stream=await navigator.mediaDevices.getUserMedia({video:vc});const v=$('#vid');v.hidden=false;v.srcObject=stream;await v.play();
+   track=stream.getVideoTracks()[0];const caps=track.getCapabilities?track.getCapabilities():{},zm=$('#zm');let zc=0,zmin=0,zmax=0;
+   if(caps.zoom){zmin=zc=caps.zoom.min;zmax=caps.zoom.max;zm.min=zmin;zm.max=zmax;zm.step=caps.zoom.step||0.1;zm.value=zc;zm.hidden=false;
+    zm.oninput=()=>{zc=+zm.value;track.applyConstraints({advanced:[{zoom:zc}]}).catch(()=>{})}}
+   const det=new BarcodeDetector({formats:FM.filter(f=>sup.includes(f))}),cv=document.createElement('canvas'),cx=cv.getContext('2d');let tick=0,last=Date.now();
+   timer=setInterval(async()=>{
+    if(scanning||!v.videoWidth)return;scanning=true;
+    try{
+     const vw=v.videoWidth,vh=v.videoHeight;let val=await best(det,v,vw,vh);
+     if(!val&&tick++%2==0){for(const f of [.5,.3]){const cw=vw*f,ch=vh*f,sc=Math.min(4,1400/cw);cv.width=cw*sc;cv.height=ch*sc;cx.drawImage(v,(vw-cw)/2,(vh-ch)/2,cw,ch,0,0,cv.width,cv.height);val=await best(det,cv,cv.width,cv.height);if(val)break}}
+     if(val){last=Date.now();found(val)}
+     else if(caps.zoom&&Date.now()-last>2500){last=Date.now();zc+=(zmax-zmin)/5;if(zc>zmin+(zmax-zmin)*.7)zc=zmin;zm.value=zc;track&&track.applyConstraints({advanced:[{zoom:zc}]}).catch(()=>{})}
+    }catch(e){}finally{scanning=false}
+   },160);
   }else{
    await loadH5();$('#vid').hidden=true;const F=Html5QrcodeSupportedFormats;
-   h5=new Html5Qrcode('reader',{formatsToSupport:[F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E],experimentalFeatures:{useBarCodeDetectorIfSupported:true},verbose:false});
-   await h5.start({facingMode:'environment'},{fps:10,qrbox:{width:280,height:150}},found,()=>{});
+   h5=new Html5Qrcode('reader',{formatsToSupport:[F.QR_CODE,F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.CODE_128,F.CODE_39],experimentalFeatures:{useBarCodeDetectorIfSupported:true},verbose:false});
+   try{await h5.start({facingMode:'environment'},{fps:12,videoConstraints:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080},advanced:[{focusMode:'continuous'}]}},t=>found(t),()=>{})}
+   catch(e1){await h5.start({facingMode:'environment'},{fps:12},t=>found(t),()=>{})}
   }
  }catch(e){stopScan();const n=e&&e.name;note(n=='NotAllowedError'||/denied|permission/i.test(String(e))?'Camera permission was blocked. Allow camera access for this app or site in your settings, then try again.':n=='NotFoundError'?'No camera found on this device.':'Camera couldn’t start ('+(e&&e.message||n)+'). Try “Photo of barcode” or type the digits.')}
 }
 $('#scan').onclick=()=>window.Android?Android.scan():startWeb();
-window.onNativeScan=c=>{$('#code').value=c;lookup(c)};
+window.onNativeScan=c=>found(c);
 window.onNativeScanError=m=>{toast('Built-in scanner unavailable'+(m?' ('+m+')':'')+', switching to the camera view');startWeb()};
 $('#ph').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
- try{if('BarcodeDetector' in window){const c=await new BarcodeDetector().detect(await createImageBitmap(f));if(c.length){found(c[0].rawValue);return}}
+ try{if('BarcodeDetector' in window){const sup=await BarcodeDetector.getSupportedFormats(),det=new BarcodeDetector({formats:FM.filter(x=>sup.includes(x))}),bm=await createImageBitmap(f),val=await best(det,bm,bm.width,bm.height);if(val){found(val);return}}
   await loadH5();found(await new Html5Qrcode('reader').scanFile(f,false))}
- catch(x){note('No barcode found in that photo. Hold the camera closer, keep the lines flat and sharp, and try again.')}};
+ catch(x){note('No barcode or QR code found in that photo. Hold the camera closer, keep the lines flat and sharp, and try again.')}};
 if(window.Android){$('#phl').hidden=true;$('#scan').textContent='Scan barcode'}
 lists();
 </script>

@@ -1,42 +1,25 @@
 🍖 I want to be 100% transparent and let everyone know that this project is 100% vibe-coded. I'm just a man with an idea. I do not know how to code. AI did all of the work. 🍖
 
+This app has an HTML web version, an Android, and an Apple version. I do not own an apple device so if there's issues then I apologize, but you'll just have to use the web app.
 
-
-Here's the public HTML for the app. https://pixeledberry.github.io/GalGuard/ You can install the web version of the app by:
-
-
+Here's the public HTML for the app. https://pixeledberry.github.io/GalGuard/ Either just leave the page open in your browser or you can install the web version of the app by:
 
 Go to the app webpage then:
 
+**On iPhone or iPad (Safari)**
 
+1. Tap the Share button (the square with an upward arrow).
+2. Scroll down and tap Add to Home Screen (if you do not see it, scroll to the bottom, tap Edit Actions, and add it).
+3. Rename the app if desired, turn on Open as Web App, and tap Add.
 
-On iPhone or iPad (Safari)
+**On Android (Google Chrome, Firefox, Brave)**
 
+1. Tap the More menu (three dots) on the right side of the address bar.
+2. Select Install and create shortcut or Add to Home screen, then tap Install
 
+Otherwise if you want a standalone app instead of the web version, you can install the android or apple version of the app from the available packages.
 
-1\. Tap the Share button (the square with an upward arrow).
-
-2\. Scroll down and tap Add to Home Screen (if you do not see it, scroll to the bottom, tap Edit Actions, and add it).
-
-3\. Rename the app if desired, turn on Open as Web App, and tap Add.
-
-
-
-On Android (Google Chrome, Firefox, Brave)
-
-
-
-1\. Tap the More menu (three dots) on the right side of the address bar.
-
-2\. Select Install and create shortcut or Add to Home screen, then tap Install
-
-
-
-Otherwise you can install the android or apple version of the app if you want a standalone app instead of the web version.
-
-
-
-
+---
 
 # GalGuard
 
@@ -44,64 +27,71 @@ A barcode scanner that checks food ingredients for people with **alpha-gal syndr
 
 It runs as a single static web page (`index.html`, no build step, no backend) and also ships as an Android wrapper app.
 
-> \*\*Disclaimer:\*\* GalGuard is a screening aid, not medical advice. Ingredient data is crowdsourced and can be missing or wrong, and some ingredients (such as "natural flavors") never reveal their source. Always read the label and follow your allergist's guidance.
+> **Disclaimer:** GalGuard is a screening aid, not medical advice. Ingredient data is crowdsourced and can be missing or wrong, and some ingredients (such as "natural flavors") never reveal their source. Always read the label and follow your allergist's guidance.
 
-\---
+---
 
 ## Changelog
 
-### v1.8 (latest)
+### v2.0 (latest)
+- **Export Settings and Import Settings** buttons under "My settings". Back up your settings, favorites, history, and rating overrides, then restore them on a new device from a file or pasted text. Importing adds to the favorites and history already on the device and replaces the sensitivity settings.
+- **Ingredients that start with "vegan" are no longer flagged** (for example, "Vegan Pepperoni").
+- **Android app fixes:** restored the app's build file (`app/build.gradle.kts`), which was empty in the Android zips from v1.2 through v1.9 and stopped the project from syncing or building. The share sheet now also works for exporting favorites and backups.
+- **Public README:** now opens with a new disclaimer and install instructions, and the changelog shows only the last 10 versions.
 
-* **New app icon:** a shield with an ornate silver "G". Used as the Android adaptive launcher icon, the web favicon, the home-screen icon on iPhone and Android, and a logo in the page header. A 512 px version is included for store listings.
-* Added a web app manifest and icons so "Add to Home screen" installs the page with the new icon.
-* README is now split into a public version (`README.md`) and a private version (`README-private.md`).
+### v1.9
+- **Works on Apple devices.** The web page is tuned for iPhone and iPad: "Add to Home Screen" settings, iOS-style form controls, text sizing, and the scanner library now preloads so the first scan starts faster.
+- **New iOS app project** (`GalGuardiOS`) alongside the web page and Android app. It uses Apple's built-in scanner for barcodes and QR codes, with pinch-to-zoom and nearest-to-center selection.
+- **Cloud build workflows** that build the Android APK and an unsigned iOS IPA on GitHub, so you don't need Android Studio or a Mac.
+- Added `apple-touch-icon.png`, the file iPhones use for the home-screen icon.
+- README now opens with a transparency statement.
+
+### v1.8
+- **New app icon:** a shield with an ornate silver "G". Used as the Android adaptive launcher icon, the web favicon, the home-screen icon on iPhone and Android, and a logo in the page header. A 512 px version is included for store listings.
+- Added a web app manifest and icons so "Add to Home screen" installs the page with the new icon.
+- README is now split into a public version (`README.md`) and a private version (`README-private.md`).
 
 ### Earlier versions
-
-* **v1.7:** Dairy is now yellow by default and red when you check it in settings, like the other sensitivities.
-* **v1.6:** Clear button for the barcode field; sensitivity settings that turn items red; mammal by-products and hidden animal-derived ingredients flagged yellow; tap any flagged ingredient for the reason; QR code scanning; longer-range scanning with zoom; the code nearest the center of the frame is read first.
-* **v1.5:** Fixed highlighting not appearing in some browsers and a lookup problem; added a "Try a sample" button and a version label in the footer.
-* **v1.4:** Fixed words wrapped in underscores not being matched; added French, Spanish, German, and Italian terms; builds an ingredient list from database tags when no text exists; added flag counts.
-* **v1.3:** Visible "searching" status after a scan, retries for barcode format variants, request timeout, clearer error messages.
-* **v1.2:** Red now reads "Do not eat" and yellow "Avoid"; stopped duplicate scans; higher-resolution autofocus camera.
-* **v1.1:** Ingredients shown immediately; scan history; custom flag lists; export favorites; rating overrides; camera fallback.
-* **v1.0:** First release: barcode lookup, rating, and favorites.
-
-\---
+- **v1.7:** Dairy is now yellow by default and red when you check it in settings, like the other sensitivities.
+- **v1.6:** Clear button for the barcode field; sensitivity settings that turn items red; mammal by-products and hidden animal-derived ingredients flagged yellow; tap any flagged ingredient for the reason; QR code scanning; longer-range scanning with zoom; the code nearest the center of the frame is read first.
+- **v1.5:** Fixed highlighting not appearing in some browsers and a lookup problem; added a "Try a sample" button and a version label in the footer.
+- **v1.4:** Fixed words wrapped in underscores not being matched; added French, Spanish, German, and Italian terms; builds an ingredient list from database tags when no text exists; added flag counts.
+- **v1.3:** Visible "searching" status after a scan, retries for barcode format variants, request timeout, clearer error messages.
+- **v1.2:** Red now reads "Do not eat" and yellow "Avoid"; stopped duplicate scans; higher-resolution autofocus camera.
+- **v1.1:** Ingredients shown immediately; scan history; custom flag lists; export favorites; rating overrides; camera fallback.
+---
 
 ## Features
 
+Works in modern browsers on iPhone and iPad (Safari), Android, and desktop. On iPhone and iPad the camera uses a built-in scanning library.
+
 ### Looking up products
-
-* **Live camera scanning.** Point the camera at a barcode and it searches automatically as soon as a code is read.
-* **QR codes.** QR codes that contain a product number (including GS1 Digital Link URLs) are looked up automatically. Other QR codes show a short notice and scanning continues.
-* **Supported formats:** EAN-13, EAN-8, UPC-A, UPC-E, Code 128, Code 39, QR.
-* **Built for distance and small codes.**
-
-  * Requests high-resolution video with continuous autofocus.
-  * If nothing is found in the full frame, it re-checks magnified center regions.
-  * Shows a zoom slider on phones that support camera zoom, and gradually auto-zooms when it can't find a code.
-  * When several codes are visible, the one **closest to the center** of the frame wins. Product barcodes are preferred over unrelated QR codes.
-* **Photo of barcode.** Take or choose a photo if the live camera is unavailable.
-* **Type the digits.** Enter a barcode manually, with a **Clear** button to reset the field and result.
-* **Paste an ingredient list.** For products not in the database. A **Try a sample** button runs a made-up list so you can see the highlighting.
-* **Barcode format fallbacks.** If a 12-digit UPC-A isn't found, it retries as 13-digit EAN (and vice versa, plus 14-digit codes with a leading zero).
+- **Live camera scanning.** Point the camera at a barcode and it searches automatically as soon as a code is read.
+- **QR codes.** QR codes that contain a product number (including GS1 Digital Link URLs) are looked up automatically. Other QR codes show a short notice and scanning continues.
+- **Supported formats:** EAN-13, EAN-8, UPC-A, UPC-E, Code 128, Code 39, QR.
+- **Built for distance and small codes.**
+  - Requests high-resolution video with continuous autofocus.
+  - If nothing is found in the full frame, it re-checks magnified center regions.
+  - Shows a zoom slider on phones that support camera zoom, and gradually auto-zooms when it can't find a code.
+  - When several codes are visible, the one **closest to the center** of the frame wins. Product barcodes are preferred over unrelated QR codes.
+- **Photo of barcode.** Take or choose a photo if the live camera is unavailable.
+- **Type the digits.** Enter a barcode manually, with a **Clear** button to reset the field and result.
+- **Paste an ingredient list.** For products not in the database. A **Try a sample** button runs a made-up list so you can see the highlighting.
+- **Barcode format fallbacks.** If a 12-digit UPC-A isn't found, it retries as 13-digit EAN (and vice versa, plus 14-digit codes with a leading zero).
 
 ### Ratings and highlighting
-
 Each product gets one rating and a severity meter:
 
-|Rating|Color|Meaning|
-|-|-|-|
-|**Do not eat**|Red|Contains at least one red-flagged ingredient|
-|**Avoid**|Yellow|No red flags, but contains yellow-flagged ingredients|
-|**Likely OK**|Green|Nothing flagged in the listed ingredients|
-|**Can't tell**|Gray|No ingredient list available|
+| Rating | Color | Meaning |
+|---|---|---|
+| **Do not eat** | Red | Contains at least one red-flagged ingredient |
+| **Avoid** | Yellow | No red flags, but contains yellow-flagged ingredients |
+| **Likely OK** | Green | Nothing flagged in the listed ingredients |
+| **Can't tell** | Gray | No ingredient list available |
 
 The full ingredient list appears immediately after a scan or lookup, with flagged ingredients highlighted inline and a count such as "2 red, 3 yellow".
 
 ### Tap for the reason
-
 Every highlighted ingredient, in the text or in the list beneath it, is tappable (and keyboard accessible). A panel explains why it was flagged, what its color means, and whether it's red because of one of your settings.
 
 ### What gets flagged
@@ -111,74 +101,79 @@ Beef, pork, lamb, mutton, veal, venison, bison, goat, rabbit, horse, ham, bacon,
 
 **Yellow (avoid): mammal by-products and ingredients that may be processed with mammal products**
 
-|Group|Examples|
-|-|-|
-|Gelatin|gelatin, E441|
-|Tissue and bone|collagen, chondroitin, cartilage, bone phosphate (E542), bone char, glucosamine|
-|Unnamed animal sources|"animal fat", "animal protein", hydrolyzed protein, shortening, bouillon, E627/E631/E635|
-|Amino acids|L-cysteine|
-|Enzymes and rennet|rennet, pepsin, pancreatin, lipase, trypsin, "enzymes"|
-|Glycerin and glycerides|glycerin, glycerol, mono- and diglycerides, E422, E470–E479|
-|Fatty acids and stearates|stearic acid, magnesium/calcium/sodium stearate, polysorbates, oleic acid, E481–E495, E570–E572|
-|Flavors|"natural flavors" and translations|
-|Lanolin|lanolin, vitamin D3 / cholecalciferol|
-|Cheese and whey|cheese, whey, casein, curds (often made with animal rennet)|
-|Dairy|milk, butter, cream, yogurt, ghee, lactose|
+| Group | Examples |
+|---|---|
+| Gelatin | gelatin, E441 |
+| Tissue and bone | collagen, chondroitin, cartilage, bone phosphate (E542), bone char, glucosamine |
+| Unnamed animal sources | "animal fat", "animal protein", hydrolyzed protein, shortening, bouillon, E627/E631/E635 |
+| Amino acids | L-cysteine |
+| Enzymes and rennet | rennet, pepsin, pancreatin, lipase, trypsin, "enzymes" |
+| Glycerin and glycerides | glycerin, glycerol, mono- and diglycerides, E422, E470–E479 |
+| Fatty acids and stearates | stearic acid, magnesium/calcium/sodium stearate, polysorbates, oleic acid, E481–E495, E570–E572 |
+| Flavors | "natural flavors" and translations |
+| Lanolin | lanolin, vitamin D3 / cholecalciferol |
+| Cheese and whey | cheese, whey, casein, curds (often made with animal rennet) |
+| Dairy | milk, butter, cream, yogurt, ghee, lactose |
 
-Plant-based look-alikes are **not** flagged: vegetable glycerin, plant-based mono- and diglycerides, coconut/almond/oat milk, cocoa/shea butter, cream of tartar, kidney beans, cod liver, and similar.
+Plant-based look-alikes are **not** flagged: vegetable glycerin, plant-based mono- and diglycerides, coconut/almond/oat milk, cocoa/shea butter, cream of tartar, kidney beans, cod liver, and similar. Any ingredient that starts with the word "vegan" (for example "Vegan Pepperoni") is skipped as well.
 
 ### Personal settings
-
-* **Sensitivities.** Some things affect people with AGS differently. Check any of these to flag them **red** instead of yellow: dairy, gelatin, glycerin and mono/diglycerides, stearic acid and stearates, natural flavors, lanolin and vitamin D3, rennet and animal enzymes. Unchecked, they show as yellow.
-* **Custom lists.** Add your own ingredients to always flag red or always flag yellow (comma separated).
-* **Rating overrides.** On any result, "Rating wrong?" lets you mark a product safe or do-not-eat, or reset it. There's also a link to fix the ingredients on Open Food Facts.
+- **Sensitivities.** Some things affect people with AGS differently. Check any of these to flag them **red** instead of yellow: dairy, gelatin, glycerin and mono/diglycerides, stearic acid and stearates, natural flavors, lanolin and vitamin D3, rennet and animal enzymes. Unchecked, they show as yellow.
+- **Custom lists.** Add your own ingredients to always flag red or always flag yellow (comma separated).
+- **Rating overrides.** On any result, "Rating wrong?" lets you mark a product safe or do-not-eat, or reset it. There's also a link to fix the ingredients on Open Food Facts.
+- **Export Settings / Import Settings.** Two buttons under "My settings" create a backup of your settings, favorites, history, and rating overrides (a small text file) and restore it on another device. You can save or share the backup, copy it, and import it from a file or by pasting the text.
 
 ### Favorites, history, and export
+- **Favorites.** Add products with the star button. They show their current rating and re-rate automatically when you change settings. Tap to reopen, or remove with the **×**.
+- **History.** The last 40 scanned products, with a Clear history button.
+- **Export.** Export favorites as a text list using the device's share sheet, the clipboard, or a downloaded `.txt` file, whichever is available.
 
-* **Favorites.** Add products with the star button. They show their current rating and re-rate automatically when you change settings. Tap to reopen, or remove with the **×**.
-* **History.** The last 40 scanned products, with a Clear history button.
-* **Export.** Export favorites as a text list using the device's share sheet, the clipboard, or a downloaded `.txt` file, whichever is available.
-
-\---
+---
 
 ## How favorites and settings are stored
 
 Everything personal is stored **in the visitor's own browser** using `localStorage`. There is no server, no account, and no cookies.
 
-|Key|Contents|
-|-|-|
-|`gg\_favs`|Favorite products (name, brand, barcode, image link, ingredient text)|
-|`gg\_hist`|Last 40 scanned products|
-|`gg\_ovr`|Your safe / do-not-eat rating overrides|
-|`gg\_cfg`|Sensitivities and custom flag lists|
+| Key | Contents |
+|---|---|
+| `gg_favs` | Favorite products (name, brand, barcode, image link, ingredient text) |
+| `gg_hist` | Last 40 scanned products |
+| `gg_ovr` | Your safe / do-not-eat rating overrides |
+| `gg_cfg` | Sensitivities and custom flag lists |
+
+**Moving to a new device:** tap **Export Settings** (under My settings) on the old device to create a backup, then **Import Settings** on the new one. Importing adds the backup's favorites and history to anything already there and replaces the sensitivity settings.
 
 What this means in practice:
-
-* **Each visitor has their own data.** Two people opening the same GitHub Pages link each get a separate, private list. GitHub never sees it.
-* **Per browser and device.** Favorites on a phone won't appear on a laptop, or in a different browser on the same phone.
-* **Shared browsers share data.** Two people using the same browser profile would see the same list.
-* **Clearing site data or using a private tab deletes it.** iPhone Safari may also remove site data after about a week of not visiting; adding the page to the Home Screen helps.
-* **Why not cookies?** Cookies hold about 4 KB and are sent with every request. `localStorage` holds around 5 MB, stays on the device, and doesn't expire.
+- **Each visitor has their own data.** Two people opening the same GitHub Pages link each get a separate, private list. GitHub never sees it.
+- **Per browser and device.** Favorites on a phone won't appear on a laptop, or in a different browser on the same phone.
+- **Shared browsers share data.** Two people using the same browser profile would see the same list.
+- **Clearing site data or using a private tab deletes it.** iPhone Safari may also remove site data after about a week of not visiting; adding the page to the Home Screen helps.
+- **Why not cookies?** Cookies hold about 4 KB and are sent with every request. `localStorage` holds around 5 MB, stays on the device, and doesn't expire.
 
 The Android app uses the same storage inside its built-in WebView, so favorites live on that phone and are separate from the web version.
 
-\---
+---
 
 ## Privacy and data sources
 
-* Product data comes from [Open Food Facts](https://world.openfoodfacts.org) (open database, licensed under the ODbL). The only information sent over the network is the barcode number you look up.
-* On browsers without a built-in barcode detector (for example iPhone Safari), the page loads the open-source `html5-qrcode` library from cdnjs the first time you use the camera.
-* No analytics, tracking, accounts, or advertising.
+- Product data comes from [Open Food Facts](https://world.openfoodfacts.org) (open database, licensed under the ODbL). The only information sent over the network is the barcode number you look up.
+- On browsers without a built-in barcode detector (for example iPhone Safari), the page loads the open-source `html5-qrcode` library from cdnjs the first time you use the camera.
+- No analytics, tracking, accounts, or advertising.
 
-\---
+---
 
 ## Project structure
 
 ```
 index.html                  The entire web app (HTML, CSS, JavaScript)
 manifest.webmanifest        Optional: lets "Add to Home screen" install it as an app
+apple-touch-icon.png        Optional: home screen icon on iPhone and iPad
 icon-192.png, icon-512.png  Optional: app icons for the manifest
 galguard-icon.svg           Source artwork for the icon
+.github/workflows/         build-android.yml and build-ios.yml (optional cloud builds)
+GalGuardiOS/
+  project.yml               XcodeGen project definition
+  GalGuard/                 Swift source, bundled page, and app icon
 GalGuardAndroid/
   app/src/main/
     AndroidManifest.xml
@@ -190,14 +185,12 @@ GalGuardAndroid/
 ```
 
 ## Known limitations
-
-* Ingredient data depends on Open Food Facts; products missing from it need a pasted ingredient list.
-* Hidden sources can't be detected from a label (for example sugar refined with bone char, or an unnamed "natural flavor"). GalGuard flags the ingredient names it can see.
-* Camera range depends on the phone's camera. Browsers without a built-in barcode detector use a library fallback that scans the whole frame and can't prefer the center code.
-* Favorites and settings don't sync between devices.
-* The Android project has not been published to the Play Store; it builds as a debug APK.
+- Ingredient data depends on Open Food Facts; products missing from it need a pasted ingredient list.
+- Hidden sources can't be detected from a label (for example sugar refined with bone char, or an unnamed "natural flavor"). GalGuard flags the ingredient names it can see.
+- Camera range depends on the phone's camera. Browsers without a built-in barcode detector use a library fallback that scans the whole frame and can't prefer the center code.
+- On iPhone and iPad, the web page uses the library fallback scanner, which scans the whole frame and doesn't pick the code nearest the center or offer a zoom slider. The iOS app uses Apple's scanner instead.
+- Favorites and settings don't sync automatically between devices; use Export Settings and Import Settings to move them.
+- The Android project has not been published to the Play Store; it builds as a debug APK.
 
 ## Credits
-
 Product data: Open Food Facts contributors. QR/barcode fallback scanning: html5-qrcode. Android scanning: Google ML Kit code scanner.
-

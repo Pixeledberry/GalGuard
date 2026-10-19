@@ -1,0 +1,32 @@
+name: Build iOS app (unsigned)
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "GalGuardiOS/**"
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate the Xcode project
+        working-directory: GalGuardiOS
+        run: xcodegen generate
+      - name: Build (no code signing)
+        working-directory: GalGuardiOS
+        run: |
+          xcodebuild -project GalGuard.xcodeproj -scheme GalGuard -configuration Release \
+            -sdk iphoneos -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
+      - name: Package unsigned IPA
+        working-directory: GalGuardiOS
+        run: |
+          mkdir Payload
+          cp -R build/Build/Products/Release-iphoneos/GalGuard.app Payload/
+          zip -qr GalGuard.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GalGuard-ios-ipa
+          path: GalGuardiOS/GalGuard.ipa

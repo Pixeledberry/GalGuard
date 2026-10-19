@@ -1,6 +1,6 @@
 🚫🍖 I want to be 100% transparent and let everyone know that this project is 100% vibe-coded. I'm just a man with an idea. I do not know how to code. AI did all of the work. 🍖🚫
 
-This app has an HTML web version, an Android, and an Apple version. I do not own an apple device so if there's issues then I apologize, but you'll just have to use the web app.
+This app has an HTML web version, an Android, and an Apple version. $\color{red}{\text{(Apple version needs a sideloading tool to install because the app is not signed. If unable, just use the web app)}}$ I do not own an apple device so if there's issues then I apologize, but you'll just have to use the web app.
 
 Here's the public HTML for the app. https://pixeledberry.github.io/GalGuard/ Either just leave the page open in your browser or you can install the web version of the app by:
 
@@ -17,7 +17,7 @@ Go to the app webpage then:
 1. Tap the More menu (three dots) on the right side of the address bar.
 2. Select Install and create shortcut or Add to Home screen, then tap Install
 
-Otherwise if you want a standalone app instead of the web version, you can install the android or apple version of the app from the available packages.
+Otherwise if you want a standalone app instead of the web version, you can install the android or apple version of the app from the available releases.
 
 ---
 
@@ -33,7 +33,11 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v2.1 (latest)
+### v2.2 (latest)
+- **Automatic releases:** both build workflows now publish a GitHub Release when a build succeeds. The Android APK and the unsigned iOS IPA are attached to a release named after the app version (for example, v2.2), so anyone can download them from the Releases page without signing in. The files are still saved as workflow Artifacts too.
+- **README wording:** the public README now points people to "available releases", and the Apple note about needing a sideloading tool is shown in red.
+
+### v2.1
 - **"Meatless" prefix:** an ingredient that starts with "meatless" is no longer flagged, the same as "vegan" (for example, "Meatless Pepperoni"). The German words "vegane" and "fleischlose" work the same way.
 - **Camera box follows the scan area:** the box on the camera view now starts at its largest size. Each time nothing is found and the app re-checks a smaller or more zoomed-in area, the box shrinks on screen to match exactly what is being checked. After the smallest size, the box returns to full size, and on phones with camera zoom the zoom also steps up.
 - **German ingredient lists:** much fuller German support, including compound words (Schweinefleisch, Rindertalg, Schweineschmalz), gelatin and collagen, rennet and enzymes, glycerin and glycerides, fatty acids and stearates, natural flavors, lanolin, and dairy words. German "plant-based" wording (pflanzlich, vegetabil, mikrobiell) is skipped. The app also reads a product's German ingredient text when that is the only one available.
@@ -63,7 +67,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 - **v1.5:** Fixed highlighting not appearing in some browsers and a lookup problem; added a "Try a sample" button and a version label in the footer.
 - **v1.4:** Fixed words wrapped in underscores not being matched; added French, Spanish, German, and Italian terms; builds an ingredient list from database tags when no text exists; added flag counts.
 - **v1.3:** Visible "searching" status after a scan, retries for barcode format variants, request timeout, clearer error messages.
-- **v1.2:** Red now reads "Do not eat" and yellow "Avoid"; stopped duplicate scans; higher-resolution autofocus camera.
 ---
 
 ## Features

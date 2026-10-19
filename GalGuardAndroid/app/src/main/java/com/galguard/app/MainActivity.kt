@@ -1,0 +1,110 @@
+package com.galguard.app
+
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Bundle
+import android.webkit.JavascriptInterface
+import android.webkit.PermissionRequest
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.webkit.WebViewAssetLoader
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
+import org.json.JSONObject
+
+class MainActivity : Activity() {
+    private lateinit var web: WebView
+    private var pending: PermissionRequest? = null
+    private val host = "appassets.androidplatform.net"
+
+    @SuppressLint("SetJavaScriptEnabled")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        web = WebView(this)
+        setContentView(web)
+
+        // Serves bundled files over https so the page runs in a secure context.
+        val loader = WebViewAssetLoader.Builder()
+            .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
+            .build()
+
+        web.settings.javaScriptEnabled = true
+        web.settings.domStorageEnabled = true // favorites, history and settings are saved here
+        web.webViewClient = object : WebViewClient() {
+            override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? =
+                loader.shouldInterceptRequest(request.url)
+
+            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                if (request.url.host == host) return false
+                startActivity(Intent(Intent.ACTION_VIEW, request.url)) // external links open in the browser
+                return true
+            }
+        }
+        // Lets the in-page camera view work if the built-in scanner is unavailable.
+        web.webChromeClient = object : WebChromeClient() {
+            override fun onPermissionRequest(request: PermissionRequest) {
+                runOnUiThread {
+                    if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                        request.grant(request.resources)
+                    } else {
+                        pending = request
+                        requestPermissions(arrayOf(Manifest.permission.CAMERA), 1)
+                    }
+                }
+            }
+        }
+        web.addJavascriptInterface(Bridge(), "Android")
+        web.loadUrl("https://$host/assets/galguard.html")
+    }
+
+    override fun onRequestPermissionsResult(code: Int, perms: Array<out String>, results: IntArray) {
+        val req = pending ?: return
+        pending = null
+        if (results.firstOrNull() == PackageManager.PERMISSION_GRANTED) req.grant(req.resources) else req.deny()
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        if (web.canGoBack()) web.goBack() else super.onBackPressed()
+    }
+
+    inner class Bridge {
+        @JavascriptInterface
+        fun share(text: String) {
+            runOnUiThread {
+                val send = Intent(Intent.ACTION_SEND).apply {
+                    type = "text/plain"
+                    putExtra(Intent.EXTRA_TEXT, text)
+                }
+                startActivity(Intent.createChooser(send, "Share"))
+            }
+        }
+
+        @JavascriptInterface
+        fun scan() {
+            runOnUiThread {
+                val options = GmsBarcodeScannerOptions.Builder()
+                    .setBarcodeFormats(
+                        Barcode.FORMAT_EAN_13, Barcode.FORMAT_EAN_8,
+                        Barcode.FORMAT_UPC_A, Barcode.FORMAT_UPC_E,
+                        Barcode.FORMAT_QR_CODE, Barcode.FORMAT_CODE_128, Barcode.FORMAT_CODE_39
+                    ).enableAutoZoom().build()
+                GmsBarcodeScanning.getClient(this@MainActivity, options).startScan()
+                    .addOnSuccessListener { code ->
+                        val value = code.rawValue ?: code.displayValue ?: return@addOnSuccessListener
+                        web.evaluateJavascript("window.onNativeScan(${JSONObject.quote(value)})", null)
+                    }
+                    .addOnFailureListener { e ->
+                        web.evaluateJavascript("window.onNativeScanError && window.onNativeScanError(${JSONObject.quote(e.message ?: "")})", null)
+                    }
+            }
+        }
+    }
+}

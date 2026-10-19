@@ -70,13 +70,13 @@ mark[data-i]{cursor:pointer}mark[data-i]:focus-visible{outline:3px solid var(--i
 <section id="v2" hidden><div id="favs"></div></section>
 <section id="v3" hidden><div id="hist"></div></section>
 </main>
-<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>Web v1.6</footer>
+<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>Web v1.7</footer>
 <div id="toast" hidden></div>
 <script>
 const $=s=>document.querySelector(s);
 const ls={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let favs=ls.get('gg_favs',[]),hist=ls.get('gg_hist',[]),ovr=ls.get('gg_ovr',{}),cfg=(c=>{c=Object.assign({sens:{},avoid:'',caution:''},c);if(c.dairy)c.sens.dairy=true;delete c.dairy;delete c.strict;return c})(ls.get('gg_cfg',{})),LA=null,cur=null,stream=null,timer=null,h5=null,h5p=null;
-// Groups: [id, default color (null = flag only if you marked it), pattern, sensitivity key, reason]
+// Groups: [id, default color, pattern, sensitivity key, reason]. Yellow by default; red when the matching sensitivity is checked.
 // red = mammal-derived (do not eat). yellow = mammal by-product or may be processed with mammal products (avoid).
 const MEAT='beef|pork|lamb|mutton|veal|venison|bison|goat|rabbit|elk|moose|horse|kangaroo|bovine|porcine|ovine|caprine|ham|bacon|sausages?|pepperoni|salami|prosciutto|pancetta|chorizo|bologna|mortadella|hot dogs?|jerky|brisket|steaks?|ribs|liver|kidney|tripe|oxtail|pork rinds?|bone broth|bone marrow|beef extract|meat extract|lard|tallow|tallowate|suet|mammal\\w*|meat|natural casings?|hog casings?|sheep casings?|boeuf|bœuf|porc|agneau|veau|jambon|saindoux|suif|viande|carne|cerdo|puerco|cordero|ternera|jamón|tocino|manteca de cerdo|sebo|rindfleisch|schweinefleisch|schwein|schinken|schmalz|talg|fleisch|manzo|maiale|agnello|strutto';
 const G=[
@@ -91,7 +91,7 @@ const G=[
 ['flav','m','natural (?:and artificial )?flavou?rs?|natural flavou?rings?|arômes? naturels?|aromas? naturales?|natürliche aromen','flavors','The source of natural flavors is not disclosed. They can include meat-derived or other animal-derived ingredients.'],
 ['lan','m','lanolin|cholecalciferol|vitamin d3','lanolin','Lanolin comes from sheep wool, and vitamin D3 is commonly made from it.'],
 ['cheese','m','cheeses?|whey|casein|caseinate|curds?|fromage|queso|käse','dairy','Cheese and whey products are often made with animal rennet taken from calf stomachs.'],
-['dairy',null,'milk|butter|buttermilk|cream|lactose|ghee|yogh?urt|dairy|lait|leche|milch|latte|beurre|mantequilla|crème|sahne|lactosa|suero|petit-lait','dairy','Dairy comes from mammal milk. Some people with AGS react to it and others do not.']];
+['dairy','m','milk|butter|buttermilk|cream|lactose|ghee|yogh?urt|dairy|lait|leche|milch|latte|beurre|mantequilla|crème|sahne|lactosa|suero|petit-lait','dairy','Dairy comes from mammal milk. Some people with AGS react to it and others do not.']];
 const SENS={dairy:'Dairy (milk, butter, cream, cheese, whey, casein)',gelatin:'Gelatin',glycerin:'Glycerin and mono/diglycerides',stearates:'Stearic acid, stearates and fatty-acid emulsifiers',flavors:'Natural flavors',lanolin:'Lanolin and vitamin D3',rennet:'Rennet and animal enzymes'};
 const GR=Object.fromEntries(G.map(g=>[g[0],g[4]]));
 const GL={meat:'mammal meat or fat',gel:'gelatin (mammal collagen)',tissue:'mammal tissue or bone',hidden:'animal source not named',cyst:'animal-derived amino acid',enz:'animal enzymes or rennet',gly:'glycerin or glycerides',stear:'fatty acids or stearates',flav:'source not disclosed',lan:'sheep wool derived',cheese:'cheese or whey (rennet)',dairy:'dairy',cust:'on your list'};
@@ -134,7 +134,7 @@ function render(){
 }
 function showWhy(i){
  const h=LA&&LA.hits[i],w=$('#why');if(!h||!w)return;const red=h.k=='r';
- const status=red?(h.sens?'You marked “'+SENS[h.key]+'” as a sensitivity, so it is flagged red: do not eat.':h.custom?'This is on your always-red list: do not eat.':'Red means do not eat. This is a mammal-derived ingredient.'):(h.custom?'This is on your always-yellow list: avoid.':'Yellow means avoid. It may be made from, or processed with, mammal products, and the label does not say. Contact the maker, or look for a version labeled vegan or plant-based.');
+ const status=red?(h.sens?'You marked “'+SENS[h.key]+'” as a sensitivity, so it is flagged red: do not eat.':h.custom?'This is on your always-red list: do not eat.':'Red means do not eat. This is a mammal-derived ingredient.'):(h.custom?'This is on your always-yellow list: avoid.':h.g=='dairy'?'Yellow means avoid. Dairy comes from mammals, and some people with AGS react to it while others do not.':'Yellow means avoid. It may be made from, or processed with, mammal products, and the label does not say. Contact the maker, or look for a version labeled vegan or plant-based.');
  const tip=!red&&h.key?'<p>If you react to this, turn it on under My settings to flag it red.</p>':'';
  w.className='why '+h.k;w.innerHTML='<b>'+esc(h.t)+'</b> <span>'+(red?'Red · Do not eat':'Yellow · Avoid')+'</span><p>'+esc(h.custom?'Added by you.':GR[h.g])+'</p><p>'+esc(status)+'</p>'+tip;w.hidden=false;
  w.scrollIntoView({behavior:'smooth',block:'nearest'});

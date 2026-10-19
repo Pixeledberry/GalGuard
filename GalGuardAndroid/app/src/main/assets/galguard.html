@@ -56,7 +56,7 @@ details input[type=text]{width:100%;margin:6px 0}
 #toast{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));background:var(--acc);color:var(--accink);padding:10px 14px;border-radius:10px;text-align:center}
 .why{border-left:6px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;margin:0 0 12px;font-size:15px}.why.r{border-color:var(--hr)}.why.m{border-color:var(--hy)}.why p{margin:6px 0 0}.why span{color:var(--mut);font-size:14px}
 mark[data-i]{cursor:pointer}mark[data-i]:focus-visible{outline:3px solid var(--ink)}
-.cam::after{content:"";position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border:2px solid rgba(255,255,255,.75);border-radius:12px;pointer-events:none}
+#sb{position:absolute;left:50%;top:50%;width:100%;height:100%;transform:translate(-50%,-50%);border:3px solid #fff;border-radius:12px;box-shadow:0 0 0 100vmax rgba(0,0,0,.4);pointer-events:none;transition:width .25s ease,height .25s ease;z-index:1}
 #zm{position:absolute;left:12px;right:12px;bottom:10px;width:calc(100% - 24px);z-index:2}
 #sens label{display:block;margin:6px 0}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}button{-webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:transparent}input[type=text],input:not([type]),textarea{-webkit-appearance:none;appearance:none}
@@ -65,7 +65,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}button{-webkit-appearan
 <main>
 <nav><button id="t1" class="on">Scan</button><button id="t3">History</button><button id="t2">Favorites <span id="fc"></span></button></nav>
 <section id="v1">
- <div class="cam off" id="cam"><video id="vid" playsinline muted></video><div id="reader"></div><input type="range" id="zm" hidden aria-label="Zoom"></div>
+ <div class="cam off" id="cam"><video id="vid" playsinline muted></video><div id="reader"></div><div id="sb"></div><input type="range" id="zm" hidden aria-label="Zoom"></div>
  <button class="pri" id="scan">Start camera</button>
  <label class="photo" id="phl">Photo of barcode<input type="file" id="ph" accept="image/*" capture="environment" hidden></label>
  <div class="row"><input id="code" inputmode="numeric" placeholder="Or type the barcode digits" aria-label="Barcode digits"><button id="go">Check</button><button id="cl" aria-label="Clear barcode">Clear</button></div>
@@ -82,7 +82,7 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}button{-webkit-appearan
 <section id="v2" hidden><div id="favs"></div></section>
 <section id="v3" hidden><div id="hist"></div></section>
 </main>
-<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>Web v2.0</footer>
+<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>Web v2.1</footer>
 <div id="toast" hidden></div>
 <script>
 const $=s=>document.querySelector(s);
@@ -104,10 +104,25 @@ const G=[
 ['lan','m','lanolin|cholecalciferol|vitamin d3','lanolin','Lanolin comes from sheep wool, and vitamin D3 is commonly made from it.'],
 ['cheese','m','cheeses?|whey|casein|caseinate|curds?|fromage|queso|käse','dairy','Cheese and whey products are often made with animal rennet taken from calf stomachs.'],
 ['dairy','m','milk|butter|buttermilk|cream|lactose|ghee|yogh?urt|dairy|lait|leche|milch|latte|beurre|mantequilla|crème|sahne|lactosa|suero|petit-lait','dairy','Dairy comes from mammal milk. Some people with AGS react to it and others do not.']];
+// German ingredient words (compound words are listed because German writes them as one word)
+const DEG='(?:rind(?:er)?|schwein(?:e|s)?|lamm|kalb(?:s)?|hammel|ziegen|pferde|hirsch|reh|wild|büffel)';
+const DE={
+meat:'(?:vom|von|aus|mit)\\s+(?:rind|rindern|schwein|schweinen|lamm|kalb)|rinder|schwein|schweine|lamm|lämmer|kalb|hammel|ziege|ziegen|kaninchen|pferd|pferde|hirsch|reh|büffel|speck|schinken|wurst|würste|salami|mettwurst|leberwurst|bratwurst|blutwurst|fleisch|fleischextrakt|fleischbrühe|fleischbruehe|schmalz|schweineschmalz|gänseschmalz|talg|rindertalg|rindsfett|schweinefett|knochenbrühe|knochenbruehe|knochenmark|innereien|leber|niere|herz|zunge|magen|kutteln|naturdarm|saitling|'+DEG+'(?:fleisch|fett|talg|schmalz|brühe|bruehe|extrakt|gelatine|kollagen|protein|eiweiß|eiweiss|knochen|leber|herz|niere|zunge|wurst|schinken|speck|hack|hackfleisch|haut|blut|darm|därme|gulasch|braten|steak|filet|kotelett|schnitzel|sehnen|knorpel|plasma)',
+gel:'speisegelatine|gelatinepulver|gelatinen',
+tissue:'kollagen|kollagenhydrolysat|knorpel|knochen|knochenmehl|knochenkohle|knochenphosphat|chondroitin\\w*|glucosamin|glukosamin',
+hidden:'tierisch(?:e|es|en|er)?\\s+(?:fett|fette|fetten|eiweiß|eiweiss|proteine?|fettsäuren|öl|öle)|hydrolysiert(?:es|e|er)?\\s+(?:tierisch(?:es|e|er)?\\s+)?(?:eiweiß|eiweiss|protein\\w*)|speisefett|speisefette|backfett|ausbackfett|bratfett|schmelzfett|brühwürfel|ribonukleotide|inosinat|guanylat',
+cyst:'cystein|cystin',
+enz:'enzym|pankreatin|pankreasenzyme|labferment|labenzym|lab|tierisches lab',
+gly:'glyzerin|glyzerol|monoglycerid\\w*|diglycerid\\w*|mono-? ?(?:und|u\\.)? ?diglycerid\\w*',
+stear:'stearinsäure|stearinsaeure|magnesiumstearat|calciumstearat|kalziumstearat|natriumstearat|magnesiumsalze (?:der|von) speisefettsäuren|speisefettsäuren?|speisefettsaeuren?|fettsäuren?|fettsäureester|polysorbat\\s*\\d+|ölsäure',
+flav:'natürlich(?:e|es|en)?\\s+aromen?|aromen?\\s+\\(natürlich\\)',
+lan:'wollwachs|wollfett|vitamin-d3',
+cheese:'käse|kaese|schmelzkäse|frischkäse|hartkäse|weichkäse|schnittkäse|reibekäse|käsepulver|molke|molkenpulver|molkenerzeugnis\\w*|molkeneiweiß|molkeneiweiss|molkenprotein\\w*|kasein|kaseinat|quark',
+dairy:'milch|vollmilch|magermilch|trockenmilch|milchpulver|vollmilchpulver|magermilchpulver|milcheiweiß|milcheiweiss|milchprotein\\w*|milchzucker|milchfett|milcherzeugnis\\w*|buttermilch|butterfett|butterreinfett|butterschmalz|sahne|schlagsahne|rahm|joghurt|jogurt|kefir|laktose'};
 const SENS={dairy:'Dairy (milk, butter, cream, cheese, whey, casein)',gelatin:'Gelatin',glycerin:'Glycerin and mono/diglycerides',stearates:'Stearic acid, stearates and fatty-acid emulsifiers',flavors:'Natural flavors',lanolin:'Lanolin and vitamin D3',rennet:'Rennet and animal enzymes'};
 const GR=Object.fromEntries(G.map(g=>[g[0],g[4]]));
 const GL={meat:'mammal meat or fat',gel:'gelatin (mammal collagen)',tissue:'mammal tissue or bone',hidden:'animal source not named',cyst:'animal-derived amino acid',enz:'animal enzymes or rennet',gly:'glycerin or glycerides',stear:'fatty acids or stearates',flav:'source not disclosed',lan:'sheep wool derived',cheese:'cheese or whey (rennet)',dairy:'dairy',cust:'on your list'};
-const EX=/\bvegan\b[^,;()\n]*|\b(?:vegetable|plant[- ]based|vegan|palm|soy|sunflower|canola)\s+(?:glycerin\w*|glycerol|shortening|stearic acid|(?:mono-? ?(?:and|&)? ?)?(?:di|mono)glycerides|(?:magnesium|calcium) stearate)|\b(?:cocoa|shea|peanut|almond|nut|apple|coconut)\s+butter|\b(?:coconut|almond|oat|soy|rice|cashew)\s+(?:milk|cream|yogh?urt)|cream of tartar|meat[- ]?(?:free|less|alternatives?)|plant[- ]based meat|kidney beans?|(?:cod|fish|chicken|turkey|duck|goose)\s+liver/gi;
+const EX=/\b(?:vegan\w*|meatless|fleischlos\w*)\b[^,;()\n]*|\b(?:pflanzlich|vegetabil|mikrobiell)\w*\s+[a-zäöüß-]+|\b(?:vegetable|plant[- ]based|vegan|palm|soy|sunflower|canola)\s+(?:glycerin\w*|glycerol|shortening|stearic acid|(?:mono-? ?(?:and|&)? ?)?(?:di|mono)glycerides|(?:magnesium|calcium) stearate)|\b(?:cocoa|shea|peanut|almond|nut|apple|coconut)\s+butter|\b(?:coconut|almond|oat|soy|rice|cashew)\s+(?:milk|cream|yogh?urt)|cream of tartar|meat[- ]?(?:free|less|alternatives?)|plant[- ]based meat|kidney beans?|(?:cod|fish|chicken|turkey|duck|goose)\s+liver/gi;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const LBL={a:'Do not eat',c:'Avoid',o:'Likely OK',u:"Can't tell"};
 const MSG={a:'Contains red-flagged ingredients. Do not eat this.',c:'Contains yellow-flagged ingredients that may be animal-derived. Avoid unless the source is confirmed.',o:'No mammal-derived ingredients found in the listed ingredients.',u:'No ingredient list available for this product.'};
@@ -120,7 +135,7 @@ function analyze(text){
  const cl=s=>s.split(',').map(x=>x.trim()).filter(Boolean).map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
  const sets=[],ca=cl(cfg.avoid),cc=cl(cfg.caution);
  if(ca)sets.push({g:'cust',k:'r',src:ca,custom:1});if(cc)sets.push({g:'cust',k:'m',src:cc,custom:1});
- G.forEach(([g,base,src,key])=>{const sens=!!(key&&cfg.sens[key]),k=sens?'r':base;if(k)sets.push({g,k,src,key,sens})});
+ G.forEach(([g,base,src,key])=>{const sens=!!(key&&cfg.sens[key]),k=sens?'r':base;if(k)sets.push({g,k,src:DE[g]?src+'|'+DE[g]:src,key,sens})});
  let hits=[];
  sets.forEach((S,pri)=>{const re=new RegExp('(^|[^\\p{L}\\p{N}])('+S.src+')(?![\\p{L}\\p{N}])','giu');let m;
   while((m=re.exec(masked))){const s0=m.index+m[1].length;hits.push({...S,pri,s:s0,e:s0+m[2].length,t:m[2].toLowerCase()})}});
@@ -180,9 +195,9 @@ async function lookup(code){
  let failed=false;
  for(const c of tries){
   try{const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),12000);
-   const r=await fetch('https://world.openfoodfacts.org/api/v2/product/'+c+'.json?fields=product_name,brands,ingredients_text,ingredients_text_en,image_front_small_url,ingredients_tags',{signal:ctl.signal});clearTimeout(to);
+   const r=await fetch('https://world.openfoodfacts.org/api/v2/product/'+c+'.json?fields=product_name,brands,ingredients_text,ingredients_text_en,image_front_small_url,ingredients_text_de,ingredients_tags',{signal:ctl.signal});clearTimeout(to);
    const j=await r.json();
-   if(j.status===1){const p=j.product;cur={code,name:p.product_name||'Unnamed product',brand:p.brands||'',img:p.image_front_small_url||'',text:p.ingredients_text_en||p.ingredients_text||(p.ingredients_tags||[]).map(t=>t.replace(/^[a-z]{2}:/,'').replace(/-/g,' ')).join(', ')};
+   if(j.status===1){const p=j.product;cur={code,name:p.product_name||'Unnamed product',brand:p.brands||'',img:p.image_front_small_url||'',text:p.ingredients_text_en||p.ingredients_text||p.ingredients_text_de||(p.ingredients_tags||[]).map(t=>t.replace(/^[a-z]{2}:/,'').replace(/-/g,' ')).join(', ')};
     hist=[cur,...hist.filter(h=>h.code!=code)].slice(0,40);ls.set('gg_hist',hist);try{lists();render()}catch(e){note('Found <b>'+esc(cur.name)+'</b> but couldn’t display it: '+esc(e.message))}return}
   }catch(e){failed=true}
  }
@@ -234,40 +249,47 @@ let busy=false,track=null,scanning=false;
 function extractCode(v){v=String(v||'').trim();if(/^\d{8,14}$/.test(v))return v;const m=v.match(/(?:\/01\/|[?&]gtin=)(\d{8,14})\b/i)||v.match(/(?:^|\D)(\d{12,14})(?:\D|$)/);return m?m[1]:''}
 function found(value){
  const code=extractCode(value);
- if(!code){if(!found.t||Date.now()-found.t>3000){found.t=Date.now();toast('Read “'+String(value).slice(0,50)+'”, but it has no product barcode number')}return}
- if(busy)return;busy=true;setTimeout(()=>busy=false,2500);navigator.vibrate&&navigator.vibrate(80);stopScan();$('#code').value=code;lookup(code)}
+ if(!code){if(!found.t||Date.now()-found.t>3000){found.t=Date.now();toast('Read “'+String(value).slice(0,50)+'”, but it has no product barcode number')}return false}
+ if(busy)return true;busy=true;setTimeout(()=>busy=false,2500);navigator.vibrate&&navigator.vibrate(80);stopScan();$('#code').value=code;lookup(code);return true}
 const dist=(c,w,h)=>{const b=c.boundingBox||{x:0,y:0,width:0,height:0};return Math.hypot(b.x+b.width/2-w/2,b.y+b.height/2-h/2)};
 async function best(det,src,w,h){const r=await det.detect(src);if(!r.length)return'';r.sort((a,b)=>dist(a,w,h)-dist(b,w,h));return(r.find(c=>extractCode(c.rawValue))||r[0]).rawValue}
-function stopScan(){clearInterval(timer);if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}track=null;$('#zm').hidden=true;if(h5){const x=h5;h5=null;x.stop().then(()=>x.clear()).catch(()=>{})}$('#cam').className='cam off';$('#scan').textContent=window.Android?'Scan barcode':'Start camera'}
+// The box on screen is exactly the part of the picture being checked. It starts at the largest size,
+// shrinks a step each time nothing is found, and returns to full size (after nudging the zoom, where supported).
+const STAGES=[1,.7,.5,.35,.25];
+let stage=0;
+function setBox(f){const b=$('#sb');b.style.width=b.style.height=(f*100)+'%'}
+function stopScan(){clearInterval(timer);if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}track=null;h5=null;$('#zm').hidden=true;$('#cam').className='cam off';$('#scan').textContent=window.Android?'Scan barcode':'Start camera'}
 function loadH5(){return h5p||(h5p=window.Html5Qrcode?Promise.resolve():new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js';s.onload=ok;s.onerror=()=>{h5p=null;no(new Error('scanner library failed to load; check your connection'))};document.head.appendChild(s)}))}
+function region(v,f){const vw=v.videoWidth,vh=v.videoHeight,cw=v.clientWidth||vw,ch=v.clientHeight||vh,k=Math.max(cw/vw,ch/vh),ww=cw/k,wh=ch/k;return{x:(vw-ww*f)/2,y:(vh-wh*f)/2,w:ww*f,h:wh*f}}
 async function startWeb(){
  if($('#cam').className=='cam'){stopScan();return}
  if(!window.isSecureContext||!navigator.mediaDevices){note('The camera only works on a secure (https) page. Use “Photo of barcode” or type the digits.');return}
- $('#cam').className='cam';$('#scan').textContent='Stop camera';toast('Point the camera at a barcode or QR code. It searches automatically.');
+ $('#cam').className='cam';$('#scan').textContent='Stop camera';stage=0;setBox(STAGES[0]);toast('Point the camera at a barcode or QR code. It searches automatically.');
  try{
   let sup=[];if('BarcodeDetector' in window){try{sup=await BarcodeDetector.getSupportedFormats()}catch(e){}}
-  const vc={facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080},advanced:[{focusMode:'continuous'}]};
-  if(sup.includes('ean_13')&&sup.includes('upc_a')){
-   stream=await navigator.mediaDevices.getUserMedia({video:vc});const v=$('#vid');v.hidden=false;v.srcObject=stream;await v.play();
-   track=stream.getVideoTracks()[0];const caps=track.getCapabilities?track.getCapabilities():{},zm=$('#zm');let zc=0,zmin=0,zmax=0;
-   if(caps.zoom){zmin=zc=caps.zoom.min;zmax=caps.zoom.max;zm.min=zmin;zm.max=zmax;zm.step=caps.zoom.step||0.1;zm.value=zc;zm.hidden=false;
-    zm.oninput=()=>{zc=+zm.value;track.applyConstraints({advanced:[{zoom:zc}]}).catch(()=>{})}}
-   const det=new BarcodeDetector({formats:FM.filter(f=>sup.includes(f))}),cv=document.createElement('canvas'),cx=cv.getContext('2d');let tick=0,last=Date.now();
-   timer=setInterval(async()=>{
-    if(scanning||!v.videoWidth)return;scanning=true;
-    try{
-     const vw=v.videoWidth,vh=v.videoHeight;let val=await best(det,v,vw,vh);
-     if(!val&&tick++%2==0){for(const f of [.5,.3]){const cw=vw*f,ch=vh*f,sc=Math.min(4,1400/cw);cv.width=cw*sc;cv.height=ch*sc;cx.drawImage(v,(vw-cw)/2,(vh-ch)/2,cw,ch,0,0,cv.width,cv.height);val=await best(det,cv,cv.width,cv.height);if(val)break}}
-     if(val){last=Date.now();found(val)}
-     else if(caps.zoom&&Date.now()-last>2500){last=Date.now();zc+=(zmax-zmin)/5;if(zc>zmin+(zmax-zmin)*.7)zc=zmin;zm.value=zc;track&&track.applyConstraints({advanced:[{zoom:zc}]}).catch(()=>{})}
-    }catch(e){}finally{scanning=false}
-   },160);
-  }else{
-   await loadH5();$('#vid').hidden=true;const F=Html5QrcodeSupportedFormats;
-   h5=new Html5Qrcode('reader',{formatsToSupport:[F.QR_CODE,F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.CODE_128,F.CODE_39],experimentalFeatures:{useBarCodeDetectorIfSupported:true},verbose:false});
-   try{await h5.start({facingMode:'environment'},{fps:12,videoConstraints:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080},advanced:[{focusMode:'continuous'}]}},t=>found(t),()=>{})}
-   catch(e1){await h5.start({facingMode:'environment'},{fps:12},t=>found(t),()=>{})}
-  }
+  let det=null;
+  if(sup.includes('ean_13')&&sup.includes('upc_a'))det=new BarcodeDetector({formats:FM.filter(f=>sup.includes(f))});
+  else{await loadH5();const F=Html5QrcodeSupportedFormats;h5=new Html5Qrcode('reader',{formatsToSupport:[F.QR_CODE,F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.CODE_128,F.CODE_39],verbose:false})}
+  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080},advanced:[{focusMode:'continuous'}]}});
+  const v=$('#vid');v.hidden=false;v.srcObject=stream;await v.play();
+  track=stream.getVideoTracks()[0];const caps=track.getCapabilities?track.getCapabilities():{},zm=$('#zm');let zc=0,zmin=0,zmax=0;
+  if(caps.zoom){zmin=zc=caps.zoom.min;zmax=caps.zoom.max;zm.min=zmin;zm.max=zmax;zm.step=caps.zoom.step||0.1;zm.value=zc;zm.hidden=false;
+   zm.oninput=()=>{zc=+zm.value;track.applyConstraints({advanced:[{zoom:zc}]}).catch(()=>{})}}
+  const cv=document.createElement('canvas'),cx=cv.getContext('2d');
+  const advance=()=>{stage++;if(stage>=STAGES.length){stage=0;
+   if(caps.zoom&&track){zc+=(zmax-zmin)/5;if(zc>zmin+(zmax-zmin)*.7)zc=zmin;zm.value=zc;track.applyConstraints({advanced:[{zoom:zc}]}).catch(()=>{})}}
+   setBox(STAGES[stage])};
+  timer=setInterval(async()=>{
+   if(scanning||!v.videoWidth)return;scanning=true;
+   try{
+    const r=region(v,STAGES[stage]),sc=Math.min(4,1600/r.w);cv.width=Math.max(1,Math.round(r.w*sc));cv.height=Math.max(1,Math.round(r.h*sc));
+    cx.drawImage(v,r.x,r.y,r.w,r.h,0,0,cv.width,cv.height);
+    let val='';
+    if(det)val=await best(det,cv,cv.width,cv.height);
+    else{const blob=await new Promise(ok=>cv.toBlob(ok,'image/jpeg',.92));val=(await h5.scanFileV2(new File([blob],'frame.jpg',{type:'image/jpeg'}),false)).decodedText}
+    if(!(val&&found(val)))advance();
+   }catch(e){advance()}finally{scanning=false}
+  },260);
  }catch(e){stopScan();const n=e&&e.name;note(n=='NotAllowedError'||/denied|permission/i.test(String(e))?'Camera permission was blocked. Allow camera access for this app or site in your settings, then try again.':n=='NotFoundError'?'No camera found on this device.':'Camera couldn’t start ('+(e&&e.message||n)+'). Try “Photo of barcode” or type the digits.')}
 }
 $('#scan').onclick=()=>window.Android?Android.scan():startWeb();

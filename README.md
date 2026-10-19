@@ -1,4 +1,4 @@
-🍖 I want to be 100% transparent and let everyone know that this project is 100% vibe-coded. I'm just a man with an idea. I do not know how to code. AI did all of the work. 🍖
+🚫🍖 I want to be 100% transparent and let everyone know that this project is 100% vibe-coded. I'm just a man with an idea. I do not know how to code. AI did all of the work. 🍖🚫
 
 This app has an HTML web version, an Android, and an Apple version. I do not own an apple device so if there's issues then I apologize, but you'll just have to use the web app.
 
@@ -33,7 +33,13 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v2.0 (latest)
+### v2.1 (latest)
+- **"Meatless" prefix:** an ingredient that starts with "meatless" is no longer flagged, the same as "vegan" (for example, "Meatless Pepperoni"). The German words "vegane" and "fleischlose" work the same way.
+- **Camera box follows the scan area:** the box on the camera view now starts at its largest size. Each time nothing is found and the app re-checks a smaller or more zoomed-in area, the box shrinks on screen to match exactly what is being checked. After the smallest size, the box returns to full size, and on phones with camera zoom the zoom also steps up.
+- **German ingredient lists:** much fuller German support, including compound words (Schweinefleisch, Rindertalg, Schweineschmalz), gelatin and collagen, rennet and enzymes, glycerin and glycerides, fatty acids and stearates, natural flavors, lanolin, and dairy words. German "plant-based" wording (pflanzlich, vegetabil, mikrobiell) is skipped. The app also reads a product's German ingredient text when that is the only one available.
+- **Public README:** the disclaimer at the top now starts and ends with 🚫.
+
+### v2.0
 - **Export Settings and Import Settings** buttons under "My settings". Back up your settings, favorites, history, and rating overrides, then restore them on a new device from a file or pasted text. Importing adds to the favorites and history already on the device and replaces the sensitivity settings.
 - **Ingredients that start with "vegan" are no longer flagged** (for example, "Vegan Pepperoni").
 - **Android app fixes:** restored the app's build file (`app/build.gradle.kts`), which was empty in the Android zips from v1.2 through v1.9 and stopped the project from syncing or building. The share sheet now also works for exporting favorites and backups.
@@ -58,7 +64,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 - **v1.4:** Fixed words wrapped in underscores not being matched; added French, Spanish, German, and Italian terms; builds an ingredient list from database tags when no text exists; added flag counts.
 - **v1.3:** Visible "searching" status after a scan, retries for barcode format variants, request timeout, clearer error messages.
 - **v1.2:** Red now reads "Do not eat" and yellow "Avoid"; stopped duplicate scans; higher-resolution autofocus camera.
-- **v1.1:** Ingredients shown immediately; scan history; custom flag lists; export favorites; rating overrides; camera fallback.
 ---
 
 ## Features
@@ -71,8 +76,8 @@ Works in modern browsers on iPhone and iPad (Safari), Android, and desktop. On i
 - **Supported formats:** EAN-13, EAN-8, UPC-A, UPC-E, Code 128, Code 39, QR.
 - **Built for distance and small codes.**
   - Requests high-resolution video with continuous autofocus.
-  - If nothing is found in the full frame, it re-checks magnified center regions.
-  - Shows a zoom slider on phones that support camera zoom, and gradually auto-zooms when it can't find a code.
+  - The scan box on the camera view starts at its largest size. If nothing is found, it re-checks a smaller, magnified area and the box shrinks on screen to match, then returns to full size and starts again.
+  - Shows a zoom slider on phones that support camera zoom, and steps the zoom up each time a full round finds nothing.
   - When several codes are visible, the one **closest to the center** of the frame wins. Product barcodes are preferred over unrelated QR codes.
 - **Photo of barcode.** Take or choose a photo if the live camera is unavailable.
 - **Type the digits.** Enter a barcode manually, with a **Clear** button to reset the field and result.
@@ -97,7 +102,7 @@ Every highlighted ingredient, in the text or in the list beneath it, is tappable
 ### What gets flagged
 
 **Red (do not eat): mammal-derived ingredients**
-Beef, pork, lamb, mutton, veal, venison, bison, goat, rabbit, horse, ham, bacon, sausage, jerky, organ meats, lard, tallow, suet, bone broth, bone marrow, natural/hog/sheep casings, and equivalent words in French, Spanish, German, and Italian.
+Beef, pork, lamb, mutton, veal, venison, bison, goat, rabbit, horse, ham, bacon, sausage, jerky, organ meats, lard, tallow, suet, bone broth, bone marrow, natural/hog/sheep casings, and equivalent words in French, Spanish, Italian, and German (including German compound words such as Schweinefleisch, Rindertalg, and Schweineschmalz).
 
 **Yellow (avoid): mammal by-products and ingredients that may be processed with mammal products**
 
@@ -115,7 +120,9 @@ Beef, pork, lamb, mutton, veal, venison, bison, goat, rabbit, horse, ham, bacon,
 | Cheese and whey | cheese, whey, casein, curds (often made with animal rennet) |
 | Dairy | milk, butter, cream, yogurt, ghee, lactose |
 
-Plant-based look-alikes are **not** flagged: vegetable glycerin, plant-based mono- and diglycerides, coconut/almond/oat milk, cocoa/shea butter, cream of tartar, kidney beans, cod liver, and similar. Any ingredient that starts with the word "vegan" (for example "Vegan Pepperoni") is skipped as well.
+Plant-based look-alikes are **not** flagged: vegetable glycerin, plant-based mono- and diglycerides, coconut/almond/oat milk, cocoa/shea butter, cream of tartar, kidney beans, cod liver, and similar. Any ingredient that starts with the word "vegan" or "meatless" (for example "Vegan Pepperoni" or "Meatless Pepperoni") is skipped as well, along with the German "vegane", "fleischlose", "pflanzliches", and "mikrobielles".
+
+**Languages.** Ingredient lists in English, French, Spanish, Italian, and German are checked. German has the fullest coverage. If a product has no English list, GalGuard reads its original-language or German list.
 
 ### Personal settings
 - **Sensitivities.** Some things affect people with AGS differently. Check any of these to flag them **red** instead of yellow: dairy, gelatin, glycerin and mono/diglycerides, stearic acid and stearates, natural flavors, lanolin and vitamin D3, rennet and animal enzymes. Unchecked, they show as yellow.
@@ -185,6 +192,7 @@ GalGuardAndroid/
 ```
 
 ## Known limitations
+- The German word "Rind" on its own (beef) is not flagged, because the same word means rind or peel in English ("orange rind"). Words like "Rindfleisch", "Rindertalg", and "vom Rind" are flagged.
 - Ingredient data depends on Open Food Facts; products missing from it need a pasted ingredient list.
 - Hidden sources can't be detected from a label (for example sugar refined with bone char, or an unnamed "natural flavor"). GalGuard flags the ingredient names it can see.
 - Camera range depends on the phone's camera. Browsers without a built-in barcode detector use a library fallback that scans the whole frame and can't prefer the center code.

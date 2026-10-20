@@ -1,4 +1,4 @@
-# GalGuard (Android) v2.6
+# GalGuard (Android) v2.7
 1. Install Android Studio (Koala or newer). File > Open > select this folder and let Gradle sync.
 2. Run on a phone with USB debugging on, or build an installable file: Build > Build APK(s). Copy app/build/outputs/apk/debug/app-debug.apk to your phone and open it.
 Scanning uses Google built-in scanner; if it cannot start, the app falls back to an in-app camera view (asks for camera permission). Product data needs internet.
@@ -17,3 +17,5 @@ New in 2.4: a "+ New recipe" button to add, edit and delete your own recipes (wi
 New in 2.5: "Scan ingredient list" now uses Google's document scanner and on-device text recognition; Export / Import Settings moved into the menu.
 
 New in 2.6: Add as Recipe button, device back button closes sub-screens instead of the app, graphite dark/auto themes, small layout fixes.
+
+New in 2.7: Uncheck all button and hint on the shopping list, Seasonal themes.

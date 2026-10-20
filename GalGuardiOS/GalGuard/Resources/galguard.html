@@ -150,7 +150,7 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
 <section id="v5" hidden><div id="shop"></div></section>
 <section id="v6" hidden><button class="back" id="bkback">‹ Back</button><h2 style="margin:0">Export / Import Settings</h2><p class="legend">Back up your settings, favorites, history, rating overrides, theme, recipes and shopping list, or restore them on a new device.</p><div class="row"><button id="xs" style="flex:1">Export Settings</button><button id="is" style="flex:1">Import Settings</button></div><div id="bk" class="why" hidden></div><input type="file" id="bf" accept=".json,application/json,text/plain" hidden></section>
 </main>
-<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v2.6</footer>
+<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v2.7</footer>
 <div id="scrim" hidden></div>
 <aside id="drawer" hidden aria-label="Menu">
  <div class="dh"><h2>Menu</h2><button id="dclose" aria-label="Close menu">×</button></div>
@@ -428,7 +428,13 @@ const TH=[
  {id:'lav',n:'Lavender Mist',g:'Feminine',bg:'#f1eefb',card:'#ffffff',ink:'#271f3d',mut:'#6d6590',line:'#ddd6f3',acc:'#7c5cd6'},
  {id:'peach',n:'Peach Blush',g:'Feminine',bg:'#fff1ea',card:'#ffffff',ink:'#3d241b',mut:'#8a6a5e',line:'#f6d9cb',acc:'#e8775a'},
  {id:'orchid',n:'Orchid Night',g:'Feminine',dk:1,bg:'#1a1024',card:'#261833',ink:'#f3e9fa',mut:'#b49ac8',line:'#3a2850',acc:'#d672e8'},
- {id:'berry',n:'Berry Dusk',g:'Feminine',dk:1,bg:'#1f0f1a',card:'#2c1825',ink:'#fbe9f1',mut:'#c297ae',line:'#43263a',acc:'#ee5f98'}];
+ {id:'berry',n:'Berry Dusk',g:'Feminine',dk:1,bg:'#1f0f1a',card:'#2c1825',ink:'#fbe9f1',mut:'#c297ae',line:'#43263a',acc:'#ee5f98'},
+ {id:'spring',n:'Spring Meadow',g:'Seasonal',bg:'#eef7ea',card:'#ffffff',ink:'#1f3320',mut:'#5f7a5c',line:'#d3e8cc',acc:'#3f8f3a'},
+ {id:'summer',n:'Summer Sunshine',g:'Seasonal',bg:'#fff8e1',card:'#ffffff',ink:'#3b2f0b',mut:'#8a7440',line:'#f3e3a8',acc:'#c25e00'},
+ {id:'autumn',n:'Autumn Harvest',g:'Seasonal',dk:1,bg:'#1f1510',card:'#2b1d15',ink:'#f5e6d8',mut:'#b89a82',line:'#43301f',acc:'#e07a2f'},
+ {id:'winter',n:'Winter Frost',g:'Seasonal',bg:'#eef4fa',card:'#ffffff',ink:'#14283d',mut:'#5a7289',line:'#cfdeeb',acc:'#2f7fb8'},
+ {id:'halloween',n:'Halloween',g:'Seasonal',dk:1,bg:'#120d18',card:'#1d1626',ink:'#f3ece6',mut:'#a898b5',line:'#33283f',acc:'#ff7a18'},
+ {id:'holiday',n:'Holiday',g:'Seasonal',dk:1,bg:'#0f1f17',card:'#172b20',ink:'#f1efe6',mut:'#9fb8a6',line:'#264034',acc:'#d63a3a'}];
 const THV=['--bg','--card','--ink','--mut','--line','--acc','--accink','--ok','--warn','--bad','--okbg','--warnbg','--badbg','--hr','--hy'];
 const h2r=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
 const r2h=a=>'#'+a.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
@@ -457,7 +463,7 @@ function cleanTheme(t){
 let theme=cleanTheme(ls.get('gg_theme',null));
 function setTheme(t,quiet){theme=cleanTheme(t);ls.set('gg_theme',theme);applyTheme(theme.id=='custom'?theme:TH.find(x=>x.id==theme.id));drawThemes()}
 function drawThemes(){
- const groups=['Basic','Masculine','Feminine'];
+ const groups=['Basic','Masculine','Feminine','Seasonal'];
  $('#thl').innerHTML=groups.map(g=>'<p class="aisle" style="margin:12px 0 6px">'+g+'</p><div class="swg">'+TH.filter(x=>x.g==g).map(x=>{
   const sw=x.id=='auto'?'<span class="dots"><i style="background:#f0f0f1"></i><i style="background:#2a2a2c"></i><i style="background:#141414"></i></span>':'<span class="dots"><i style="background:'+x.bg+'"></i><i style="background:'+x.card+'"></i><i style="background:'+x.acc+'"></i></span>';
   return'<button class="sw" data-t="'+x.id+'" aria-pressed="'+(theme.id==x.id)+'">'+sw+'<span>'+esc(x.n)+'</span></button>'}).join('')+'</div>').join('');
@@ -512,7 +518,8 @@ function shopDraw(){
   (stale?'<div class="why m"><b>This list is from the week of '+esc(weekLabel(shop.week))+'.</b><p>Start a new week to carry over only what you still need.</p><div class="links"><button id="shnew">Start new week</button></div></div>':'')+
   '<div class="row"><input type="text" id="shin" placeholder="Add an item (e.g. rice flour)" aria-label="Add an item"><button id="shadd">Add</button></div>'+
   (shop.items.length?AORD.filter(a=>by[a]).map(a=>'<p class="aisle">'+a+'</p>'+by[a].map(row).join('')).join(''):'<p class="empty">Nothing here yet. Add items above, or tap “+” next to a recipe ingredient or “Add to shopping list” on a scanned product.</p>')+
-  (shop.items.length?'<div class="links" style="margin-top:14px"><button id="shshare">Copy or share list</button><button id="shclr"'+(done.length?'':' disabled')+'>Clear checked</button></div><div class="links">'+(stale?'':'<button id="shnew">Start new week</button>')+'<button id="shall">'+(clearArm?'Tap again to confirm':'Clear all')+'</button></div>':'');
+  (shop.items.length?'<div class="links" style="margin-top:14px"><button id="shnew">Start new week</button><button id="shclr"'+(done.length?'':' disabled')+'>Uncheck all</button></div><div class="links"><button id="shshare">Copy or share list</button><button id="shall">'+(clearArm?'Tap again to confirm':'Clear all')+'</button></div>':'')+
+  '<p class="legend" style="margin-top:18px"><b>Start new week:</b> removes the items you have checked off, keeps everything you have not, and dates the list to the current week. Use it when a new shopping week begins. “Uncheck all” keeps every item and only clears the check marks.</p>';
 }
 function shopAddFromInput(){const t=$('#shin').value;if(!t.trim())return;shopAdd(t,'Added by you');saveShop();shopDraw();$('#shin').focus()}
 $('#shop').onclick=e=>{
@@ -520,7 +527,7 @@ $('#shop').onclick=e=>{
  if(t.id=='shback'){back(()=>tab(1));return}
  if(t.id=='shadd'){shopAddFromInput();return}
  if(t.id=='shnew'){shop.items=shop.items.filter(i=>!i.done);shop.week=monday();saveShop();shopDraw();toast('New week started. Checked items were removed.');return}
- if(t.id=='shclr'){shop.items=shop.items.filter(i=>!i.done);saveShop();shopDraw();return}
+ if(t.id=='shclr'){shop.items.forEach(i=>i.done=false);saveShop();shopDraw();return}
  if(t.id=='shall'){if(!clearArm){clearArm=1;shopDraw();setTimeout(()=>{if(clearArm){clearArm=0;if(!$('#v5').hidden)shopDraw()}},4000);return}clearArm=0;shop.items=[];saveShop();shopDraw();return}
  if(t.id=='shshare'){shareText('Shopping list, week of '+weekLabel(shop.week)+'\n'+shop.items.filter(i=>!i.done).map(i=>'☐ '+i.text).join('\n'),'Shopping list');return}
  if(t.dataset.r){shop.items=shop.items.filter(i=>i.id!=t.dataset.r);saveShop();shopDraw()}};

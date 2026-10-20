@@ -33,7 +33,11 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v2.6 (latest)
+### v2.7 (latest)
+- **Shopping list buttons.** "Clear checked" is now **Uncheck all**: it keeps every item and just clears the check marks. "Start new week" and "Copy or share list" swapped places ("Start new week" is now in the top row). A hint at the bottom of the page explains what "Start new week" does.
+- **Seasonal themes.** A new "Seasonal" group under the Feminine themes in the menu: Spring Meadow, Summer Sunshine, Autumn Harvest, Winter Frost, Halloween and Holiday.
+
+### v2.6
 - **Add as Recipe.** A new button next to "Try a sample" in "Paste an ingredient list" turns the pasted or scanned list into a new recipe: it opens the New recipe page with the ingredients already filled in, one ingredient per line (split at the commas, keeping anything in brackets together). Add a name, photo and steps, then save.
 - **Device back button.** Pressing back on your phone (or the browser's back button) now leaves a sub-screen instead of closing the app: it closes the menu, the Shopping List, the Export / Import page, a recipe, and the recipe editor, one step at a time. On iPhone you can swipe in from the left edge.
 - **Graphite look.** The Dark theme and the Auto theme (in both light and dark mode) now use graphite grey instead of blue-black. The colored dark presets (Midnight Navy, Forest, Deep Ocean, Orchid Night, Berry Dusk) keep their own colors.
@@ -49,7 +53,7 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ### v2.3
 - **Menu button (top right).** A hamburger button opens a side menu with **Themes**, **Custom colors**, and the **Weekly Shopping List**. A small red number on the button shows how many items are still left to buy.
-- **Themes.** Auto (follows your device), Light and Dark, five masculine presets (Midnight Navy, Steel Blue, Forest, Graphite Amber, Deep Ocean) and five feminine presets (Rose Quartz, Lavender Mist, Peach Blush, Orchid Night, Berry Dusk). **Custom colors** has a background and an accent color picker; text, card and line colors are worked out automatically so everything stays readable. Your choice is remembered and included in Export Settings.
+- **Themes.** Auto (follows your device), Light and Dark, five masculine presets (Midnight Navy, Steel Blue, Forest, Graphite Amber, Deep Ocean) and five feminine presets (Rose Quartz, Lavender Mist, Peach Blush, Orchid Night, Berry Dusk) and six seasonal ones (Spring Meadow, Summer Sunshine, Autumn Harvest, Winter Frost, Halloween, Holiday). **Custom colors** has a background and an accent color picker; text, card and line colors are worked out automatically so everything stays readable. Your choice is remembered and included in Export Settings.
 - **Weekly Shopping List.** Add items by hand, tap "+" next to any recipe ingredient, use "Add all to list" on a recipe, or tap "Add to shopping list" on a scanned product. Items are grouped by store aisle, can be checked off, removed, copied or shared. "Start new week" clears checked items and keeps the rest; a banner appears when the list is from a previous week.
 - **New Recipe tab** (between Scan and History) where you can add your own recipes, with the photo at the very top of each, times, servings, ingredients (with red and yellow highlights and tap-for-reason), instructions and notes. Search and filter by category or safety rating, and mark favorites.
 - **Favorite recipes.** Tap the star on a recipe card or page. They are listed under the **★ Favorites** switch inside the Recipe tab and under **Favorites → Recipes**.
@@ -87,7 +91,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 - README is now split into a public version (`README.md`) and a private version (`README-private.md`).
 
 ### Earlier versions
-- **v1.7:** Dairy is now yellow by default and red when you check it in settings, like the other sensitivities.
 ---
 
 ## Features

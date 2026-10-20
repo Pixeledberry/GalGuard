@@ -17,8 +17,11 @@ Go to the app webpage then:
 1. Tap the More menu (three dots) on the right side of the address bar.
 2. Select Install and create shortcut or Add to Home screen, then tap Install
 
-$\color{red}{\text{Otherwise if you want a standalone app instead of the web version, you can install the android or apple version of the app 
-from the available releases. You really SHOULD be using the standalone apps. They use the Google and Apple scanners respectively and perform much better.}}$
+$\color{red}{\text{Otherwise if you want a standalone app instead of the web version, you can install}}$
+
+$\color{red}{\text{the android or apple version of the app from the available releases. You really SHOULD be using}}$
+
+$\color{red}{\text{the standalone apps. They use the Google and Apple scanners respectively and perform much better.}}$
 
 ---
 

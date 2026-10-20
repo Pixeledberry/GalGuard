@@ -57,7 +57,7 @@ details input[type=text]{width:100%;margin:6px 0}
 .why{border-left:6px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;margin:0 0 12px;font-size:15px}.why.r{border-color:var(--hr)}.why.m{border-color:var(--hy)}.why p{margin:6px 0 0}.why span{color:var(--mut);font-size:14px}
 mark[data-i]{cursor:pointer}mark[data-i]:focus-visible{outline:3px solid var(--ink)}
 #sb{position:absolute;left:50%;top:50%;width:100%;height:100%;transform:translate(-50%,-50%);border:3px solid #fff;border-radius:12px;box-shadow:0 0 0 100vmax rgba(0,0,0,.4);pointer-events:none;transition:width .25s ease,height .25s ease;z-index:1}
-#zm{-webkit-appearance:none;appearance:none;background:rgba(0,0,0,.45);border-radius:12px;accent-color:#fff;position:absolute;right:-76px;top:calc(50% - 12px);width:200px;height:24px;margin:0;transform:rotate(-90deg);z-index:2}#zm::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid #333}#zm::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid #333}#zl{position:absolute;right:8px;bottom:8px;z-index:2;color:#fff;font:600 12px system-ui;background:rgba(0,0,0,.5);border-radius:8px;padding:2px 6px;pointer-events:none}.cam video{transform-origin:50% 50%}
+#zm{touch-action:none;-webkit-appearance:none;appearance:none;background:rgba(0,0,0,.45);border-radius:12px;accent-color:#fff;position:absolute;right:-76px;top:calc(50% - 12px);width:200px;height:24px;margin:0;transform:rotate(-90deg);z-index:2}#zm::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid #333}#zm::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid #333}#zl{position:absolute;right:8px;bottom:8px;z-index:2;color:#fff;font:600 12px system-ui;background:rgba(0,0,0,.5);border-radius:8px;padding:2px 6px;pointer-events:none}.cam video{transform-origin:50% 50%}
 #sens label{display:block;margin:6px 0}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}button{-webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:transparent}input[type=text],input:not([type]),textarea{-webkit-appearance:none;appearance:none}
 /* ---- v2.3 ---- */
@@ -172,7 +172,7 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
 <section id="v5" hidden><div id="shop"></div></section>
 <section id="v6" hidden><button class="back" id="bkback">‹ Back</button><h2 style="margin:0">Export / Import Settings</h2><p class="legend">Back up your settings, favorites, history, rating overrides, theme, recipes and shopping list, or restore them on a new device.</p><div class="row"><button id="xs" style="flex:1">Export Settings</button><button id="is" style="flex:1">Import Settings</button></div><div id="bk" class="why" hidden></div><input type="file" id="bf" accept=".json,application/json,text/plain" hidden></section>
 </main>
-<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.1</footer>
+<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.2</footer>
 <div id="scrim" hidden></div>
 <aside id="drawer" hidden aria-label="Menu">
  <div class="dh"><h2>Menu</h2><button id="dclose" aria-label="Close menu">×</button></div>
@@ -364,7 +364,7 @@ const dist=(c,w,h)=>{const b=c.boundingBox||{x:0,y:0,width:0,height:0};return Ma
 async function best(det,src,w,h){const r=await det.detect(src);if(!r.length)return'';r.sort((a,b)=>dist(a,w,h)-dist(b,w,h));return(r.find(c=>extractCode(c.rawValue))||r[0]).rawValue}
 // The box on screen is exactly the part of the picture being checked. It starts at the largest size,
 // shrinks a step each time nothing is found, and returns to full size (after nudging the zoom, where supported).
-const STAGES=[.7,.5,.35,.25];
+const STAGES=[.7];
 let stage=0;
 function setBox(f){const b=$('#sb');b.style.width=b.style.height=(f*100)+'%'}
 function stopScan(){ocrRun++;scanMode='';$('#ocrbar').hidden=true;$('#scani').textContent='Scan ingredient list';clearInterval(timer);if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}track=null;h5=null;$('#zm').hidden=true;$('#zl').hidden=true;dz=1;$('#vid').style.transform='';$('#cam').className='cam off';$('#scan').textContent=window.Android?'Scan barcode':'Start camera'}
@@ -394,9 +394,10 @@ async function startWeb(){
   // Touching the slider takes over from the automatic zoom steps.
   zm.oninput=()=>{manual=true;setZ(+zm.value)};
   const cv=document.createElement('canvas'),cx=cv.getContext('2d');
-  const advance=()=>{stage++;if(stage>=STAGES.length){stage=0;
+  let fails=0;
+  const advance=()=>{if(++fails>=4){fails=0;
    if(!manual){let z=zc+(zmax-zmin)/5;if(z>zmin+(zmax-zmin)*.7)z=zmin;setZ(z)}}
-   setBox(STAGES[stage])};
+   setBox(STAGES[0])};
   timer=setInterval(async()=>{
    if(scanning||!v.videoWidth)return;scanning=true;
    try{
@@ -530,9 +531,9 @@ function cleanShop(s){
 const rid=()=>Math.random().toString(36).slice(2,9);
 function cleanList(l){const c=cleanShop(l);return{id:String(l&&l.id||'').replace(/[^a-z0-9]/gi,'').slice(0,20)||rid(),name:(l&&typeof l.name=='string'&&l.name.trim()||'Shopping list').slice(0,40),week:c.week,items:c.items}}
 function cleanStore(x){
- const st={cur:'',imgs:false,lists:[]};if(!x||typeof x!='object')x={};
+ const st={cur:'',imgs:true,ig:0,lists:[]};if(!x||typeof x!='object')x={};
  if(Array.isArray(x.lists))x.lists.slice(0,20).forEach(l=>st.lists.push(cleanList(l)));else if(Array.isArray(x.items))st.lists.push(cleanList(x));
- if(x.imgs===true)st.imgs=true;if(!st.lists.length)st.lists.push(cleanList({name:'Shopping list'}));
+ if(x.ig===1){st.ig=1;st.imgs=x.imgs===true}if(!st.lists.length)st.lists.push(cleanList({name:'Shopping list'}));
  const seen={};st.lists.forEach(l=>{if(seen[l.id])l.id=rid();seen[l.id]=1});
  st.cur=st.lists.some(l=>l.id==x.cur)?x.cur:st.lists[0].id;return st}
 let SH=cleanStore(ls.get('gg_shops',null)||ls.get('gg_shop',null));
@@ -644,7 +645,7 @@ $('#shs').onclick=e=>{
  if(b.dataset.mv){const T=SH.lists.find(l=>l.id==b.dataset.mv);if(T){if(!T.items.some(x=>nrm(x.text)==nrm(it.text)))T.items.push(it);shop.items=shop.items.filter(x=>x!=it);saveShop();shopDraw();toast('Moved to “'+T.name+'”')}back(closeSheetDOM);return}
  if(b.dataset.cat!==undefined){it.cat=AORD.includes(b.dataset.cat)?b.dataset.cat:'';saveShop();shopDraw();back(closeSheetDOM);return}
  if(b.id=='shs_img'){closeSheetDOM();swapTop('lb',closeLbDOM);showLb(it.img,it.text);return}
- if(b.id=='shs_imgs'){SH.imgs=!SH.imgs;saveShop();shopDraw();toast(SH.imgs?'Images turned on for scanned products':'Images turned off');back(closeSheetDOM)}};
+ if(b.id=='shs_imgs'){SH.imgs=!SH.imgs;SH.ig=1;saveShop();shopDraw();toast(SH.imgs?'Images turned on for scanned products':'Images turned off');back(closeSheetDOM)}};
 function closeLbDOM(){$('#lb').hidden=true;$('#lbi').removeAttribute('src')}
 function showLb(src,name){const big=String(src).replace(/\.(?:100|200)\.jpg(?=$|\?)/,'.400.jpg'),im=$('#lbi');im.onerror=()=>{im.onerror=null;im.src=src};im.src=big;$('#lbc').textContent=name||'';$('#lb').hidden=false}
 $('#lb').onclick=()=>back(closeLbDOM);
@@ -885,7 +886,7 @@ function importExtra(d){
   S.lists.forEach(L=>{let t=SH.lists.find(x=>x.name.toLowerCase()==L.name.toLowerCase());
    if(!t){if(SH.lists.length<20){if(SH.lists.some(x=>x.id==L.id))L.id=rid();SH.lists.push(L)}return}
    L.items.forEach(i=>{if(!t.items.some(x=>nrm(x.text)==nrm(i.text)))t.items.push(i)});if(L.week>t.week)t.week=L.week});
-  if(S.imgs)SH.imgs=true;saveShop()}
+  if(S.ig===1){SH.imgs=S.imgs;SH.ig=1}saveShop()}
  rcacheReset();drawOcr();rlist();rfavDraw()}
 // ---------- init ----------
 // ---------- My Lists ----------

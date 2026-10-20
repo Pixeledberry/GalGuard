@@ -37,7 +37,12 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v3.1 (latest)
+### v3.2 (latest)
+- **Product photos in shopping lists are on by default.** Scanned products show their small photo in every shopping list. You can still turn them off from the press-and-hold menu of a scanned item, and your choice is remembered. (If you had photos off before, this version turns them on once.)
+- **Camera zoom slider no longer scrolls the page.** Moving the slider on a phone now only changes the zoom.
+- **Scan box locked at 70%.** The barcode scan box stays at 70% and no longer shrinks. If nothing is found for a few tries, the automatic zoom still steps in, unless you are using the zoom slider.
+
+### v3.1
 - **My Lists tab.** The "Favorites" tab is now **My Lists**, and the red number bubble on it is gone. It shows all of your lists: **Products** and **Recipes** (your favorites, each with its count in brackets, like Recipes) and every shopping list, including ones you create with **+ New list**. Tap a list to open it; the others are hidden until you go back. Press and hold a list for **Merge lists**, **Rename**, **Clear list** and **Delete list**. Products and Recipes are built-in, so they can only be cleared. The Weekly Shopping List is still in the menu too.
 - **Recipe photos work on Android.** "Choose photo" now opens your phone's gallery, and there is a new **Take photo** button, to the left of it, that opens the camera.
 - **Missing-photo picture centered.** The placeholder plate shown when a recipe has no photo is now centered in the photo frame.
@@ -88,10 +93,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 - **Scan ingredient list.** A new button under "Scan barcode" uses the same camera view and resizing box, but reads the printed ingredient list with text recognition, pastes it into "Paste an ingredient list", and analyzes it automatically. It starts at the word "Ingredients" and keeps everything after it, including the "Contains" line. There is also a "Photo of ingredient list" option (web and iPhone) and a language setting under My settings (English, German, French, Spanish, Italian). The first use downloads the text reader (about 15 MB) and needs internet.
 - **Rating fixes.** Chicken, turkey and poultry sausage, bacon, hot dogs and ham are now yellow instead of red (the meat is poultry, but casings and processing can involve pork or beef). Dairy-free, non-dairy and plant-based milk, butter, cheese and cream are no longer flagged; "hot dog buns", "butternut squash", "butter lettuce", jalapeño "ribs", goat cheese (now yellow as cheese, not red as goat), "avoid bone char" and marine collagen are handled correctly. Many more cheeses (parmesan, feta, mozzarella, cheddar and others) and half-and-half are now recognized as dairy.
 - **Export and Import Settings** now also carry your theme, favorite and created recipes and shopping list.
-
-### v2.2
-- **Automatic releases:** both build workflows now publish a GitHub Release when a build succeeds. The Android APK and the unsigned iOS IPA are attached to a release named after the app version (for example, v2.2), so anyone can download them from the Releases page without signing in. The files are still saved as workflow Artifacts too.
-- **README wording:** the public README now points people to "available releases", and the Apple note about needing a sideloading tool is shown in red.
 
 ---
 

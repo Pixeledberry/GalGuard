@@ -1,4 +1,4 @@
-# GalGuard (Android) v3.0
+# GalGuard (Android) v3.1
 1. Install Android Studio (Koala or newer). File > Open > select this folder and let Gradle sync.
 2. Run on a phone with USB debugging on, or build an installable file: Build > Build APK(s). Copy app/build/outputs/apk/debug/app-debug.apk to your phone and open it.
 Scanning uses Google built-in scanner; if it cannot start, the app falls back to an in-app camera view (asks for camera permission). Product data needs internet.
@@ -25,3 +25,5 @@ New in 2.8: press-and-hold menu on shopping items (enlarged image, edit category
 New in 2.9: multiple shopping lists, more shopping categories (Hygiene, Pet and more), long-press highlight fix, Export favorites for recipes.
 
 New in 3.0: updates install over older versions (fixed signing key; one last uninstall needed from older versions, export your settings first), vertical camera zoom slider, scan box starts at 70%.
+
+New in 3.1: My Lists tab, recipe photo gallery/camera buttons, centered missing-photo picture.

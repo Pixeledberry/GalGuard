@@ -118,10 +118,22 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
 #shsb{width:100%;max-width:560px;margin:0 auto;background:var(--card);color:var(--ink);border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:85vh;overflow:auto;animation:slidein .18s ease}
 .menub:disabled{opacity:.5}
 .shrow,.shrow *{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none}.shrow ::selection,.shrow::selection{background:transparent}
+
+/* v3.1 */
+.rimgw .rph,.hero .rph{display:flex;align-items:center;justify-content:center;text-align:center}
+.btns3{display:flex;gap:6px;margin-top:8px}.btns3 button{flex:1 1 0;min-width:0;padding:11px 4px!important;font-size:14px!important;white-space:nowrap;margin:0}
+.pbtn{flex-wrap:wrap}.pbtn .photo{flex:1 1 130px;margin:0;display:flex;align-items:center;justify-content:center;gap:6px}
+.mlc{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:8px;cursor:pointer;-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none}
+.mlc *{-webkit-user-select:none!important;user-select:none!important}.mlc ::selection{background:transparent}
+.mlc>div{flex:1;min-width:0}.mlc small{display:block;color:var(--mut);font-size:13px;margin-top:2px}.mlcnt{color:var(--mut);font-weight:600}.mli{font-size:24px}.mlg{color:var(--mut);font-size:22px}
+#mls{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:25;display:flex;align-items:flex-end}
+#mlsb{width:100%;max-width:560px;margin:0 auto;background:var(--card);color:var(--ink);border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:85vh;overflow:auto;animation:slidein .18s ease}
+#mls[hidden]{display:none}
+@media(max-width:360px){.btns3{gap:4px}.btns3 button{font-size:12px!important;padding:11px 2px!important}}
 </style></head><body>
 <header><h1><img id="logo" alt="" width="36" height="36" style="vertical-align:-8px;margin-right:8px">GalGuard</h1><p>Scan a barcode. See how risky it is for alpha-gal.</p><button id="hb" aria-label="Menu" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span><i id="hbn" hidden></i></button></header>
 <main>
-<nav><button id="t1" class="on">Scan</button><button id="t4">Recipes</button><button id="t3">History</button><button id="t2">Favorites <span id="fc"></span></button></nav>
+<nav><button id="t1" class="on">Scan</button><button id="t4">Recipes</button><button id="t3">History</button><button id="t2">My Lists</button></nav>
 <section id="v1">
  <div class="cam off" id="cam"><video id="vid" playsinline muted></video><div id="reader"></div><div id="sb"></div><input type="range" id="zm" hidden aria-label="Zoom"><span id="zl" hidden></span></div>
  <button class="pri" id="scan">Start camera</button>
@@ -130,7 +142,7 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
  <label class="photo" id="phl">Photo of barcode<input type="file" id="ph" accept="image/*" capture="environment" hidden></label>
  <label class="photo" id="phil">Photo of ingredient list<input type="file" id="phi" accept="image/*" capture="environment" hidden></label>
  <div class="row"><input id="code" inputmode="numeric" placeholder="Barcode digits" aria-label="Barcode digits"><button id="go">Check</button><button id="cl" aria-label="Clear barcode">Clear</button></div>
- <details><summary>Paste an ingredient list</summary><input type="text" id="pn" placeholder="Product name (optional)" aria-label="Product name"><textarea id="pt" placeholder="Paste ingredients from the label"></textarea><button id="pa">Analyze</button> <button id="ps">Try a sample</button> <button id="par">Add as Recipe</button></details>
+ <details><summary>Paste an ingredient list</summary><input type="text" id="pn" placeholder="Product name (optional)" aria-label="Product name"><textarea id="pt" placeholder="Paste ingredients from the label"></textarea><div class="btns3"><button id="pa">Analyze</button><button id="ps">Try a sample</button><button id="par">Add as recipe</button></div></details>
  <details><summary>My settings</summary>
   <p class="legend">Sensitivities: things some people with AGS react to and others don’t. Anything you check is flagged red (do not eat).</p>
   <div id="sens"></div>
@@ -140,7 +152,7 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
   <p class="legend">On the web, the first ingredient scan downloads the text reader (about 15 MB) and needs internet. The Android and iPhone apps use the phone’s built-in text reader.</p></details>
  <div id="result"></div>
 </section>
-<section id="v2" hidden><div class="seg"><button id="fp" class="on">Products</button><button id="fr">Recipes <span id="rfc"></span></button></div><div id="favs"></div><div id="rfavs" hidden></div></section>
+<section id="v2" hidden><div id="mlh"></div><div id="mld" hidden><button class="back" id="mlback">‹ My Lists</button><div class="seg" hidden><button id="fp" class="on">Products</button><button id="fr">Recipes <span id="rfc"></span></button></div><div id="favs"></div><div id="rfavs" hidden></div></div></section>
 <section id="v3" hidden><div id="hist"></div></section>
 <section id="v4" hidden>
  <div id="rl">
@@ -160,7 +172,7 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
 <section id="v5" hidden><div id="shop"></div></section>
 <section id="v6" hidden><button class="back" id="bkback">‹ Back</button><h2 style="margin:0">Export / Import Settings</h2><p class="legend">Back up your settings, favorites, history, rating overrides, theme, recipes and shopping list, or restore them on a new device.</p><div class="row"><button id="xs" style="flex:1">Export Settings</button><button id="is" style="flex:1">Import Settings</button></div><div id="bk" class="why" hidden></div><input type="file" id="bf" accept=".json,application/json,text/plain" hidden></section>
 </main>
-<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.0</footer>
+<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.1</footer>
 <div id="scrim" hidden></div>
 <aside id="drawer" hidden aria-label="Menu">
  <div class="dh"><h2>Menu</h2><button id="dclose" aria-label="Close menu">×</button></div>
@@ -175,6 +187,7 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
  <button class="menub" id="mbk"><span aria-hidden="true">💾</span> Export / Import Settings</button>
 </aside>
 <div id="toast" hidden style="z-index:30"></div>
+<div id="mls" hidden><div id="mlsb" role="dialog" aria-label="List options"></div></div>
 <div id="shs" hidden><div id="shsb" role="dialog" aria-label="Item options"></div></div>
 <div id="lb" hidden role="dialog" aria-label="Enlarged image"><img id="lbi" alt=""><p id="lbc"></p></div>
 <script type="application/json" id="rdata">[]</script>
@@ -266,7 +279,7 @@ $('#result').onclick=e=>{const mk=e.target.closest('mark[data-i]');if(mk){showWh
 $('#result').onkeydown=e=>{if((e.key=='Enter'||e.key==' ')&&e.target.matches('mark[data-i]')){e.preventDefault();showWhy(+e.target.dataset.i)}};
 function items(arr,fav,empty){return arr.length?arr.map((f,i)=>'<div class="item" data-i="'+i+'" tabindex="0">'+(f.img?'<img src="'+esc(f.img)+'" alt="">':'')+'<div><b>'+esc(f.name)+'</b><span style="color:var(--mut);font-size:14px">'+esc(f.brand)+'</span></div>'+badge(rating(f).v)+(fav?'<button class="x" data-x="'+i+'" aria-label="Remove '+esc(f.name)+'">×</button>':'')+'</div>').join(''):'<p class="empty">'+empty+'</p>'}
 function lists(){
- $('#fc').textContent=favs.length||'';
+ if(typeof mlHub=='function')mlHub();
  $('#favs').innerHTML=(favs.length?'<div class="links"><button id="ex">Export favorites</button></div>':'')+items(favs,1,'No favorites yet. Scan a product and tap “Add to favorites”.');
  if(window.rfavDraw)rfavDraw();
  $('#hist').innerHTML=(hist.length?'<div class="links"><button id="ch">Clear history</button></div>':'')+items(hist,0,'Nothing scanned yet.');
@@ -505,7 +518,7 @@ $('#dclose').onclick=closeDrawer;$('#scrim').onclick=closeDrawer;
 document.addEventListener('keydown',e=>{if(e.key!='Escape')return;if(!$('#lb').hidden||!$('#shs').hidden||!$('#drawer').hidden)back()});
 $('#mbk').onclick=()=>{closeDrawerDOM();stopScan();swapTop('v6',()=>tab(curTab));tab(6)};
 $('#bkback').onclick=()=>back(()=>tab(1));
-$('#mshop').onclick=()=>{closeDrawerDOM();stopScan();swapTop('v5',()=>tab(curTab));tab(5);shopDraw()};
+$('#mshop').onclick=()=>{hubShop=false;closeDrawerDOM();stopScan();swapTop('v5',()=>tab(curTab));tab(5);shopDraw()};
 // ---------- shopping list ----------
 const pad=n=>String(n).padStart(2,'0'),ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 function monday(){const d=new Date();d.setHours(12);d.setDate(d.getDate()-((d.getDay()+6)%7));return ymd(d)}
@@ -555,18 +568,18 @@ const AISLES=[
 const catOf=i=>i.cat||aisleOf(i.text);
 const aisleOf=t=>{for(const[a,re]of AISLES)if(re.test(t))return a;return'Other'};
 function weekLabel(w){const[y,m,d]=w.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{month:'short',day:'numeric'})}
-let clearArm=0,delArm=0,listForm='';
+let clearArm=0,delArm=0,listForm='',hubShop=false;
 function shopDraw(){
  const stale=shop.week!=monday(),open=shop.items.filter(i=>!i.done),done=shop.items.filter(i=>i.done);
  const by={};shop.items.forEach(i=>{(by[catOf(i)]=by[catOf(i)]||[]).push(i)});
  const row=i=>'<div class="shrow'+(i.done?' done':'')+'" data-id="'+i.id+'"><input type="checkbox" id="c'+i.id+'" data-c="'+i.id+'"'+(i.done?' checked':'')+'>'+(SH.imgs&&i.img?'<img class="zm sth" src="'+esc(i.img)+'" alt="" loading="lazy" referrerpolicy="no-referrer" data-n="'+esc(i.text)+'">':'')+'<label for="c'+i.id+'">'+esc(i.text)+(i.src?'<small>'+esc(i.src)+'</small>':'')+'</label><button class="x" data-r="'+i.id+'" aria-label="Remove '+esc(i.text)+'">×</button></div>';
- $('#shop').innerHTML='<button class="back" id="shback">‹ Back</button><h2 style="margin:0">Weekly Shopping List</h2><div class="row" style="margin-top:8px"><select id="shsel" aria-label="Shopping list">'+SH.lists.map(l=>'<option value="'+l.id+'"'+(l.id==shop.id?' selected':'')+'>'+esc(l.name)+'</option>').join('')+'</select><button id="shlnew"'+(SH.lists.length>=20?' disabled':'')+'>+ New list</button></div>'+
+ $('#shop').innerHTML='<button class="back" id="shback">‹ '+(hubShop?'My Lists':'Back')+'</button><h2 style="margin:0">'+(hubShop?esc(shop.name):'Weekly Shopping List')+'</h2>'+(hubShop?'':'<div class="row" style="margin-top:8px"><select id="shsel" aria-label="Shopping list">'+SH.lists.map(l=>'<option value="'+l.id+'"'+(l.id==shop.id?' selected':'')+'>'+esc(l.name)+'</option>').join('')+'</select><button id="shlnew"'+(SH.lists.length>=20?' disabled':'')+'>+ New list</button></div>')+
   (listForm?'<div class="why"><b>'+(listForm=='new'?'New list':'Rename list')+'</b><div class="row"><input type="text" id="shln" maxlength="40" value="'+(listForm=='rename'?esc(shop.name):'')+'" placeholder="List name (e.g. Costco, Pharmacy)" aria-label="List name"><button id="shlok">Save</button><button id="shlx">Cancel</button></div></div>':'')+'<p class="legend">Week of '+esc(weekLabel(shop.week))+' · '+open.length+' to buy'+(done.length?', '+done.length+' checked':'')+'</p><p class="legend" style="margin-top:-6px">Tip: press and hold an item for more options.</p>'+
   (stale?'<div class="why m"><b>This list is from the week of '+esc(weekLabel(shop.week))+'.</b><p>Start a new week to carry over only what you still need.</p><div class="links"><button id="shnew">Start new week</button></div></div>':'')+
   '<div class="row"><input type="text" id="shin" placeholder="Add an item (e.g. rice flour)" aria-label="Add an item"><button id="shadd">Add</button></div>'+
   (shop.items.length?AORD.filter(a=>by[a]).map(a=>'<p class="aisle">'+a+'</p>'+by[a].map(row).join('')).join(''):'<p class="empty">Nothing here yet. Add items above, or tap “+” next to a recipe ingredient or “Add to shopping list” on a scanned product.</p>')+
   (shop.items.length?'<div class="links" style="margin-top:14px"><button id="shnew">Start new week</button><button id="shclr"'+(done.length?'':' disabled')+'>Uncheck all</button></div><div class="links"><button id="shshare">Copy or share list</button><button id="shall">'+(clearArm?'Tap again to confirm':'Clear all')+'</button></div>':'')+
-  '<div class="links" style="margin-top:14px"><button id="shlren">Rename list</button><button id="shldel">'+(delArm?'Tap again to delete':'Delete list')+'</button></div><p class="legend" style="margin-top:18px"><b>Start new week:</b> removes the items you have checked off, keeps everything you have not, and dates the list to the current week. Use it when a new shopping week begins. “Uncheck all” keeps every item and only clears the check marks.</p>';
+  (hubShop?'':'<div class="links" style="margin-top:14px"><button id="shlren">Rename list</button><button id="shldel">'+(delArm?'Tap again to delete':'Delete list')+'</button></div>')+'<p class="legend" style="margin-top:18px"><b>Start new week:</b> removes the items you have checked off, keeps everything you have not, and dates the list to the current week. Use it when a new shopping week begins. “Uncheck all” keeps every item and only clears the check marks.</p>';
 }
 function shopAddFromInput(){const t=$('#shin').value;if(!t.trim())return;shopAdd(t,'Added by you');saveShop();shopDraw();$('#shin').focus()}
 $('#shop').onclick=e=>{
@@ -746,7 +759,7 @@ function openEditor(id,pre){
  const f=(k,l,v,ph)=>'<label class="edl">'+l+'<input type="text" id="e_'+k+'" value="'+esc(v||'')+'" placeholder="'+esc(ph||'')+'"></label>';
  $('#re').innerHTML='<button class="back" id="ecancel">‹ Cancel</button><h2 style="margin:0 0 8px">'+(r?'Edit recipe':'New recipe')+'</h2>'+
   '<div class="hero" id="eprev">'+(edImg?imgTag({im:edImg}):'<div class="rph" role="img" aria-label="No photo yet">🍽️</div>')+'</div>'+
-  '<div class="links"><label class="photo" style="flex:1;margin:0">Choose photo<input type="file" id="e_file" accept="image/*" hidden></label><button id="e_nophoto">Remove photo</button></div>'+
+  '<div class="links pbtn"><label class="photo"><span aria-hidden="true">📷</span> Take photo<input type="file" id="e_cam" accept="image/*" capture="environment" hidden></label><label class="photo"><span aria-hidden="true">🖼️</span> Choose photo<input type="file" id="e_file" accept="image/*" hidden></label></div><div class="links" style="margin-top:0"><button id="e_nophoto">Remove photo</button></div>'+
   f('t','Recipe name',r&&r.t,'e.g. Grandma’s chicken soup')+
   '<label class="edl">Category<select id="e_c">'+RCATS.map(c=>'<option'+(r&&r.c==c?' selected':'')+'>'+esc(c)+'</option>').join('')+'</select></label>'+
   '<div class="cust">'+f('pr','Prep time',r&&r.pr,'15 minutes')+f('ck','Cook time',r&&r.ck,'30 minutes')+'</div>'+
@@ -769,7 +782,7 @@ $('#re').onclick=e=>{const t=e.target;
   if(!saveMy()){myrec=old;return}
   loadRecipes();rcacheReset();rlist();toast('Recipe saved');
   if(edId){layers.pop();skipPop++;try{history.back()}catch(x){}showRecipe(rec.id)}else{swapTop('rd',closeRecipe);showRecipe(rec.id)}}};
-$('#re').onchange=async e=>{if(e.target.id!='e_file')return;const f=e.target.files[0];e.target.value='';if(!f)return;
+$('#re').onchange=async e=>{if(e.target.id!='e_file'&&e.target.id!='e_cam')return;const f=e.target.files[0];e.target.value='';if(!f)return;
  try{edImg=await shrink(f);$('#eprev').innerHTML=imgTag({im:edImg})}catch(x){toast('That photo couldn’t be read')}};
 $('#rnew').onclick=()=>openEditor(null);
 function splitIngredients(t){const out=[];let cur='',d=0;
@@ -875,6 +888,82 @@ function importExtra(d){
   if(S.imgs)SH.imgs=true;saveShop()}
  rcacheReset();drawOcr();rlist();rfavDraw()}
 // ---------- init ----------
+// ---------- My Lists ----------
+let mlForm='',mlSel=null,mlStep='',mlArm='',mlT=null,mlAt=0,mlXY=[0,0];
+const mlSub=l=>{const o=l.items.filter(i=>!i.done).length,d=l.items.length-o;return o+' to buy'+(d?' · '+d+' checked':'')};
+function mlShowHub(){$('#mld').hidden=true;$('#mlh').hidden=false;mlHub()}
+function mlHub(){
+ const h=$('#mlh');if(!h)return;
+ const rows=[{k:'p',ic:'🥫',n:'Products',c:favs.length?'('+favs.length+')':'',s:'Favorite scanned products'},{k:'r',ic:'🍲',n:'Recipes',c:rfavs.length?'('+rfavs.length+')':'',s:'Favorite recipes'}]
+  .concat(SH.lists.map(l=>({k:'s',id:l.id,ic:'🛒',n:l.name,c:'',s:'Shopping list · '+mlSub(l)})));
+ const ren=mlForm=='rename'&&SH.lists.find(l=>l.id==mlSel);
+ h.innerHTML='<h2 style="margin:0">My Lists</h2><p class="legend">Tap a list to open it. Press and hold a list for more options.</p>'+
+  (mlForm?'<div class="why"><b>'+(ren?'Rename list':'New list')+'</b><div class="row"><input type="text" id="mln" maxlength="40" value="'+(ren?esc(ren.name):'')+'" placeholder="List name (e.g. Costco, Pharmacy)" aria-label="List name"><button id="mlok">Save</button><button id="mlx">Cancel</button></div></div>'
+   :'<button class="pri" id="mlnew"'+(SH.lists.length>=20?' disabled':'')+'>+ New list</button>')+
+  rows.map(r=>'<div class="mlc" tabindex="0" data-k="'+r.k+'"'+(r.id?' data-id="'+r.id+'"':'')+'><span class="mli" aria-hidden="true">'+r.ic+'</span><div><b>'+esc(r.n)+'</b> <span class="mlcnt">'+r.c+'</span><small>'+esc(r.s)+'</small></div><span class="mlg" aria-hidden="true">›</span></div>').join('');
+}
+function closeMld(){mlShowHub()}
+function mlOpen(k,id){
+ if(k=='s'){hubShop=true;setCur(id);enter('v5',()=>{hubShop=false;tab(2);mlShowHub()});tab(5);$('#t2').className='on';shopDraw();return}
+ $('#mlh').hidden=true;$('#mld').hidden=false;favSub(k);window.scrollTo(0,0);enter('mld',closeMld)}
+function mlSave(){
+ const nm=($('#mln').value||'').trim().slice(0,40);if(!nm)return;
+ if(mlForm=='rename'){const l=SH.lists.find(x=>x.id==mlSel);if(l)l.name=nm}
+ else{if(SH.lists.length>=20)return;const L=cleanList({name:nm});L.id=rid();SH.lists.push(L)}
+ mlForm='';saveShop();mlHub()}
+$('#mlh').addEventListener('click',e=>{
+ if(Date.now()-mlAt<800){e.preventDefault();return}
+ const t=e.target;
+ if(t.id=='mlnew'){mlForm='new';mlHub();$('#mln').focus();return}
+ if(t.id=='mlx'){mlForm='';mlHub();return}
+ if(t.id=='mlok'){mlSave();return}
+ const c=t.closest('.mlc');if(c)mlOpen(c.dataset.k,c.dataset.id)});
+$('#mlh').addEventListener('keydown',e=>{if(e.target.id=='mln'&&e.key=='Enter'){mlSave();return}if(e.key=='Enter'&&e.target.classList.contains('mlc'))mlOpen(e.target.dataset.k,e.target.dataset.id)});
+$('#mlback').onclick=()=>back(closeMld);
+$('#mlh').addEventListener('pointerdown',e=>{const c=e.target.closest('.mlc');if(!c)return;mlXY=[e.clientX,e.clientY];clearTimeout(mlT);mlT=setTimeout(()=>{mlAt=Date.now();openMlSheet(c.dataset.k,c.dataset.id)},500)});
+$('#mlh').addEventListener('pointermove',e=>{if(Math.hypot(e.clientX-mlXY[0],e.clientY-mlXY[1])>10)clearTimeout(mlT)});
+['pointerup','pointercancel','pointerleave'].forEach(n=>$('#mlh').addEventListener(n,()=>clearTimeout(mlT)));
+$('#mlh').addEventListener('selectstart',e=>{const n=e.target.nodeType==1?e.target:e.target.parentElement;if(n&&n.closest&&n.closest('.mlc'))e.preventDefault()});
+$('#mlh').addEventListener('contextmenu',e=>{const c=e.target.closest('.mlc');if(!c)return;e.preventDefault();if(Date.now()-mlAt>800){mlAt=Date.now();clearTimeout(mlT);openMlSheet(c.dataset.k,c.dataset.id)}});
+function closeMlDOM(){$('#mls').hidden=true}
+function openMlSheet(k,id){mlSel=k=='s'?id:k;mlStep='';mlArm='';mlSheetDraw();$('#mls').hidden=false;enter('msheet',closeMlDOM);[0,60,250,600].forEach(t=>setTimeout(()=>{try{getSelection().removeAllRanges()}catch(e){}},t));try{navigator.vibrate&&navigator.vibrate(25)}catch(e){}}
+function mlSheetDraw(){
+ const L=SH.lists.find(l=>l.id==mlSel),built=!L,nm=built?(mlSel=='p'?'Products':'Recipes'):L.name;
+ const H='<h3 style="margin:0 0 10px;font-size:17px;text-transform:none;letter-spacing:0;color:var(--ink)">'+esc(nm)+'</h3>';
+ if(mlStep=='merge'){
+  $('#mlsb').innerHTML=H+'<p class="legend" style="margin:0 0 8px">Merge “'+esc(nm)+'” into which list? Its items are added to that list (duplicates are skipped) and “'+esc(nm)+'” is removed.</p>'+
+   SH.lists.filter(l=>l!=L).map(l=>'<button class="menub" data-mg="'+l.id+'" style="margin-top:8px"><span aria-hidden="true">🛒</span> '+esc(l.name)+'</button>').join('')+
+   '<button class="menub" id="mls_back" style="margin-top:12px">‹ Back</button>';return}
+ $('#mlsb').innerHTML=H+
+  '<button class="menub" id="mls_merge"'+(built||SH.lists.length<2?' disabled':'')+'><span aria-hidden="true">🔀</span> Merge lists</button>'+
+  '<button class="menub" id="mls_ren" style="margin-top:8px"'+(built?' disabled':'')+'><span aria-hidden="true">✏️</span> Rename</button>'+
+  '<button class="menub" id="mls_clr" style="margin-top:8px"><span aria-hidden="true">🧹</span> '+(mlArm=='clr'?'Tap again to clear':'Clear list')+'</button>'+
+  '<button class="menub" id="mls_del" style="margin-top:8px"'+(built?' disabled':'')+'><span aria-hidden="true">🗑️</span> '+(mlArm=='del'?'Tap again to delete':'Delete list')+'</button>'+
+  (built?'<p class="legend" style="margin:8px 0 0">Products and Recipes are built-in lists, so they can only be cleared.</p>':'')+
+  '<button class="menub" id="mls_x" style="margin-top:12px">Close</button>'}
+$('#mlsb').addEventListener('click',e=>{
+ const b=e.target.closest('button');if(!b||b.disabled)return;
+ const L=SH.lists.find(l=>l.id==mlSel);
+ if(b.id=='mls_x'){back(closeMlDOM);return}
+ if(b.id=='mls_back'){mlStep='';mlSheetDraw();return}
+ if(b.id=='mls_merge'){mlStep='merge';mlSheetDraw();return}
+ if(b.dataset.mg){const T=SH.lists.find(l=>l.id==b.dataset.mg);if(!L||!T)return;
+  L.items.forEach(i=>{if(!T.items.some(x=>nrm(x.text)==nrm(i.text)))T.items.push(i)});
+  const nm=L.name;SH.lists=SH.lists.filter(l=>l!=L);if(SH.cur==L.id)SH.cur=T.id;shop=SH.lists.find(l=>l.id==SH.cur)||SH.lists[0];saveShop();mlHub();back(closeMlDOM);toast('Merged “'+nm+'” into “'+T.name+'”');return}
+ if(b.id=='mls_ren'){const id=mlSel;back(closeMlDOM);setTimeout(()=>{mlForm='rename';mlSel=id;mlHub();const i=$('#mln');if(i){i.focus();i.select()}},120);return}
+ if(b.id=='mls_clr'||b.id=='mls_del'){
+  const k=b.id=='mls_clr'?'clr':'del';
+  if(mlArm!=k){mlArm=k;mlSheetDraw();setTimeout(()=>{if(mlArm==k&&!$('#mls').hidden){mlArm='';mlSheetDraw()}},4000);return}
+  mlArm='';
+  if(k=='clr'){
+   if(L){L.items=[];saveShop();toast('Cleared “'+L.name+'”')}
+   else if(mlSel=='p'){favs.splice(0);ls.set('gg_favs',favs);lists();toast('Cleared Products')}
+   else{rfavs.splice(0);ls.set('gg_rfavs',rfavs);rlist();rfavDraw();toast('Cleared Recipes')}
+  }else if(L){
+   const nm=L.name;SH.lists=SH.lists.filter(l=>l!=L);if(!SH.lists.length)SH.lists.push(cleanList({name:'Shopping list'}));
+   if(SH.cur==L.id)SH.cur=SH.lists[0].id;shop=SH.lists.find(l=>l.id==SH.cur)||SH.lists[0];saveShop();toast('Deleted “'+nm+'”')}
+  mlHub();back(closeMlDOM)}});
+$('#t2').onclick=()=>{stopScan();tab(2);mlShowHub();lists()};
 initRecipeUI();drawOcr();rlist();rfavDraw();shopBadge();favSub('p');lists();
 </script>
 </body></html>

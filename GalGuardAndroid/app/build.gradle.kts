@@ -11,8 +11,8 @@ android {
         applicationId = "com.galguard.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 21
-        versionName = "3.0"
+        versionCode = 22
+        versionName = "3.1"
     }
 
     // One fixed signing key for every build, so a new version installs over an older one and keeps its data.
@@ -38,6 +38,7 @@ android {
 
 dependencies {
     implementation("androidx.webkit:webkit:1.11.0")
+    implementation("androidx.core:core:1.13.1")
     implementation("com.google.android.gms:play-services-code-scanner:16.1.0")
     implementation("com.google.android.gms:play-services-mlkit-document-scanner:16.0.0")
     implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")

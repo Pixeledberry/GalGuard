@@ -1,4 +1,4 @@
-🚫🍖 I want to be 100% transparent and let everyone know that this project is 100% vibe-coded. I'm just a man with an idea. I do not know how to code. AI did all of the work. 🍖🚫
+🚫🍖 I want to be 100% transparent and let everyone know that this project is 100% vibe-coded. I'm just a man with an idea. I barely know how to code. AI did all of the heavy lifting here. 🍖🚫
 
 This app has an HTML web version, an Android, and an Apple version. $\color{red}{\text{(Apple version needs a sideloading tool to install because the app is not signed. If unable, just use the web app)}}$ I do not own an apple device so if there's issues then I apologize, but you'll just have to use the web app.
 
@@ -37,7 +37,14 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v3.0 (latest)
+### v3.1 (latest)
+- **My Lists tab.** The "Favorites" tab is now **My Lists**, and the red number bubble on it is gone. It shows all of your lists: **Products** and **Recipes** (your favorites, each with its count in brackets, like Recipes) and every shopping list, including ones you create with **+ New list**. Tap a list to open it; the others are hidden until you go back. Press and hold a list for **Merge lists**, **Rename**, **Clear list** and **Delete list**. Products and Recipes are built-in, so they can only be cleared. The Weekly Shopping List is still in the menu too.
+- **Recipe photos work on Android.** "Choose photo" now opens your phone's gallery, and there is a new **Take photo** button, to the left of it, that opens the camera.
+- **Missing-photo picture centered.** The placeholder plate shown when a recipe has no photo is now centered in the photo frame.
+- **Analyze, Try a sample and Add as recipe** are now on one line (the button now reads "Add as recipe").
+- **Release notes:** the Android install note now mentions tapping **More info**, then **Install anyway**, if Android blocks the install.
+
+### v3.0
 - **Updating the Android app now works.** Before this version, each build was signed with a different random key, so Android refused to install a new version over an older one and you had to uninstall first. From this version on, every build uses the same fixed key, so future updates install over the old one and keep your settings, favorites, history and shopping lists. **One last time:** if you have a version older than 3.0, Android will still ask you to uninstall it, which erases its data. Before you do that, open the menu, choose **Export / Import Settings** and copy or save your backup, then import it into 3.0. After that, updates are automatic. (On iPhone, a sideloading tool such as AltStore or Sideloadly keeps your data when it re-installs over the older version, as long as you use the same Apple ID.)
 - **Zoom slider on the camera.** The barcode camera view has a vertical zoom slider on the right side. Moving it takes over from the automatic zooming for that scan. Phones whose camera does not allow zoom control use a digital zoom, so the slider works everywhere.
 - **Scan box starts at 70%.** The scan box now starts at 70% of the view and shrinks from there. The 100% size is gone.
@@ -85,12 +92,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 ### v2.2
 - **Automatic releases:** both build workflows now publish a GitHub Release when a build succeeds. The Android APK and the unsigned iOS IPA are attached to a release named after the app version (for example, v2.2), so anyone can download them from the Releases page without signing in. The files are still saved as workflow Artifacts too.
 - **README wording:** the public README now points people to "available releases", and the Apple note about needing a sideloading tool is shown in red.
-
-### v2.1
-- **"Meatless" prefix:** an ingredient that starts with "meatless" is no longer flagged, the same as "vegan" (for example, "Meatless Pepperoni"). The German words "vegane" and "fleischlose" work the same way.
-- **Camera box follows the scan area:** the box on the camera view now starts at its largest size. Each time nothing is found and the app re-checks a smaller or more zoomed-in area, the box shrinks on screen to match exactly what is being checked. After the smallest size, the box returns to full size, and on phones with camera zoom the zoom also steps up.
-- **German ingredient lists:** much fuller German support, including compound words (Schweinefleisch, Rindertalg, Schweineschmalz), gelatin and collagen, rennet and enzymes, glycerin and glycerides, fatty acids and stearates, natural flavors, lanolin, and dairy words. German "plant-based" wording (pflanzlich, vegetabil, mikrobiell) is skipped. The app also reads a product's German ingredient text when that is the only one available.
-- **Public README:** the disclaimer at the top now starts and ends with 🚫.
 
 ---
 
@@ -164,7 +165,7 @@ Plant-based look-alikes are **not** flagged (including anything labeled dairy-fr
 - **Search and filters.** Search by recipe name or ingredient; filter by category or by safety rating (hide "Do not eat" or show only "Likely OK").
 - **Same ingredient checking as products.** Every ingredient is checked with your sensitivities and custom lists, highlighted red or yellow, and tappable for the reason. Each recipe card shows its rating.
 - **Add as Recipe.** In "Paste an ingredient list", the "Add as Recipe" button sends the list to a new recipe, one ingredient per line.
-- **Favorite recipes** are listed under "★ Favorites" in the Recipe tab and under Favorites → Recipes.
+- **Favorite recipes** are listed under "★ Favorites" in the Recipes tab and under My Lists → Recipes.
 - Recipes and photos are saved on your device only. Use Export Settings to back them up.
 
 ### Weekly shopping list
@@ -180,8 +181,8 @@ Plant-based look-alikes are **not** flagged (including anything labeled dairy-fr
 - Where the camera can't be used, "Photo of ingredient list" reads a photo instead. The reading language is chosen under My settings. Everything after the word "Ingredients" is included.
 - The text reader (Tesseract.js) is downloaded the first time and needs internet. Printed text on curved or shiny packaging can be misread, so check the pasted text.
 
-### Favorites, history, and export
-- **Favorites.** The Favorites tab has **Products** (the default) and **Recipes** sub-tabs. Add products with the star button. They show their current rating and re-rate automatically when you change settings. Tap to reopen, or remove with the **×**.
+### My Lists, history, and export
+- **My Lists.** The My Lists tab shows **Products** and **Recipes** (your favorites, with counts) and all of your shopping lists. Tap one to open it, and press and hold for Merge lists, Rename, Clear list or Delete list. Add products with the star button. They show their current rating and re-rate automatically when you change settings. Tap to reopen, or remove with the **×**.
 - **History.** The last 40 scanned products, with a Clear history button.
 - **Export.** Export favorites as a text list using the device's share sheet, the clipboard, or a downloaded `.txt` file, whichever is available.
 

@@ -33,7 +33,13 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v2.5 (latest)
+### v2.6 (latest)
+- **Add as Recipe.** A new button next to "Try a sample" in "Paste an ingredient list" turns the pasted or scanned list into a new recipe: it opens the New recipe page with the ingredients already filled in, one ingredient per line (split at the commas, keeping anything in brackets together). Add a name, photo and steps, then save.
+- **Device back button.** Pressing back on your phone (or the browser's back button) now leaves a sub-screen instead of closing the app: it closes the menu, the Shopping List, the Export / Import page, a recipe, and the recipe editor, one step at a time. On iPhone you can swipe in from the left edge.
+- **Graphite look.** The Dark theme and the Auto theme (in both light and dark mode) now use graphite grey instead of blue-black. The colored dark presets (Midnight Navy, Forest, Deep Ocean, Orchid Night, Berry Dusk) keep their own colors.
+- **Smaller fixes.** The footer now reads "v2.6" (the word "Web" is gone); the main tab is named "Recipes"; the barcode box hint is smaller so it is no longer cut off; the recipe ingredient box label now reads: Ingredients (one per line; end a line with enter key. ":" to start a group, like "Sauce:").
+
+### v2.5
 - **Better ingredient-list scanner in the apps.** On Android, "Scan ingredient list" now opens Google's document scanner (it finds the label, crops it and lets you retake or choose a photo) and reads it with Google's on-device text recognition. On iPhone and iPad it uses Apple's document camera and Apple's on-device text recognition. Both are more accurate than the web reader and work offline. If the built-in scanner can't start, the app falls back to the camera view. The web page still uses the camera reader (Tesseract.js), which needs internet the first time.
 - **Reads everything after "Ingredients".** The list now starts at the word "Ingredients" and includes everything after it, including the "Contains:" allergen line and anything printed below. If the word "Ingredients" can't be found, the full text is pasted so you can trim it.
 - **Export / Import Settings moved into the menu.** A single "Export / Import Settings" button at the bottom of the hamburger menu (below "Reset to automatic") opens a page with the Export Settings and Import Settings buttons.
@@ -82,7 +88,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ### Earlier versions
 - **v1.7:** Dairy is now yellow by default and red when you check it in settings, like the other sensitivities.
-- **v1.6:** Clear button for the barcode field; sensitivity settings that turn items red; mammal by-products and hidden animal-derived ingredients flagged yellow; tap any flagged ingredient for the reason; QR code scanning; longer-range scanning with zoom; the code nearest the center of the frame is read first.
 ---
 
 ## Features
@@ -154,6 +159,7 @@ Plant-based look-alikes are **not** flagged (including anything labeled dairy-fr
 - **Add your own recipes** with the **+ New recipe** button: name, category, prep, cook and total time, servings, a photo (shown at the top of the recipe), ingredients, instructions and notes. Edit or delete them any time.
 - **Search and filters.** Search by recipe name or ingredient; filter by category or by safety rating (hide "Do not eat" or show only "Likely OK").
 - **Same ingredient checking as products.** Every ingredient is checked with your sensitivities and custom lists, highlighted red or yellow, and tappable for the reason. Each recipe card shows its rating.
+- **Add as Recipe.** In "Paste an ingredient list", the "Add as Recipe" button sends the list to a new recipe, one ingredient per line.
 - **Favorite recipes** are listed under "★ Favorites" in the Recipe tab and under Favorites → Recipes.
 - Recipes and photos are saved on your device only. Use Export Settings to back them up.
 

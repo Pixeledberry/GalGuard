@@ -43,6 +43,7 @@ final class MainViewController: UIViewController, WKScriptMessageHandler, WKNavi
         web = WKWebView(frame: .zero, configuration: config)
         web.navigationDelegate = self
         web.uiDelegate = self
+        web.allowsBackForwardNavigationGestures = true   // swipe from the left edge = back (closes sub-screens)
         web.scrollView.contentInsetAdjustmentBehavior = .never   // the page handles safe areas itself
         view = web
     }

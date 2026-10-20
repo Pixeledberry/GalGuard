@@ -28,6 +28,7 @@ final class SchemeHandler: NSObject, WKURLSchemeHandler {
 final class MainViewController: UIViewController, WKScriptMessageHandler, WKNavigationDelegate, WKUIDelegate {
     private var web: WKWebView!
     private var scanner: AnyObject?   // ScanCoordinator on iOS 16+
+    private var textScanner: TextScanCoordinator?
 
     override func loadView() {
         let config = WKWebViewConfiguration()
@@ -36,7 +37,7 @@ final class MainViewController: UIViewController, WKScriptMessageHandler, WKNavi
         let controller = WKUserContentController()
         controller.add(self, name: "ios")
         // The page already knows how to talk to a native "Android" bridge, so we give it the same shape.
-        let shim = "window.Android={scan:function(){window.webkit.messageHandlers.ios.postMessage({a:'scan'})},share:function(t){window.webkit.messageHandlers.ios.postMessage({a:'share',t:t})}};"
+        let shim = "window.Android={scan:function(){window.webkit.messageHandlers.ios.postMessage({a:'scan'})},share:function(t){window.webkit.messageHandlers.ios.postMessage({a:'share',t:t})},scanText:function(l){window.webkit.messageHandlers.ios.postMessage({a:'scanText',l:l})}};"
         controller.addUserScript(WKUserScript(source: shim, injectionTime: .atDocumentStart, forMainFrameOnly: true))
         config.userContentController = controller
         web = WKWebView(frame: .zero, configuration: config)
@@ -54,6 +55,7 @@ final class MainViewController: UIViewController, WKScriptMessageHandler, WKNavi
     func userContentController(_ c: WKUserContentController, didReceive message: WKScriptMessage) {
         guard let body = message.body as? [String: Any], let action = body["a"] as? String else { return }
         if action == "scan" { startScan() }
+        if action == "scanText" { startTextScan(body["l"] as? String ?? "eng") }
         if action == "share", let text = body["t"] as? String {
             let sheet = UIActivityViewController(activityItems: [text], applicationActivities: nil)
             sheet.popoverPresentationController?.sourceView = view
@@ -79,6 +81,16 @@ final class MainViewController: UIViewController, WKScriptMessageHandler, WKNavi
                     if let value = result { self?.js("onNativeScan", value) }
                 }
             }
+        }
+    }
+
+    private func startTextScan(_ lang: String) {
+        let coordinator = TextScanCoordinator()
+        textScanner = coordinator
+        coordinator.start(from: self, lang: lang) { [weak self] text, error in
+            self?.textScanner = nil
+            if let error = error { self?.js("onNativeTextError", error) }
+            else if let text = text { self?.js("onNativeText", text) }
         }
     }
 

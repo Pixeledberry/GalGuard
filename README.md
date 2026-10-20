@@ -33,7 +33,12 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v2.4 (latest)
+### v2.5 (latest)
+- **Better ingredient-list scanner in the apps.** On Android, "Scan ingredient list" now opens Google's document scanner (it finds the label, crops it and lets you retake or choose a photo) and reads it with Google's on-device text recognition. On iPhone and iPad it uses Apple's document camera and Apple's on-device text recognition. Both are more accurate than the web reader and work offline. If the built-in scanner can't start, the app falls back to the camera view. The web page still uses the camera reader (Tesseract.js), which needs internet the first time.
+- **Reads everything after "Ingredients".** The list now starts at the word "Ingredients" and includes everything after it, including the "Contains:" allergen line and anything printed below. If the word "Ingredients" can't be found, the full text is pasted so you can trim it.
+- **Export / Import Settings moved into the menu.** A single "Export / Import Settings" button at the bottom of the hamburger menu (below "Reset to automatic") opens a page with the Export Settings and Import Settings buttons.
+
+### v2.4
 - **Your own recipes.** The Recipe tab has a **+ New recipe** button: name, category, prep/cook/total time, servings, a photo, ingredients (end a line with ":" for a group heading), instructions and notes. Your recipes get the same red/yellow ingredient checking, can be favorited, added to the shopping list, shared, edited and deleted. They are saved on the device and included in Export Settings and Import Settings.
 
 ### v2.3
@@ -43,7 +48,7 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 - **New Recipe tab** (between Scan and History) where you can add your own recipes, with the photo at the very top of each, times, servings, ingredients (with red and yellow highlights and tap-for-reason), instructions and notes. Search and filter by category or safety rating, and mark favorites.
 - **Favorite recipes.** Tap the star on a recipe card or page. They are listed under the **★ Favorites** switch inside the Recipe tab and under **Favorites → Recipes**.
 - **Favorites tab now has "Products" and "Recipes"** sub-tabs. Products is the default.
-- **Scan ingredient list.** A new button under "Scan barcode" uses the same camera view and resizing box, but reads the printed ingredient list with text recognition, pastes it into "Paste an ingredient list", and analyzes it automatically. It stops at "Contains", "Allergen", "Manufactured by" and similar text. There is also a "Photo of ingredient list" option (web and iPhone) and a language setting under My settings (English, German, French, Spanish, Italian). The first use downloads the text reader (about 15 MB) and needs internet.
+- **Scan ingredient list.** A new button under "Scan barcode" uses the same camera view and resizing box, but reads the printed ingredient list with text recognition, pastes it into "Paste an ingredient list", and analyzes it automatically. It starts at the word "Ingredients" and keeps everything after it, including the "Contains" line. There is also a "Photo of ingredient list" option (web and iPhone) and a language setting under My settings (English, German, French, Spanish, Italian). The first use downloads the text reader (about 15 MB) and needs internet.
 - **Rating fixes.** Chicken, turkey and poultry sausage, bacon, hot dogs and ham are now yellow instead of red (the meat is poultry, but casings and processing can involve pork or beef). Dairy-free, non-dairy and plant-based milk, butter, cheese and cream are no longer flagged; "hot dog buns", "butternut squash", "butter lettuce", jalapeño "ribs", goat cheese (now yellow as cheese, not red as goat), "avoid bone char" and marine collagen are handled correctly. Many more cheeses (parmesan, feta, mozzarella, cheddar and others) and half-and-half are now recognized as dairy.
 - **Export and Import Settings** now also carry your theme, favorite and created recipes and shopping list.
 
@@ -78,7 +83,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 ### Earlier versions
 - **v1.7:** Dairy is now yellow by default and red when you check it in settings, like the other sensitivities.
 - **v1.6:** Clear button for the barcode field; sensitivity settings that turn items red; mammal by-products and hidden animal-derived ingredients flagged yellow; tap any flagged ingredient for the reason; QR code scanning; longer-range scanning with zoom; the code nearest the center of the frame is read first.
-- **v1.5:** Fixed highlighting not appearing in some browsers and a lookup problem; added a "Try a sample" button and a version label in the footer.
 ---
 
 ## Features
@@ -144,7 +148,7 @@ Plant-based look-alikes are **not** flagged (including anything labeled dairy-fr
 - **Sensitivities.** Some things affect people with AGS differently. Check any of these to flag them **red** instead of yellow: dairy, gelatin, glycerin and mono/diglycerides, stearic acid and stearates, natural flavors, lanolin and vitamin D3, rennet and animal enzymes. Unchecked, they show as yellow.
 - **Custom lists.** Add your own ingredients to always flag red or always flag yellow (comma separated).
 - **Rating overrides.** On any result, "Rating wrong?" lets you mark a product safe or do-not-eat, or reset it. There's also a link to fix the ingredients on Open Food Facts.
-- **Export Settings / Import Settings.** Two buttons under "My settings" create a backup of your settings, favorites, history, rating overrides, theme, favorite and created recipes and shopping list (a small text file) and restore it on another device. You can save or share the backup, copy it, and import it from a file or by pasting the text.
+- **Export Settings / Import Settings.** A button at the bottom of the menu (top right) opens a page with two buttons that create a backup of your settings, favorites, history, rating overrides, theme, favorite and created recipes and shopping list (a small text file) and restore it on another device. You can save or share the backup, copy it, and import it from a file or by pasting the text.
 
 ### Recipes
 - **Add your own recipes** with the **+ New recipe** button: name, category, prep, cook and total time, servings, a photo (shown at the top of the recipe), ingredients, instructions and notes. Edit or delete them any time.
@@ -162,8 +166,8 @@ Plant-based look-alikes are **not** flagged (including anything labeled dairy-fr
 - The hamburger button at the top right opens the menu. Pick a preset (Auto, Light, Dark, five masculine, five feminine) or choose your own background and accent colors. Red and yellow highlight colors stay readable in every theme.
 
 ### Scan an ingredient list
-- The "Scan ingredient list" button under "Scan barcode" opens the camera, reads the printed ingredient list with text recognition, fills the "Paste an ingredient list" box and analyzes it. The box starts large and shrinks while it looks, like the barcode scanner. "Capture now" uses whatever is in view.
-- Where the camera can't be used, "Photo of ingredient list" reads a photo instead. The reading language is chosen under My settings.
+- In the Android and iPhone apps, "Scan ingredient list" uses Google's document scanner (Android) or Apple's document camera (iPhone), with on-device text recognition. On the web it uses the camera view below. It reads the printed ingredient list, fills the "Paste an ingredient list" box and analyzes it. The box starts large and shrinks while it looks, like the barcode scanner. "Capture now" uses whatever is in view.
+- Where the camera can't be used, "Photo of ingredient list" reads a photo instead. The reading language is chosen under My settings. Everything after the word "Ingredients" is included.
 - The text reader (Tesseract.js) is downloaded the first time and needs internet. Printed text on curved or shiny packaging can be misread, so check the pasted text.
 
 ### Favorites, history, and export
@@ -188,7 +192,7 @@ Everything personal is stored **in the visitor's own browser** using `localStora
 | `gg_shop` | Weekly shopping list |
 | `gg_theme` | Selected theme or custom colors |
 
-**Moving to a new device:** tap **Export Settings** (under My settings) on the old device to create a backup, then **Import Settings** on the new one. Importing adds the backup's favorites and history to anything already there and replaces the sensitivity settings.
+**Moving to a new device:** open the menu and tap **Export / Import Settings**, then **Export Settings**, on the old device to create a backup, then **Import Settings** on the new one. Importing adds the backup's favorites and history to anything already there and replaces the sensitivity settings.
 
 What this means in practice:
 - **Each visitor has their own data.** Two people opening the same GitHub Pages link each get a separate, private list. GitHub never sees it.

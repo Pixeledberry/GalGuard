@@ -126,9 +126,7 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
   <input type="text" id="ca" placeholder="Always flag red / do not eat (comma separated)" aria-label="Always avoid">
   <input type="text" id="cc" placeholder="Always flag yellow / avoid (comma separated)" aria-label="Always caution">
   <label style="margin-top:10px">Ingredient scanner language<select id="ocrl" style="width:100%;margin-top:4px"></select></label>
-  <p class="legend">The first ingredient scan downloads the text reader (about 15 MB) and needs internet. It is stored for next time.</p></details>
- <div class="row"><button id="xs" style="flex:1">Export Settings</button><button id="is" style="flex:1">Import Settings</button></div>
- <div id="bk" class="why" hidden></div><input type="file" id="bf" accept=".json,application/json,text/plain" hidden>
+  <p class="legend">On the web, the first ingredient scan downloads the text reader (about 15 MB) and needs internet. The Android and iPhone apps use the phone’s built-in text reader.</p></details>
  <div id="result"></div>
 </section>
 <section id="v2" hidden><div class="seg"><button id="fp" class="on">Products</button><button id="fr">Recipes <span id="rfc"></span></button></div><div id="favs"></div><div id="rfavs" hidden></div></section>
@@ -148,8 +146,9 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
  <div id="re" hidden></div>
 </section>
 <section id="v5" hidden><div id="shop"></div></section>
+<section id="v6" hidden><button class="back" id="bkback">‹ Back</button><h2 style="margin:0">Export / Import Settings</h2><p class="legend">Back up your settings, favorites, history, rating overrides, theme, recipes and shopping list, or restore them on a new device.</p><div class="row"><button id="xs" style="flex:1">Export Settings</button><button id="is" style="flex:1">Import Settings</button></div><div id="bk" class="why" hidden></div><input type="file" id="bf" accept=".json,application/json,text/plain" hidden></section>
 </main>
-<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>Web v2.4</footer>
+<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>Web v2.5</footer>
 <div id="scrim" hidden></div>
 <aside id="drawer" hidden aria-label="Menu">
  <div class="dh"><h2>Menu</h2><button id="dclose" aria-label="Close menu">×</button></div>
@@ -160,6 +159,8 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
  <div class="cust"><label>Background<input type="color" id="cbg" value="#0f161d"></label><label>Accent<input type="color" id="cac" value="#4f8cff"></label></div>
  <p class="legend">Text and card colors are chosen automatically so everything stays readable.</p>
  <button class="smallb" id="crs">Reset to automatic</button>
+ <h3>Backup</h3>
+ <button class="menub" id="mbk"><span aria-hidden="true">💾</span> Export / Import Settings</button>
 </aside>
 <div id="toast" hidden style="z-index:30"></div>
 <script type="application/json" id="rdata">[]</script>
@@ -267,7 +268,7 @@ async function exportFavs(){
  try{await navigator.clipboard.writeText(t);toast('Favorites copied to your clipboard');return}catch(e){}
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/plain'}));a.download='galguard-favorites.txt';a.click();
 }
-function tab(n){['v1','v2','v3','v4','v5'].forEach((v,i)=>$('#'+v).hidden=n!=i+1);[1,2,3,4].forEach(i=>$('#t'+i).className=n==i?'on':'');window.scrollTo(0,0)}
+function tab(n){['v1','v2','v3','v4','v5','v6'].forEach((v,i)=>$('#'+v).hidden=n!=i+1);[1,2,3,4].forEach(i=>$('#t'+i).className=n==i?'on':'');window.scrollTo(0,0)}
 $('#t1').onclick=()=>tab(1);$('#t2').onclick=()=>{stopScan();tab(2);lists()};$('#t3').onclick=()=>{stopScan();tab(3);lists()};$('#t4').onclick=()=>{stopScan();tab(4)};
 async function lookup(code){
  code=(code||'').replace(/\D/g,'');if(!code)return;
@@ -463,6 +464,8 @@ function closeDrawer(){$('#scrim').hidden=true;$('#drawer').hidden=true;$('#hb')
 $('#hb').onclick=()=>$('#drawer').hidden?openDrawer():closeDrawer();
 $('#dclose').onclick=closeDrawer;$('#scrim').onclick=closeDrawer;
 document.addEventListener('keydown',e=>{if(e.key=='Escape'&&!$('#drawer').hidden)closeDrawer()});
+$('#mbk').onclick=()=>{closeDrawer();stopScan();tab(6)};
+$('#bkback').onclick=()=>tab(1);
 $('#mshop').onclick=()=>{closeDrawer();stopScan();tab(5);shopDraw()};
 // ---------- shopping list ----------
 const pad=n=>String(n).padStart(2,'0'),ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
@@ -661,8 +664,6 @@ function ingredientsFrom(raw){
  let t=String(raw||'').replace(/\r/g,'').replace(/(\p{L})-\s*\n\s*(?=\p{Ll})/gu,'$1').replace(/\s*\n\s*/g,' ').replace(/[|_]/g,' ').replace(/\s{2,}/g,' ').trim();
  const kw=/(?:\b[il1]ngr[eé]dients?|\bingredientes|\bingredienti|\bzutaten|\bzusammensetzung)\b\s*[:：.\-–]?\s*/i,m=kw.exec(t);let has=false;
  if(m){t=t.slice(m.index+m[0].length);has=true}
- const stop=/(?:\b(?:contains?\s*:|may contain|allergen|allergy|manufactured|distributed|produced (?:in|by)|packed (?:in|by)|made in|nutrition facts|nutritional|serving size|best before|best by|use by|store in|keep refrigerated|net wt|net weight|directions|questions\??|www\.|enthält|kann spuren|hergestellt|nährwert|mindestens haltbar|peut contenir|fabriqué|valeurs nutritionnelles|puede contener|información nutricional|può contenere|valori nutrizionali)|©)/i,s=stop.exec(t);
- if(s&&s.index>10)t=t.slice(0,s.index);
  t=t.replace(/[\s,;:.]+$/,'').trim();
  const commas=(t.match(/,/g)||[]).length;
  return{text:t,hasKw:has,ok:t.length>=20&&(has||commas>=3)}}
@@ -708,7 +709,9 @@ async function startOCR(){
   }
  }catch(e){ocrLoading=false;if(run==ocrRun){stopScan();const n=e&&e.name;note(n=='NotAllowedError'||/denied|permission/i.test(String(e))?'Camera permission was blocked. Allow camera access for this app or site in your settings, then try again.':n=='NotFoundError'?'No camera found on this device.':'The ingredient scanner couldn’t start ('+(e&&e.message||n)+'). Try “Photo of ingredient list”.')}}
 }
-$('#scani').onclick=startOCR;
+$('#scani').onclick=()=>{if(window.Android&&Android.scanText){stopScan();Android.scanText(cfg.ocr&&OCRL[cfg.ocr]?cfg.ocr:'eng')}else startOCR()};
+window.onNativeText=t=>{const ing=ingredientsFrom(t);if(ing.ok)ocrDone(ing.text,false);else if(ing.text.length>=10)ocrDone(ing.text,true);else note('Couldn’t read any text in that picture. Get closer, keep the text flat and well lit, and try again.')};
+window.onNativeTextError=m=>{toast('Built-in text scanner unavailable'+(m?' ('+m+')':'')+', using the camera view');startOCR()};
 $('#ocrnow').onclick=()=>{ocrNow=true;ocrMsg('Reading…')};$('#ocrstop').onclick=stopScan;
 $('#phi').onchange=async e=>{
  const f=e.target.files[0];e.target.value='';if(!f)return;

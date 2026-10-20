@@ -16,6 +16,12 @@ import android.webkit.WebViewClient
 import androidx.webkit.WebViewAssetLoader
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanning
+import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import org.json.JSONObject
 
@@ -70,6 +76,30 @@ class MainActivity : Activity() {
         if (results.firstOrNull() == PackageManager.PERMISSION_GRANTED) req.grant(req.resources) else req.deny()
     }
 
+    private val reqDoc = 4711
+
+    private fun textError(message: String?) {
+        web.evaluateJavascript("window.onNativeTextError && window.onNativeTextError(${JSONObject.quote(message ?: "")})", null)
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode != reqDoc || resultCode != RESULT_OK) return
+        val uri = GmsDocumentScanningResult.fromActivityResultIntent(data)?.getPages()?.firstOrNull()?.getImageUri()
+        if (uri == null) { textError("no picture returned"); return }
+        try {
+            val image = InputImage.fromFilePath(this, uri)
+            TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS).process(image)
+                .addOnSuccessListener { text ->
+                    web.evaluateJavascript("window.onNativeText(${JSONObject.quote(text.text)})", null)
+                }
+                .addOnFailureListener { e -> textError(e.message) }
+        } catch (e: Exception) {
+            textError(e.message)
+        }
+    }
+
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (web.canGoBack()) web.goBack() else super.onBackPressed()
@@ -84,6 +114,22 @@ class MainActivity : Activity() {
                     putExtra(Intent.EXTRA_TEXT, text)
                 }
                 startActivity(Intent.createChooser(send, "Share"))
+            }
+        }
+
+        // Google's document scanner (auto-crops the page), then Google's on-device text recognition.
+        @JavascriptInterface
+        fun scanText(lang: String) {
+            runOnUiThread {
+                val options = GmsDocumentScannerOptions.Builder()
+                    .setGalleryImportAllowed(true)
+                    .setPageLimit(1)
+                    .setResultFormats(GmsDocumentScannerOptions.RESULT_FORMAT_JPEG)
+                    .setScannerMode(GmsDocumentScannerOptions.SCANNER_MODE_BASE)
+                    .build()
+                GmsDocumentScanning.getClient(options).getStartScanIntent(this@MainActivity)
+                    .addOnSuccessListener { sender -> startIntentSenderForResult(sender, reqDoc, null, 0, 0, 0) }
+                    .addOnFailureListener { e -> textError(e.message) }
             }
         }
 

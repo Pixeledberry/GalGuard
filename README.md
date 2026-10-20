@@ -37,7 +37,13 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v2.8 (latest)
+### v2.9 (latest)
+- **Multiple shopping lists.** The Weekly Shopping List now has a list picker and a **+ New list** button (up to 20 lists, for example "Costco" or "Pharmacy"). You can rename or delete a list, and each list has its own week and items. Press and hold an item and choose **Move to another list** to move it. Items you add from a recipe or a scanned product go to the list that is currently open, and the message tells you which one. Your existing list is kept as "Shopping list". Export Settings and Import Settings carry all of your lists; imported lists with the same name are merged.
+- **More shopping categories.** Items can now be sorted into Produce, Meat & seafood, Deli, Dairy & eggs, Bakery, Frozen, Pantry & canned, Spices & baking, Condiments & sauces, Breakfast & cereal, Snacks, Beverages, **Hygiene**, Health & pharmacy, Baby, Household & cleaning, Paper goods, **Pet** and Other. New items are sorted automatically, and you can change any item with "Edit category". (The old "Pantry & other" is now "Other".)
+- **Long-press highlight fixed.** Pressing and holding a shopping list item no longer leaves its text highlighted.
+- **Export favorites for recipes.** Favorites → Recipes and the "★ Favorites" view in the Recipes tab now have an **Export favorites** button, the same as for products. It lists each recipe with its rating (and the link, or the ingredients for recipes you created).
+
+### v2.8
 - **Press and hold a shopping list item** to open a menu with **View Enlarged Image** and **Edit category** (move the item to another aisle, or go back to Automatic). For scanned products the menu also has an option to **turn images on or off for all scanned products**; when on, each scanned product shows a small version of its picture in the list.
 - **Tap any scanned product's picture to enlarge it**: on the result page, in Favorites and History, and in the shopping list. The back button, Esc or a tap closes it.
 - **README:** the public README now tells people to use the standalone apps (shown in red).
@@ -86,13 +92,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 - **Ingredients that start with "vegan" are no longer flagged** (for example, "Vegan Pepperoni").
 - **Android app fixes:** restored the app's build file (`app/build.gradle.kts`), which was empty in the Android zips from v1.2 through v1.9 and stopped the project from syncing or building. The share sheet now also works for exporting favorites and backups.
 - **Public README:** now opens with a new disclaimer and install instructions, and the changelog shows only the last 10 versions.
-
-### v1.9
-- **Works on Apple devices.** The web page is tuned for iPhone and iPad: "Add to Home Screen" settings, iOS-style form controls, text sizing, and the scanner library now preloads so the first scan starts faster.
-- **New iOS app project** (`GalGuardiOS`) alongside the web page and Android app. It uses Apple's built-in scanner for barcodes and QR codes, with pinch-to-zoom and nearest-to-center selection.
-- **Cloud build workflows** that build the Android APK and an unsigned iOS IPA on GitHub, so you don't need Android Studio or a Mac.
-- Added `apple-touch-icon.png`, the file iPhones use for the home-screen icon.
-- README now opens with a transparency statement.
 
 ---
 
@@ -171,7 +170,7 @@ Plant-based look-alikes are **not** flagged (including anything labeled dairy-fr
 
 ### Weekly shopping list
 - Open it from the menu (top right). Add items by hand, with the "+" next to a recipe ingredient, "Add all to list" on a recipe, or "Add to shopping list" on a scanned product.
-- Items are grouped by aisle (produce, meat and seafood, dairy and eggs, bakery, frozen, pantry and other), can be checked off or removed, and the list can be copied or shared. Press and hold an item to enlarge its image, change its category, or show small pictures for scanned products.
+- Keep several lists (for example Costco or Pharmacy). Items are grouped by category (produce, meat and seafood, deli, dairy and eggs, bakery, frozen, pantry, spices and baking, condiments, breakfast, snacks, beverages, hygiene, health, baby, household, paper goods, pet, other), can be checked off or removed, and the list can be copied or shared. Press and hold an item to enlarge its image, change its category, or show small pictures for scanned products.
 - Each list is tied to a week (Monday start). "Start new week" removes checked items and keeps the rest. Duplicates are ignored.
 
 ### Menu and themes
@@ -201,7 +200,7 @@ Everything personal is stored **in the visitor's own browser** using `localStora
 | `gg_cfg` | Sensitivities, custom flag lists and ingredient-scan language |
 | `gg_rfavs` | Favorite recipe ids |
 | `gg_myrec` | Recipes you created |
-| `gg_shop` | Weekly shopping list |
+| `gg_shops` | Shopping lists |
 | `gg_theme` | Selected theme or custom colors |
 
 **Moving to a new device:** open the menu and tap **Export / Import Settings**, then **Export Settings**, on the old device to create a backup, then **Import Settings** on the new one. Importing adds the backup's favorites and history to anything already there and replaces the sensitivity settings.

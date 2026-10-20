@@ -117,6 +117,7 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
 #shs{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:25;display:flex;align-items:flex-end}
 #shsb{width:100%;max-width:560px;margin:0 auto;background:var(--card);color:var(--ink);border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:85vh;overflow:auto;animation:slidein .18s ease}
 .menub:disabled{opacity:.5}
+.shrow,.shrow *{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none}.shrow ::selection,.shrow::selection{background:transparent}
 </style></head><body>
 <header><h1><img id="logo" alt="" width="36" height="36" style="vertical-align:-8px;margin-right:8px">GalGuard</h1><p>Scan a barcode. See how risky it is for alpha-gal.</p><button id="hb" aria-label="Menu" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span><i id="hbn" hidden></i></button></header>
 <main>
@@ -148,6 +149,7 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
   <div class="row"><input type="text" id="rq" placeholder="Search recipes or ingredients" aria-label="Search recipes"></div>
   <div class="row"><select id="rcat" aria-label="Category"></select><select id="rsrc" aria-label="Source site"></select></div>
   <div class="row"><select id="rsafe" aria-label="Safety rating"><option value="">Any safety rating</option><option value="hide">Hide “Do not eat”</option><option value="ok">Only “Likely OK”</option></select></div>
+  <div class="links" id="rfexw" hidden><button id="rfex2">Export favorites</button></div>
   <p class="legend" id="rcount" role="status"></p>
   <div id="rcards" class="rgrid"></div>
   <button class="pri" id="rmore" hidden>Show more</button>
@@ -158,7 +160,7 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
 <section id="v5" hidden><div id="shop"></div></section>
 <section id="v6" hidden><button class="back" id="bkback">‹ Back</button><h2 style="margin:0">Export / Import Settings</h2><p class="legend">Back up your settings, favorites, history, rating overrides, theme, recipes and shopping list, or restore them on a new device.</p><div class="row"><button id="xs" style="flex:1">Export Settings</button><button id="is" style="flex:1">Import Settings</button></div><div id="bk" class="why" hidden></div><input type="file" id="bf" accept=".json,application/json,text/plain" hidden></section>
 </main>
-<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v2.8</footer>
+<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v2.9</footer>
 <div id="scrim" hidden></div>
 <aside id="drawer" hidden aria-label="Menu">
  <div class="dh"><h2>Menu</h2><button id="dclose" aria-label="Close menu">×</button></div>
@@ -308,7 +310,7 @@ $('#cl').onclick=()=>{$('#code').value='';$('#result').innerHTML='';$('#code').f
 // ---- backup: export / import settings, favorites, history and rating overrides ----
 const IOSAPP=!!(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.ios);
 function drawSettings(){$('#sens').innerHTML=Object.entries(SENS).map(([k,l])=>'<label><input type="checkbox" data-s="'+k+'"'+(cfg.sens[k]?' checked':'')+'> '+esc(l)+'</label>').join('');$('#ca').value=cfg.avoid;$('#cc').value=cfg.caution}
-function backupText(){return JSON.stringify({app:'GalGuard',version:1,exported:new Date().toISOString(),settings:cfg,favorites:favs,history:hist,overrides:ovr,theme:theme,recipeFavorites:rfavs,shopping:shop,myRecipes:myrec},null,1)}
+function backupText(){return JSON.stringify({app:'GalGuard',version:1,exported:new Date().toISOString(),settings:cfg,favorites:favs,history:hist,overrides:ovr,theme:theme,recipeFavorites:rfavs,shopping:SH,myRecipes:myrec},null,1)}
 function bkPanel(html){const b=$('#bk');b.className='why';b.innerHTML=html;b.hidden=false;b.scrollIntoView({behavior:'smooth',block:'nearest'})}
 async function saveBackup(t){
  if(window.Android&&Android.share){Android.share(t);return}
@@ -415,7 +417,7 @@ let RECIPES=[],RBY={};
 function loadRecipes(){RECIPES=[...BASE,...myrec];RBY={};RECIPES.forEach(r=>{r._q=(r.t+' '+r.i.join(' ')).toLowerCase();RBY[r.id]=r})}
 const hex=/^#[0-9a-f]{6}$/i;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const AORD=['Produce','Meat & seafood','Dairy & eggs','Bakery','Frozen','Pantry & other'];
+const AORD=['Produce','Meat & seafood','Deli','Dairy & eggs','Bakery','Frozen','Pantry & canned','Spices & baking','Condiments & sauces','Breakfast & cereal','Snacks','Beverages','Hygiene','Health & pharmacy','Baby','Household & cleaning','Paper goods','Pet','Other'];
 // ---------- back button support: every sub-screen is a "layer" in the browser history ----------
 const layers=[];let skipPop=0,curTab=1;
 function enter(k,close){const t=layers[layers.length-1];if(t&&t.k==k){t.close=close;return}layers.push({k,close});try{history.pushState({gg:1},'')}catch(e){}}
@@ -504,46 +506,80 @@ function cleanShop(s){
  if(/^\d{4}-\d{2}-\d{2}$/.test(s.week))out.week=s.week;
  if(Array.isArray(s.items))s.items.slice(0,500).forEach(x=>{if(x&&typeof x.text=='string'&&x.text.trim())out.items.push({id:String(x.id||Math.random().toString(36).slice(2,9)).slice(0,20),text:x.text.trim().slice(0,200),done:x.done===true,src:typeof x.src=='string'?x.src.slice(0,80):'',img:typeof x.img=='string'&&/^https:\/\//.test(x.img)&&x.img.length<500?x.img:'',cat:AORD.includes(x.cat)?x.cat:''})});
  return out}
-let shop=cleanShop(ls.get('gg_shop',null));
-const saveShop=()=>{ls.set('gg_shop',shop);shopBadge()};
+const rid=()=>Math.random().toString(36).slice(2,9);
+function cleanList(l){const c=cleanShop(l);return{id:String(l&&l.id||'').replace(/[^a-z0-9]/gi,'').slice(0,20)||rid(),name:(l&&typeof l.name=='string'&&l.name.trim()||'Shopping list').slice(0,40),week:c.week,items:c.items}}
+function cleanStore(x){
+ const st={cur:'',imgs:false,lists:[]};if(!x||typeof x!='object')x={};
+ if(Array.isArray(x.lists))x.lists.slice(0,20).forEach(l=>st.lists.push(cleanList(l)));else if(Array.isArray(x.items))st.lists.push(cleanList(x));
+ if(x.imgs===true)st.imgs=true;if(!st.lists.length)st.lists.push(cleanList({name:'Shopping list'}));
+ const seen={};st.lists.forEach(l=>{if(seen[l.id])l.id=rid();seen[l.id]=1});
+ st.cur=st.lists.some(l=>l.id==x.cur)?x.cur:st.lists[0].id;return st}
+let SH=cleanStore(ls.get('gg_shops',null)||ls.get('gg_shop',null));
+let shop=SH.lists.find(l=>l.id==SH.cur);
+const saveShop=()=>{ls.set('gg_shops',SH);shopBadge()};
+function setCur(id){SH.cur=id;shop=SH.lists.find(l=>l.id==id)||SH.lists[0];SH.cur=shop.id;clearArm=0;delArm=0;listForm='';saveShop();shopDraw()}
 const nrm=t=>t.toLowerCase().replace(/\s+/g,' ').trim();
 function shopAdd(text,src,img){text=String(text||'').trim();if(!text)return false;if(shop.items.some(i=>nrm(i.text)==nrm(text)))return false;
  shop.items.push({id:Math.random().toString(36).slice(2,9),text:text.slice(0,200),done:false,src:src||'',img:img&&/^https:\/\//.test(img)&&img.length<500?img:'',cat:''});return true}
 function shopBadge(){const n=shop.items.filter(i=>!i.done).length;const b=$('#hbn');b.textContent=n>99?'99+':n;b.hidden=!n;$('#mshopn').textContent=n?n+' to buy':'empty';$('#hb').setAttribute('aria-label','Menu'+(n?', '+n+' items on shopping list':''))}
 const AISLES=[
- ['Pantry & other',/\b(broth|stock|bouillon|(?:coconut|almond|oat|soy|rice|cashew) (?:milk|cream)|(?:peanut|almond|nut|cashew|sunflower|cocoa|shea) butter|cream of tartar|powder|dried|extract|seasoning|flakes|canned|can of|jar of|paste)\b/i],
+ ['Pet',/\b(?:(?:dog|cat|puppy|kitten|bird|fish) (?:food|treats?|toys?|litter|shampoo|bowl|chews?)|cat litter|litter|kibble|puppy|kitten|pet (?:food|treats?|supplies|toys?|shampoo)|flea|chew toys?|bird ?seed)\b/i],
+ ['Household & cleaning',/\b(?:dish soap|dishwasher|detergent|laundry|fabric softener|dryer sheets?|bleach|cleaner|cleaning|disinfect\w*|sponges?|scrub\w*|trash bags?|garbage bags?|bin liners?|mop|broom|light ?bulbs?|batteries|air freshener|windex|lysol)\b/i],
+ ['Paper goods',/\b(?:paper towels?|toilet paper|toilet tissue|tissues?|napkins?|paper plates?|paper cups?|plastic cups?|plastic wrap|cling film|aluminum foil|tin foil|foil|parchment|wax paper|zip(?:-| )?lock|sandwich bags?|freezer bags?|straws|plastic forks?)\b/i],
+ ['Hygiene',/\b(?:shampoo|conditioner|body wash|hand soap|bar soap|soap|toothpaste|toothbrush(?:es)?|floss|mouthwash|deodorant|razors?|shaving|shave|lotion|moisturi[sz]er|sunscreen|lip balm|chapstick|tampons?|pads|panty liners?|feminine|cotton (?:balls?|swabs?|pads?)|q-?tips|hair (?:gel|spray|brush|ties?)|makeup|mascara|face wash|cleanser|hand sanitizer|nail (?:polish|clippers?)|perfume|cologne|toner|serum)\b/i],
+ ['Health & pharmacy',/\b(?:vitamins?|medicine|medication|ibuprofen|advil|tylenol|acetaminophen|aspirin|bandages?|band-?aids?|allergy|antacid|cough|cold (?:medicine|relief)|supplements?|probiotics?|prescription|thermometer|first aid|melatonin|pain relief|antihistamine|eye drops)\b/i],
+ ['Baby',/\b(?:diapers?|baby (?:wipes?|food|formula|shampoo|lotion)|formula|pacifiers?|onesies?)\b/i],
+ ['Frozen',/\b(?:frozen|ice cream|popsicles?|sorbet|gelato)\b/i],
+ ['Produce',/\b(?:lemon|lime) juice\b/i],
+ ['Snacks',/\b(?:(?:potato|tortilla|corn|banana|kale|veggie|pita|plantain) chips|popcorn|pretzels?|crackers?|granola bars?|trail mix|jerky)\b/i],
+ ['Beverages',/\b(?:coffee|espresso|tea bags?|tea|juice|soda|seltzer|sparkling|bottled water|water bottles?|beer|wine|kombucha|lemonade|gatorade|cola|energy drinks?|sports drinks?|liquor|vodka|whiskey|cider|drink mix)\b/i],
+ ['Condiments & sauces',/\b(?:(?:peanut|almond|nut|cashew|sunflower) butter|ketchup|mustard|mayo(?:nnaise)?|sauce|dressing|vinegar|salsa|relish|pesto|marinade|jam|jelly|preserves|honey|maple syrup|hummus|tahini|aioli|bbq)\b/i],
+ ['Pantry & canned',/\b(?:broth|stock|bouillon|canned|can of|jar of|tomato paste|coconut milk|(?:almond|oat|soy|rice|cashew) milk)\b/i],
+ ['Spices & baking',/\b(?:flour|sugar|baking|yeast|vanilla|cinnamon|cumin|paprika|turmeric|salt|black pepper|ground pepper|white pepper|cayenne|red pepper flakes|peppercorns|oregano|nutmeg|cloves|spices?|seasoning|extract|cocoa|cornstarch|powder|dried|flakes|bay leaves|cream of tartar|sprinkles|food coloring|molasses)\b/i],
  ['Produce',/\b(apples?|bananas?|berr(?:y|ies)|lemons?|limes?|oranges?|lettuce|spinach|kale|onions?|garlic|carrots?|celery|potato(?:es)?|tomato(?:es)?|bell peppers?|jalape\w*|chil(?:e|i)s?|squash|zucchini|cucumbers?|avocados?|cilantro|parsley|basil|thyme|rosemary|sage|mint|dill|chives|mushrooms?|broccoli|cauliflower|cabbage|corn|pumpkin|ginger|scallions?|green onions?|beets?|radish\w*|mangos?|pineapple|peach\w*|pears?|grapes?|melon|cherr(?:y|ies)|asparagus|leeks?|shallots?|eggplant|okra|chard|arugula|greens|fruit|herbs?|cranberr\w*|blueberr\w*|strawberr\w*|raspberr\w*|plantains?|yams?|turnips?|fennel|brussels)\b/i],
+ ['Deli',/\b(?:deli|lunch meat|cold cuts|sliced (?:turkey|ham|roast beef)|rotisserie|prosciutto|salami|pastrami)\b/i],
  ['Meat & seafood',/\b(chicken|turkey|duck|fish|salmon|shrimp|tuna|cod|tilapia|halibut|trout|crab|scallops?|ground (?:beef|pork|turkey|chicken)|beef|pork|lamb|sausages?|bacon|ham|steak|ribs|roast)\b/i],
  ['Dairy & eggs',/\b(milk|cheeses?|butter|cream|yogh?urt|eggs?|ghee|half[- ]and[- ]half|sour cream|feta|parmesan|mozzarella|cheddar|ricotta)\b/i],
  ['Bakery',/\b(bread|buns?|tortillas?|bagels?|rolls?|pita|baguette|naan|muffins?)\b/i],
- ['Frozen',/\bfrozen\b/i]];
+ ['Breakfast & cereal',/\b(?:cereal|oatmeal|oats|granola|pancake mix|waffles?|pop-?tarts?|muesli|grits|breakfast)\b/i],
+ ['Snacks',/\b(?:chips|crackers?|popcorn|pretzels?|cookies?|candy|chocolate|granola bars?|nuts?|trail mix|jerky|snacks?|gum|mints|rice cakes|cashews|almonds|peanuts|pecans|walnuts)\b/i],
+ ['Pantry & canned',/\b(?:beans?|chickpeas|lentils|rice|pasta|spaghetti|noodles|quinoa|couscous|oil|olives?|pickles?|soup)\b/i]];
 const catOf=i=>i.cat||aisleOf(i.text);
-const aisleOf=t=>{for(const[a,re]of AISLES)if(re.test(t))return a;return'Pantry & other'};
+const aisleOf=t=>{for(const[a,re]of AISLES)if(re.test(t))return a;return'Other'};
 function weekLabel(w){const[y,m,d]=w.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{month:'short',day:'numeric'})}
-let clearArm=0;
+let clearArm=0,delArm=0,listForm='';
 function shopDraw(){
  const stale=shop.week!=monday(),open=shop.items.filter(i=>!i.done),done=shop.items.filter(i=>i.done);
  const by={};shop.items.forEach(i=>{(by[catOf(i)]=by[catOf(i)]||[]).push(i)});
- const row=i=>'<div class="shrow'+(i.done?' done':'')+'" data-id="'+i.id+'"><input type="checkbox" id="c'+i.id+'" data-c="'+i.id+'"'+(i.done?' checked':'')+'>'+(shop.imgs&&i.img?'<img class="zm sth" src="'+esc(i.img)+'" alt="" loading="lazy" referrerpolicy="no-referrer" data-n="'+esc(i.text)+'">':'')+'<label for="c'+i.id+'">'+esc(i.text)+(i.src?'<small>'+esc(i.src)+'</small>':'')+'</label><button class="x" data-r="'+i.id+'" aria-label="Remove '+esc(i.text)+'">×</button></div>';
- $('#shop').innerHTML='<button class="back" id="shback">‹ Back</button><h2 style="margin:0">Weekly Shopping List</h2><p class="legend">Week of '+esc(weekLabel(shop.week))+' · '+open.length+' to buy'+(done.length?', '+done.length+' checked':'')+'</p><p class="legend" style="margin-top:-6px">Tip: press and hold an item for more options.</p>'+
+ const row=i=>'<div class="shrow'+(i.done?' done':'')+'" data-id="'+i.id+'"><input type="checkbox" id="c'+i.id+'" data-c="'+i.id+'"'+(i.done?' checked':'')+'>'+(SH.imgs&&i.img?'<img class="zm sth" src="'+esc(i.img)+'" alt="" loading="lazy" referrerpolicy="no-referrer" data-n="'+esc(i.text)+'">':'')+'<label for="c'+i.id+'">'+esc(i.text)+(i.src?'<small>'+esc(i.src)+'</small>':'')+'</label><button class="x" data-r="'+i.id+'" aria-label="Remove '+esc(i.text)+'">×</button></div>';
+ $('#shop').innerHTML='<button class="back" id="shback">‹ Back</button><h2 style="margin:0">Weekly Shopping List</h2><div class="row" style="margin-top:8px"><select id="shsel" aria-label="Shopping list">'+SH.lists.map(l=>'<option value="'+l.id+'"'+(l.id==shop.id?' selected':'')+'>'+esc(l.name)+'</option>').join('')+'</select><button id="shlnew"'+(SH.lists.length>=20?' disabled':'')+'>+ New list</button></div>'+
+  (listForm?'<div class="why"><b>'+(listForm=='new'?'New list':'Rename list')+'</b><div class="row"><input type="text" id="shln" maxlength="40" value="'+(listForm=='rename'?esc(shop.name):'')+'" placeholder="List name (e.g. Costco, Pharmacy)" aria-label="List name"><button id="shlok">Save</button><button id="shlx">Cancel</button></div></div>':'')+'<p class="legend">Week of '+esc(weekLabel(shop.week))+' · '+open.length+' to buy'+(done.length?', '+done.length+' checked':'')+'</p><p class="legend" style="margin-top:-6px">Tip: press and hold an item for more options.</p>'+
   (stale?'<div class="why m"><b>This list is from the week of '+esc(weekLabel(shop.week))+'.</b><p>Start a new week to carry over only what you still need.</p><div class="links"><button id="shnew">Start new week</button></div></div>':'')+
   '<div class="row"><input type="text" id="shin" placeholder="Add an item (e.g. rice flour)" aria-label="Add an item"><button id="shadd">Add</button></div>'+
   (shop.items.length?AORD.filter(a=>by[a]).map(a=>'<p class="aisle">'+a+'</p>'+by[a].map(row).join('')).join(''):'<p class="empty">Nothing here yet. Add items above, or tap “+” next to a recipe ingredient or “Add to shopping list” on a scanned product.</p>')+
   (shop.items.length?'<div class="links" style="margin-top:14px"><button id="shnew">Start new week</button><button id="shclr"'+(done.length?'':' disabled')+'>Uncheck all</button></div><div class="links"><button id="shshare">Copy or share list</button><button id="shall">'+(clearArm?'Tap again to confirm':'Clear all')+'</button></div>':'')+
-  '<p class="legend" style="margin-top:18px"><b>Start new week:</b> removes the items you have checked off, keeps everything you have not, and dates the list to the current week. Use it when a new shopping week begins. “Uncheck all” keeps every item and only clears the check marks.</p>';
+  '<div class="links" style="margin-top:14px"><button id="shlren">Rename list</button><button id="shldel">'+(delArm?'Tap again to delete':'Delete list')+'</button></div><p class="legend" style="margin-top:18px"><b>Start new week:</b> removes the items you have checked off, keeps everything you have not, and dates the list to the current week. Use it when a new shopping week begins. “Uncheck all” keeps every item and only clears the check marks.</p>';
 }
 function shopAddFromInput(){const t=$('#shin').value;if(!t.trim())return;shopAdd(t,'Added by you');saveShop();shopDraw();$('#shin').focus()}
 $('#shop').onclick=e=>{
  const t=e.target;
  if(t.id=='shback'){back(()=>tab(1));return}
  if(t.id=='shadd'){shopAddFromInput();return}
+ if(t.id=='shlnew'){listForm='new';shopDraw();$('#shln').focus();return}
+ if(t.id=='shlren'){listForm='rename';shopDraw();$('#shln').focus();return}
+ if(t.id=='shlx'){listForm='';shopDraw();return}
+ if(t.id=='shlok'){shopListSave();return}
+ if(t.id=='shldel'){if(!delArm){delArm=1;shopDraw();setTimeout(()=>{if(delArm){delArm=0;if(!$('#v5').hidden)shopDraw()}},4000);return}const nm=shop.name;SH.lists=SH.lists.filter(l=>l!=shop);if(!SH.lists.length)SH.lists.push(cleanList({name:'Shopping list'}));setCur(SH.lists[0].id);toast('Deleted “'+nm+'”');return}
  if(t.id=='shnew'){shop.items=shop.items.filter(i=>!i.done);shop.week=monday();saveShop();shopDraw();toast('New week started. Checked items were removed.');return}
  if(t.id=='shclr'){shop.items.forEach(i=>i.done=false);saveShop();shopDraw();return}
  if(t.id=='shall'){if(!clearArm){clearArm=1;shopDraw();setTimeout(()=>{if(clearArm){clearArm=0;if(!$('#v5').hidden)shopDraw()}},4000);return}clearArm=0;shop.items=[];saveShop();shopDraw();return}
- if(t.id=='shshare'){shareText('Shopping list, week of '+weekLabel(shop.week)+'\n'+shop.items.filter(i=>!i.done).map(i=>'☐ '+i.text).join('\n'),'Shopping list');return}
+ if(t.id=='shshare'){shareText(shop.name+', week of '+weekLabel(shop.week)+'\n'+shop.items.filter(i=>!i.done).map(i=>'☐ '+i.text).join('\n'),'Shopping list');return}
  if(t.dataset.r){shop.items=shop.items.filter(i=>i.id!=t.dataset.r);saveShop();shopDraw()}};
-$('#shop').onchange=e=>{const c=e.target.dataset.c;if(!c)return;const it=shop.items.find(i=>i.id==c);if(it){it.done=e.target.checked;saveShop();shopDraw()}};
-$('#shop').onkeydown=e=>{if(e.key=='Enter'&&e.target.id=='shin')shopAddFromInput()};
+$('#shop').onchange=e=>{if(e.target.id=='shsel'){setCur(e.target.value);return}const c=e.target.dataset.c;if(!c)return;const it=shop.items.find(i=>i.id==c);if(it){it.done=e.target.checked;saveShop();shopDraw()}};
+$('#shop').onkeydown=e=>{if(e.key=='Enter'&&e.target.id=='shin')shopAddFromInput();if(e.key=='Enter'&&e.target.id=='shln')shopListSave()};
+function shopListSave(){const nm=$('#shln').value.trim().slice(0,40);if(!nm){toast('Give the list a name');return}
+ if(listForm=='new'){const L=cleanList({name:nm});L.id=rid();SH.lists.push(L);setCur(L.id);return}
+ shop.name=nm;listForm='';saveShop();shopDraw()}
 async function shareText(t,title){
  if(window.Android&&Android.share){Android.share(t);return}
  try{if(navigator.share){await navigator.share({title,text:t});return}}catch(e){if(e.name=='AbortError')return}
@@ -556,17 +592,22 @@ sh.addEventListener('pointerdown',e=>{const r=e.target.closest('.shrow');if(!r||
 sh.addEventListener('pointermove',e=>{if(Math.hypot(e.clientX-lpXY[0],e.clientY-lpXY[1])>10)clearTimeout(lpT)});
 ['pointerup','pointercancel','pointerleave'].forEach(n=>sh.addEventListener(n,()=>clearTimeout(lpT)));
 sh.addEventListener('click',e=>{if(Date.now()-lpAt<800){e.preventDefault();e.stopPropagation()}},true);
+sh.addEventListener('selectstart',e=>{const n=e.target.nodeType==1?e.target:e.target.parentElement;if(n&&n.closest&&n.closest('.shrow'))e.preventDefault()});
 sh.addEventListener('contextmenu',e=>{const r=e.target.closest('.shrow');if(!r)return;e.preventDefault();if(Date.now()-lpAt>800){lpAt=Date.now();clearTimeout(lpT);openShopSheet(r.dataset.id)}});
 let shId=null;
 function closeSheetDOM(){$('#shs').hidden=true}
-function openShopSheet(id){const it=shop.items.find(i=>i.id==id);if(!it)return;shId=id;sheetMain();$('#shs').hidden=false;enter('sheet',closeSheetDOM);try{navigator.vibrate&&navigator.vibrate(25)}catch(e){}}
+function openShopSheet(id){const it=shop.items.find(i=>i.id==id);if(!it)return;shId=id;sheetMain();$('#shs').hidden=false;enter('sheet',closeSheetDOM);[0,60,250,600].forEach(t=>setTimeout(()=>{try{getSelection().removeAllRanges()}catch(e){}},t));try{navigator.vibrate&&navigator.vibrate(25)}catch(e){}}
 function sheetMain(){
  const it=shop.items.find(i=>i.id==shId);if(!it)return;const scanned=it.src=='Scanned product'||!!it.img;
  $('#shsb').innerHTML='<h3 style="margin:0 0 10px;font-size:17px;text-transform:none;letter-spacing:0;color:var(--ink)">'+esc(it.text)+'</h3>'+
   '<button class="menub" id="shs_img"'+(it.img?'':' disabled')+'><span aria-hidden="true">🖼️</span> View Enlarged Image</button>'+(it.img?'':'<p class="legend" style="margin:4px 0 0">Only scanned products have an image.</p>')+
   '<button class="menub" id="shs_cat" style="margin-top:8px"><span aria-hidden="true">🏷️</span> Edit category <small>'+esc(it.cat||'Automatic: '+aisleOf(it.text))+'</small></button>'+
-  (scanned?'<button class="menub" id="shs_imgs" style="margin-top:8px"><span aria-hidden="true">'+(shop.imgs?'🙈':'🖼️')+'</span> '+(shop.imgs?'Turn off images for all scanned products':'Turn on images for all scanned products')+'</button>':'')+
+  (scanned?'<button class="menub" id="shs_imgs" style="margin-top:8px"><span aria-hidden="true">'+(SH.imgs?'🙈':'🖼️')+'</span> '+(SH.imgs?'Turn off images for all scanned products':'Turn on images for all scanned products')+'</button>':'')+
+  (SH.lists.length>1?'<button class="menub" id="shs_move" style="margin-top:8px"><span aria-hidden="true">📋</span> Move to another list</button>':'')+
   '<button class="menub" id="shs_x" style="margin-top:8px;justify-content:center">Close</button>'}
+function sheetLists(){
+ const it=shop.items.find(i=>i.id==shId);if(!it)return;
+ $('#shsb').innerHTML='<button class="back" id="shs_back">‹ Back</button><h3 style="margin:0 0 10px;font-size:17px;text-transform:none;letter-spacing:0;color:var(--ink)">Move “'+esc(it.text)+'” to…</h3>'+SH.lists.filter(l=>l!=shop).map(l=>'<button class="menub" data-mv="'+l.id+'" style="margin-bottom:8px">'+esc(l.name)+'</button>').join('')}
 function sheetCats(){
  const it=shop.items.find(i=>i.id==shId);if(!it)return;
  $('#shsb').innerHTML='<button class="back" id="shs_back">‹ Back</button><h3 style="margin:0 0 10px;font-size:17px;text-transform:none;letter-spacing:0;color:var(--ink)">Category for “'+esc(it.text)+'”</h3>'+
@@ -578,9 +619,11 @@ $('#shs').onclick=e=>{
  if(b.id=='shs_x'){back(closeSheetDOM);return}
  if(b.id=='shs_back'){sheetMain();return}
  if(b.id=='shs_cat'){sheetCats();return}
+ if(b.id=='shs_move'){sheetLists();return}
+ if(b.dataset.mv){const T=SH.lists.find(l=>l.id==b.dataset.mv);if(T){if(!T.items.some(x=>nrm(x.text)==nrm(it.text)))T.items.push(it);shop.items=shop.items.filter(x=>x!=it);saveShop();shopDraw();toast('Moved to “'+T.name+'”')}back(closeSheetDOM);return}
  if(b.dataset.cat!==undefined){it.cat=AORD.includes(b.dataset.cat)?b.dataset.cat:'';saveShop();shopDraw();back(closeSheetDOM);return}
  if(b.id=='shs_img'){closeSheetDOM();swapTop('lb',closeLbDOM);showLb(it.img,it.text);return}
- if(b.id=='shs_imgs'){shop.imgs=!shop.imgs;saveShop();shopDraw();toast(shop.imgs?'Images turned on for scanned products':'Images turned off');back(closeSheetDOM)}};
+ if(b.id=='shs_imgs'){SH.imgs=!SH.imgs;saveShop();shopDraw();toast(SH.imgs?'Images turned on for scanned products':'Images turned off');back(closeSheetDOM)}};
 function closeLbDOM(){$('#lb').hidden=true;$('#lbi').removeAttribute('src')}
 function showLb(src,name){const big=String(src).replace(/\.(?:100|200)\.jpg(?=$|\?)/,'.400.jpg'),im=$('#lbi');im.onerror=()=>{im.onerror=null;im.src=src};im.src=big;$('#lbc').textContent=name||'';$('#lb').hidden=false}
 $('#lb').onclick=()=>back(closeLbDOM);
@@ -626,11 +669,11 @@ function rlist(){
  const all=recipeFilter(),vis=all.slice(0,rs.n);
  $('#rcount').textContent=all.length+(rs.sub=='fav'?' favorite':'')+' recipe'+(all.length==1?'':'s');
  $('#rcards').innerHTML=vis.length?vis.map(card).join(''):'<p class="empty" style="grid-column:1/-1">'+(!RECIPES.length?'No recipes yet. Tap “+ New recipe” above to add your own.':rs.sub=='fav'&&!rfavs.length?'No favorite recipes yet. Tap the ☆ on a recipe to save it here.':'No recipes match.')+'</p>';
- $('#rmore').hidden=all.length<=rs.n;$('#rmore').textContent='Show more ('+(all.length-rs.n)+' left)';
+ $('#rfexw').hidden=!(rs.sub=='fav'&&rfavs.length);$('#rmore').hidden=all.length<=rs.n;$('#rmore').textContent='Show more ('+(all.length-rs.n)+' left)';
 }
 function rfavDraw(){
  const f=RECIPES.filter(r=>rfavs.includes(r.id)).sort((a,b)=>a.t.localeCompare(b.t));
- $('#rfavs').innerHTML=(f.length?'<div class="links"><button id="rfex">Export favorite recipes</button></div><div class="rgrid">'+f.map(card).join('')+'</div>':'<p class="empty">No favorite recipes yet. Open the Recipe tab and tap the ☆ on a recipe.</p>');
+ $('#rfavs').innerHTML=(f.length?'<div class="links"><button id="rfex">Export favorites</button></div><div class="rgrid">'+f.map(card).join('')+'</div>':'<p class="empty">No favorite recipes yet. Open the Recipe tab and tap the ☆ on a recipe.</p>');
  $('#rfc').textContent=rfavs.length?'('+rfavs.length+')':'';
 }
 function toggleRFav(id){const i=rfavs.indexOf(id);if(i<0)rfavs.push(id);else rfavs.splice(i,1);ls.set('gg_rfavs',rfavs);rlist();rfavDraw()}
@@ -661,18 +704,23 @@ $('#rd').onclick=e=>{
  const r=RBY[rs.open];if(!r)return;const t=e.target;
  if(t.id=='rback'){back(closeRecipe);return}
  if(t.id=='rfv'){toggleRFav(r.id);t.className=rfavs.includes(r.id)?'on':'';t.textContent=rfavs.includes(r.id)?'★ Favorite':'☆ Favorite';return}
- if(t.id=='radd'){let n=0;rrate(r).lines.forEach(x=>{if(shopAdd(x,r.t))n++});saveShop();toast(n?'Added '+n+' item'+(n==1?'':'s')+' to your shopping list':'Everything is already on your list');return}
+ if(t.id=='radd'){let n=0;rrate(r).lines.forEach(x=>{if(shopAdd(x,r.t))n++});saveShop();toast(n?'Added '+n+' item'+(n==1?'':'s')+' to “'+shop.name+'”':'Everything is already on your list');return}
  if(t.id=='redit'){openEditor(r.id);return}
  if(t.id=='rdel'){if(!t.dataset.arm){t.dataset.arm=1;t.textContent='Tap again to delete';setTimeout(()=>{if(t.isConnected){delete t.dataset.arm;t.textContent='Delete recipe'}},4000);return}myrec=myrec.filter(x=>x.id!=r.id);rfavs=rfavs.filter(x=>x!=r.id);saveMy();ls.set('gg_rfavs',rfavs);loadRecipes();rcacheReset();back(closeRecipe);rfavDraw();toast('Recipe deleted');return}
  if(t.id=='rsh'){shareText(r.t+'\n'+(r.u?r.u+'\n':'')+'\nIngredients:\n'+rrate(r).lines.map(x=>'• '+x).join('\n'),r.t);return}
- if(t.dataset.add){const x=r.i[+t.dataset.add];if(shopAdd(x,r.t)){saveShop();t.className='pl ok';t.textContent='✓';toast('Added to your shopping list')}else toast('Already on your shopping list');return}
+ if(t.dataset.add){const x=r.i[+t.dataset.add];if(shopAdd(x,r.t)){saveShop();t.className='pl ok';t.textContent='✓';toast('Added to “'+shop.name+'”')}else toast('Already on “'+shop.name+'”');return}
  const mk=t.closest('mark[data-i]');if(mk)showWhy(+mk.dataset.i,rrate(r),$('#rwhy'))};
 $('#rd').onkeydown=e=>{if((e.key=='Enter'||e.key==' ')&&e.target.matches('mark[data-i]')){e.preventDefault();showWhy(+e.target.dataset.i,rrate(RBY[rs.open]),$('#rwhy'))}};
 function cardClick(e){
  const s=e.target.closest('[data-star]');if(s){e.stopPropagation();toggleRFav(s.dataset.star);return}
  const c=e.target.closest('.rc');if(c){openRecipe(c.dataset.id)}}
 function cardKey(e){if((e.key=='Enter'||e.key==' ')&&e.target.classList.contains('rc')){e.preventDefault();openRecipe(e.target.dataset.id)}}
-$('#rcards').onclick=cardClick;$('#rfavs').onclick=e=>{if(e.target.id=='rfex'){shareText('My favorite alpha-gal recipes\n'+RECIPES.filter(r=>rfavs.includes(r.id)).map(r=>'• '+r.t+' — '+r.u).join('\n'),'Favorite recipes');return}cardClick(e)};
+$('#rcards').onclick=cardClick;function exportRecipeFavs(){
+ const f=RECIPES.filter(r=>rfavs.includes(r.id)).sort((a,b)=>a.t.localeCompare(b.t));
+ if(!f.length){toast('No favorite recipes to export yet');return}
+ shareText(f.map(r=>r.t+' | '+SRCN[r.s]+' | '+LBL[rrate(r).v]+(r.u?' | '+r.u:'\n  Ingredients: '+rrate(r).lines.join('; '))).join('\n'),'GalGuard favorite recipes')}
+$('#rfavs').onclick=e=>{if(e.target.id=='rfex'){exportRecipeFavs();return}cardClick(e)};
+$('#rfex2').onclick=exportRecipeFavs;
 $('#rcards').onkeydown=$('#rfavs').onkeydown=cardKey;
 $('#rs1').onclick=()=>{rs.sub='all';rs.n=24;rlist()};$('#rs2').onclick=()=>{rs.sub='fav';rs.n=24;rlist()};
 $('#rq').oninput=e=>{rs.q=e.target.value;rs.n=24;rlist()};
@@ -729,7 +777,7 @@ $('#fp').onclick=()=>favSub('p');$('#fr').onclick=()=>favSub('r');
 // ---------- add scanned product to shopping list ----------
 document.addEventListener('click',e=>{const b=e.target.closest('#fsh');if(!b||!cur)return;
  const t=cur.name+(cur.brand?' ('+cur.brand.split(',')[0]+')':'');
- if(shopAdd(t,'Scanned product',cur.img)){saveShop();toast('Added to your shopping list')}else toast('Already on your shopping list')});
+ if(shopAdd(t,'Scanned product',cur.img)){saveShop();toast('Added to “'+shop.name+'”')}else toast('Already on “'+shop.name+'”')});
 // ---------- ingredient-list scanner (OCR) ----------
 const OCRL={eng:'English',deu:'German (Deutsch)',fra:'French (Français)',spa:'Spanish (Español)',ita:'Italian (Italiano)'};
 const OS=[1,.8,.6];let ostage=0,tessP=null,ocrW=null,ocrLang='',ocrNow=false;
@@ -812,7 +860,11 @@ function importExtra(d){
  if(Array.isArray(d.myRecipes)){const m=cleanMy(d.myRecipes);m.forEach(x=>{if(!myrec.some(y=>y.id==x.id))myrec.push(x)});if(m.length){saveMy();loadRecipes()}}
  if(d.theme)setTheme(d.theme);
  if(Array.isArray(d.recipeFavorites)){d.recipeFavorites.slice(0,500).forEach(id=>{if(typeof id=='string'&&RBY[id]&&!rfavs.includes(id))rfavs.push(id)});ls.set('gg_rfavs',rfavs)}
- if(d.shopping&&typeof d.shopping=='object'){const s=cleanShop(d.shopping);s.items.forEach(i=>{if(!shop.items.some(x=>nrm(x.text)==nrm(i.text)))shop.items.push(i)});if(s.imgs)shop.imgs=true;if(!shop.items.length||s.week>shop.week)shop.week=s.week;saveShop()}
+ if(d.shopping&&typeof d.shopping=='object'){const S=cleanStore(d.shopping);
+  S.lists.forEach(L=>{let t=SH.lists.find(x=>x.name.toLowerCase()==L.name.toLowerCase());
+   if(!t){if(SH.lists.length<20){if(SH.lists.some(x=>x.id==L.id))L.id=rid();SH.lists.push(L)}return}
+   L.items.forEach(i=>{if(!t.items.some(x=>nrm(x.text)==nrm(i.text)))t.items.push(i)});if(L.week>t.week)t.week=L.week});
+  if(S.imgs)SH.imgs=true;saveShop()}
  rcacheReset();drawOcr();rlist();rfavDraw()}
 // ---------- init ----------
 initRecipeUI();drawOcr();rlist();rfavDraw();shopBadge();favSub('p');lists();

@@ -57,7 +57,7 @@ details input[type=text]{width:100%;margin:6px 0}
 .why{border-left:6px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;margin:0 0 12px;font-size:15px}.why.r{border-color:var(--hr)}.why.m{border-color:var(--hy)}.why p{margin:6px 0 0}.why span{color:var(--mut);font-size:14px}
 mark[data-i]{cursor:pointer}mark[data-i]:focus-visible{outline:3px solid var(--ink)}
 #sb{position:absolute;left:50%;top:50%;width:100%;height:100%;transform:translate(-50%,-50%);border:3px solid #fff;border-radius:12px;box-shadow:0 0 0 100vmax rgba(0,0,0,.4);pointer-events:none;transition:width .25s ease,height .25s ease;z-index:1}
-#zm{position:absolute;left:12px;right:12px;bottom:10px;width:calc(100% - 24px);z-index:2}
+#zm{-webkit-appearance:none;appearance:none;background:rgba(0,0,0,.45);border-radius:12px;accent-color:#fff;position:absolute;right:-76px;top:calc(50% - 12px);width:200px;height:24px;margin:0;transform:rotate(-90deg);z-index:2}#zm::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid #333}#zm::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid #333}#zl{position:absolute;right:8px;bottom:8px;z-index:2;color:#fff;font:600 12px system-ui;background:rgba(0,0,0,.5);border-radius:8px;padding:2px 6px;pointer-events:none}.cam video{transform-origin:50% 50%}
 #sens label{display:block;margin:6px 0}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}button{-webkit-appearance:none;appearance:none;-webkit-tap-highlight-color:transparent}input[type=text],input:not([type]),textarea{-webkit-appearance:none;appearance:none}
 /* ---- v2.3 ---- */
@@ -123,7 +123,7 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
 <main>
 <nav><button id="t1" class="on">Scan</button><button id="t4">Recipes</button><button id="t3">History</button><button id="t2">Favorites <span id="fc"></span></button></nav>
 <section id="v1">
- <div class="cam off" id="cam"><video id="vid" playsinline muted></video><div id="reader"></div><div id="sb"></div><input type="range" id="zm" hidden aria-label="Zoom"></div>
+ <div class="cam off" id="cam"><video id="vid" playsinline muted></video><div id="reader"></div><div id="sb"></div><input type="range" id="zm" hidden aria-label="Zoom"><span id="zl" hidden></span></div>
  <button class="pri" id="scan">Start camera</button>
  <button class="pri" id="scani" style="margin-top:8px">Scan ingredient list</button>
  <div id="ocrbar" class="why" hidden><p id="ocrmsg" role="status"></p><div class="links"><button id="ocrnow">Capture now</button><button id="ocrstop">Stop</button></div></div>
@@ -160,7 +160,7 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
 <section id="v5" hidden><div id="shop"></div></section>
 <section id="v6" hidden><button class="back" id="bkback">‹ Back</button><h2 style="margin:0">Export / Import Settings</h2><p class="legend">Back up your settings, favorites, history, rating overrides, theme, recipes and shopping list, or restore them on a new device.</p><div class="row"><button id="xs" style="flex:1">Export Settings</button><button id="is" style="flex:1">Import Settings</button></div><div id="bk" class="why" hidden></div><input type="file" id="bf" accept=".json,application/json,text/plain" hidden></section>
 </main>
-<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v2.9</footer>
+<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.0</footer>
 <div id="scrim" hidden></div>
 <aside id="drawer" hidden aria-label="Menu">
  <div class="dh"><h2>Menu</h2><button id="dclose" aria-label="Close menu">×</button></div>
@@ -351,12 +351,13 @@ const dist=(c,w,h)=>{const b=c.boundingBox||{x:0,y:0,width:0,height:0};return Ma
 async function best(det,src,w,h){const r=await det.detect(src);if(!r.length)return'';r.sort((a,b)=>dist(a,w,h)-dist(b,w,h));return(r.find(c=>extractCode(c.rawValue))||r[0]).rawValue}
 // The box on screen is exactly the part of the picture being checked. It starts at the largest size,
 // shrinks a step each time nothing is found, and returns to full size (after nudging the zoom, where supported).
-const STAGES=[1,.7,.5,.35,.25];
+const STAGES=[.7,.5,.35,.25];
 let stage=0;
 function setBox(f){const b=$('#sb');b.style.width=b.style.height=(f*100)+'%'}
-function stopScan(){ocrRun++;scanMode='';$('#ocrbar').hidden=true;$('#scani').textContent='Scan ingredient list';clearInterval(timer);if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}track=null;h5=null;$('#zm').hidden=true;$('#cam').className='cam off';$('#scan').textContent=window.Android?'Scan barcode':'Start camera'}
+function stopScan(){ocrRun++;scanMode='';$('#ocrbar').hidden=true;$('#scani').textContent='Scan ingredient list';clearInterval(timer);if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}track=null;h5=null;$('#zm').hidden=true;$('#zl').hidden=true;dz=1;$('#vid').style.transform='';$('#cam').className='cam off';$('#scan').textContent=window.Android?'Scan barcode':'Start camera'}
 function loadH5(){return h5p||(h5p=window.Html5Qrcode?Promise.resolve():new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js';s.onload=ok;s.onerror=()=>{h5p=null;no(new Error('scanner library failed to load; check your connection'))};document.head.appendChild(s)}))}
-function region(v,f){const vw=v.videoWidth,vh=v.videoHeight,cw=v.clientWidth||vw,ch=v.clientHeight||vh,k=Math.max(cw/vw,ch/vh),ww=cw/k,wh=ch/k;return{x:(vw-ww*f)/2,y:(vh-wh*f)/2,w:ww*f,h:wh*f}}
+let dz=1;
+function region(v,f){f=f/dz;const vw=v.videoWidth,vh=v.videoHeight,cw=v.clientWidth||vw,ch=v.clientHeight||vh,k=Math.max(cw/vw,ch/vh),ww=cw/k,wh=ch/k;return{x:(vw-ww*f)/2,y:(vh-wh*f)/2,w:ww*f,h:wh*f}}
 async function startWeb(){
  if($('#cam').className=='cam'){const was=scanMode;stopScan();if(was!='ocr')return}
  scanMode='bar';
@@ -369,12 +370,19 @@ async function startWeb(){
   else{await loadH5();const F=Html5QrcodeSupportedFormats;h5=new Html5Qrcode('reader',{formatsToSupport:[F.QR_CODE,F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.CODE_128,F.CODE_39],verbose:false})}
   stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080},advanced:[{focusMode:'continuous'}]}});
   const v=$('#vid');v.hidden=false;v.srcObject=stream;await v.play();
-  track=stream.getVideoTracks()[0];const caps=track.getCapabilities?track.getCapabilities():{},zm=$('#zm');let zc=0,zmin=0,zmax=0;
-  if(caps.zoom){zmin=zc=caps.zoom.min;zmax=caps.zoom.max;zm.min=zmin;zm.max=zmax;zm.step=caps.zoom.step||0.1;zm.value=zc;zm.hidden=false;
-   zm.oninput=()=>{zc=+zm.value;track.applyConstraints({advanced:[{zoom:zc}]}).catch(()=>{})}}
+  track=stream.getVideoTracks()[0];const caps=track.getCapabilities?track.getCapabilities():{},zm=$('#zm'),zl=$('#zl');let zc=0,zmin=0,zmax=0,manual=false;dz=1;v.style.transform='';
+  // Vertical zoom slider on the right. Uses the camera's own zoom where available, otherwise a digital zoom.
+  const hw=!!caps.zoom;
+  if(hw){zmin=zc=caps.zoom.min;zmax=caps.zoom.max;zm.min=zmin;zm.max=zmax;zm.step=caps.zoom.step||0.1;zm.value=zc}
+  else{zmin=1;zmax=4;zc=1;zm.min=1;zm.max=4;zm.step=0.05;zm.value=1}
+  {const W=Math.max(100,Math.min(240,($('#cam').clientHeight||300)-50));zm.style.width=W+'px';zm.style.right=(26-W/2)+'px'}
+  const setZ=z=>{zc=z;if(hw)track.applyConstraints({advanced:[{zoom:z}]}).catch(()=>{});else{dz=z;v.style.transform='scale('+z+')'}zl.textContent=(hw?(z/zmin):z).toFixed(1)+'×';zm.value=z};
+  zm.hidden=false;zl.hidden=false;zl.textContent='1.0×';
+  // Touching the slider takes over from the automatic zoom steps.
+  zm.oninput=()=>{manual=true;setZ(+zm.value)};
   const cv=document.createElement('canvas'),cx=cv.getContext('2d');
   const advance=()=>{stage++;if(stage>=STAGES.length){stage=0;
-   if(caps.zoom&&track){zc+=(zmax-zmin)/5;if(zc>zmin+(zmax-zmin)*.7)zc=zmin;zm.value=zc;track.applyConstraints({advanced:[{zoom:zc}]}).catch(()=>{})}}
+   if(!manual){let z=zc+(zmax-zmin)/5;if(z>zmin+(zmax-zmin)*.7)z=zmin;setZ(z)}}
    setBox(STAGES[stage])};
   timer=setInterval(async()=>{
    if(scanning||!v.videoWidth)return;scanning=true;

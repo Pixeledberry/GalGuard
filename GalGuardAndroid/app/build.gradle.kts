@@ -11,8 +11,22 @@ android {
         applicationId = "com.galguard.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 20
-        versionName = "2.9"
+        versionCode = 21
+        versionName = "3.0"
+    }
+
+    // One fixed signing key for every build, so a new version installs over an older one and keeps its data.
+    signingConfigs {
+        create("galguard") {
+            storeFile = file("galguard.jks")
+            storePassword = "galguard"
+            keyAlias = "galguard"
+            keyPassword = "galguard"
+        }
+    }
+    buildTypes {
+        getByName("debug") { signingConfig = signingConfigs.getByName("galguard") }
+        getByName("release") { signingConfig = signingConfigs.getByName("galguard") }
     }
 
     compileOptions {

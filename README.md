@@ -37,7 +37,12 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v2.9 (latest)
+### v3.0 (latest)
+- **Updating the Android app now works.** Before this version, each build was signed with a different random key, so Android refused to install a new version over an older one and you had to uninstall first. From this version on, every build uses the same fixed key, so future updates install over the old one and keep your settings, favorites, history and shopping lists. **One last time:** if you have a version older than 3.0, Android will still ask you to uninstall it, which erases its data. Before you do that, open the menu, choose **Export / Import Settings** and copy or save your backup, then import it into 3.0. After that, updates are automatic. (On iPhone, a sideloading tool such as AltStore or Sideloadly keeps your data when it re-installs over the older version, as long as you use the same Apple ID.)
+- **Zoom slider on the camera.** The barcode camera view has a vertical zoom slider on the right side. Moving it takes over from the automatic zooming for that scan. Phones whose camera does not allow zoom control use a digital zoom, so the slider works everywhere.
+- **Scan box starts at 70%.** The scan box now starts at 70% of the view and shrinks from there. The 100% size is gone.
+
+### v2.9
 - **Multiple shopping lists.** The Weekly Shopping List now has a list picker and a **+ New list** button (up to 20 lists, for example "Costco" or "Pharmacy"). You can rename or delete a list, and each list has its own week and items. Press and hold an item and choose **Move to another list** to move it. Items you add from a recipe or a scanned product go to the list that is currently open, and the message tells you which one. Your existing list is kept as "Shopping list". Export Settings and Import Settings carry all of your lists; imported lists with the same name are merged.
 - **More shopping categories.** Items can now be sorted into Produce, Meat & seafood, Deli, Dairy & eggs, Bakery, Frozen, Pantry & canned, Spices & baking, Condiments & sauces, Breakfast & cereal, Snacks, Beverages, **Hygiene**, Health & pharmacy, Baby, Household & cleaning, Paper goods, **Pet** and Other. New items are sorted automatically, and you can change any item with "Edit category". (The old "Pantry & other" is now "Other".)
 - **Long-press highlight fixed.** Pressing and holding a shopping list item no longer leaves its text highlighted.
@@ -86,12 +91,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 - **Camera box follows the scan area:** the box on the camera view now starts at its largest size. Each time nothing is found and the app re-checks a smaller or more zoomed-in area, the box shrinks on screen to match exactly what is being checked. After the smallest size, the box returns to full size, and on phones with camera zoom the zoom also steps up.
 - **German ingredient lists:** much fuller German support, including compound words (Schweinefleisch, Rindertalg, Schweineschmalz), gelatin and collagen, rennet and enzymes, glycerin and glycerides, fatty acids and stearates, natural flavors, lanolin, and dairy words. German "plant-based" wording (pflanzlich, vegetabil, mikrobiell) is skipped. The app also reads a product's German ingredient text when that is the only one available.
 - **Public README:** the disclaimer at the top now starts and ends with 🚫.
-
-### v2.0
-- **Export Settings and Import Settings** buttons under "My settings". Back up your settings, favorites, history, and rating overrides, then restore them on a new device from a file or pasted text. Importing adds to the favorites and history already on the device and replaces the sensitivity settings.
-- **Ingredients that start with "vegan" are no longer flagged** (for example, "Vegan Pepperoni").
-- **Android app fixes:** restored the app's build file (`app/build.gradle.kts`), which was empty in the Android zips from v1.2 through v1.9 and stopped the project from syncing or building. The share sheet now also works for exporting favorites and backups.
-- **Public README:** now opens with a new disclaimer and install instructions, and the changelog shows only the last 10 versions.
 
 ---
 

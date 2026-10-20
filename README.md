@@ -17,7 +17,7 @@ Go to the app webpage then:
 1. Tap the More menu (three dots) on the right side of the address bar.
 2. Select Install and create shortcut or Add to Home screen, then tap Install
 
-Otherwise if you want a standalone app instead of the web version, you can install the android or apple version of the app from the available releases.
+$\color{red}{\text{Otherwise if you want a standalone app instead of the web version, you can install the android or apple version of the app from the available releases. You really SHOULD be using the standalone apps. They use the Google and Apple scanners respectively and perform much better.}}$
 
 ---
 
@@ -33,7 +33,12 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v2.7 (latest)
+### v2.8 (latest)
+- **Press and hold a shopping list item** to open a menu with **View Enlarged Image** and **Edit category** (move the item to another aisle, or go back to Automatic). For scanned products the menu also has an option to **turn images on or off for all scanned products**; when on, each scanned product shows a small version of its picture in the list.
+- **Tap any scanned product's picture to enlarge it**: on the result page, in Favorites and History, and in the shopping list. The back button, Esc or a tap closes it.
+- **README:** the public README now tells people to use the standalone apps (shown in red).
+
+### v2.7
 - **Shopping list buttons.** "Clear checked" is now **Uncheck all**: it keeps every item and just clears the check marks. "Start new week" and "Copy or share list" swapped places ("Start new week" is now in the top row). A hint at the bottom of the page explains what "Start new week" does.
 - **Seasonal themes.** A new "Seasonal" group under the Feminine themes in the menu: Spring Meadow, Summer Sunshine, Autumn Harvest, Winter Frost, Halloween and Holiday.
 
@@ -85,12 +90,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 - Added `apple-touch-icon.png`, the file iPhones use for the home-screen icon.
 - README now opens with a transparency statement.
 
-### v1.8
-- **New app icon:** a shield with an ornate silver "G". Used as the Android adaptive launcher icon, the web favicon, the home-screen icon on iPhone and Android, and a logo in the page header. A 512 px version is included for store listings.
-- Added a web app manifest and icons so "Add to Home screen" installs the page with the new icon.
-- README is now split into a public version (`README.md`) and a private version (`README-private.md`).
-
-### Earlier versions
 ---
 
 ## Features
@@ -168,7 +167,7 @@ Plant-based look-alikes are **not** flagged (including anything labeled dairy-fr
 
 ### Weekly shopping list
 - Open it from the menu (top right). Add items by hand, with the "+" next to a recipe ingredient, "Add all to list" on a recipe, or "Add to shopping list" on a scanned product.
-- Items are grouped by aisle (produce, meat and seafood, dairy and eggs, bakery, frozen, pantry and other), can be checked off or removed, and the list can be copied or shared.
+- Items are grouped by aisle (produce, meat and seafood, dairy and eggs, bakery, frozen, pantry and other), can be checked off or removed, and the list can be copied or shared. Press and hold an item to enlarge its image, change its category, or show small pictures for scanned products.
 - Each list is tied to a week (Monday start). "Start new week" removes checked items and keeps the rest. Duplicates are ignored.
 
 ### Menu and themes

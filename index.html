@@ -109,6 +109,14 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
 .edl{display:block;margin:12px 0 0;font-size:14px;color:var(--mut);font-weight:600}.edl input,.edl select,.edl textarea{display:block;width:100%;margin-top:4px;color:var(--ink);font-weight:400}.edl textarea{padding:11px;border:1px solid var(--line);border-radius:10px;background:var(--card);font:inherit;resize:vertical}.cust .edl{flex:1}#rnew{margin:0 0 12px}
 #code::placeholder{font-size:13px}
 @media(max-width:360px){.row button{padding:11px 10px!important}}
+
+.shrow{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}.shrow .sth{width:40px;height:40px;object-fit:contain;border-radius:8px;background:#fff;flex:none}
+.top img,.item img,img.zm{cursor:zoom-in}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:12px}
+#lbi{max-width:100%;max-height:78vh;object-fit:contain;background:#fff;border-radius:12px}#lbc{margin:0;color:#fff;text-align:center;font-weight:600}
+#shs{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:25;display:flex;align-items:flex-end}
+#shsb{width:100%;max-width:560px;margin:0 auto;background:var(--card);color:var(--ink);border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:85vh;overflow:auto;animation:slidein .18s ease}
+.menub:disabled{opacity:.5}
 </style></head><body>
 <header><h1><img id="logo" alt="" width="36" height="36" style="vertical-align:-8px;margin-right:8px">GalGuard</h1><p>Scan a barcode. See how risky it is for alpha-gal.</p><button id="hb" aria-label="Menu" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span><i id="hbn" hidden></i></button></header>
 <main>
@@ -150,7 +158,7 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
 <section id="v5" hidden><div id="shop"></div></section>
 <section id="v6" hidden><button class="back" id="bkback">‹ Back</button><h2 style="margin:0">Export / Import Settings</h2><p class="legend">Back up your settings, favorites, history, rating overrides, theme, recipes and shopping list, or restore them on a new device.</p><div class="row"><button id="xs" style="flex:1">Export Settings</button><button id="is" style="flex:1">Import Settings</button></div><div id="bk" class="why" hidden></div><input type="file" id="bf" accept=".json,application/json,text/plain" hidden></section>
 </main>
-<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v2.7</footer>
+<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v2.8</footer>
 <div id="scrim" hidden></div>
 <aside id="drawer" hidden aria-label="Menu">
  <div class="dh"><h2>Menu</h2><button id="dclose" aria-label="Close menu">×</button></div>
@@ -165,6 +173,8 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
  <button class="menub" id="mbk"><span aria-hidden="true">💾</span> Export / Import Settings</button>
 </aside>
 <div id="toast" hidden style="z-index:30"></div>
+<div id="shs" hidden><div id="shsb" role="dialog" aria-label="Item options"></div></div>
+<div id="lb" hidden role="dialog" aria-label="Enlarged image"><img id="lbi" alt=""><p id="lbc"></p></div>
 <script type="application/json" id="rdata">[]</script>
 <script>
 const $=s=>document.querySelector(s);
@@ -405,6 +415,7 @@ let RECIPES=[],RBY={};
 function loadRecipes(){RECIPES=[...BASE,...myrec];RBY={};RECIPES.forEach(r=>{r._q=(r.t+' '+r.i.join(' ')).toLowerCase();RBY[r.id]=r})}
 const hex=/^#[0-9a-f]{6}$/i;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const AORD=['Produce','Meat & seafood','Dairy & eggs','Bakery','Frozen','Pantry & other'];
 // ---------- back button support: every sub-screen is a "layer" in the browser history ----------
 const layers=[];let skipPop=0,curTab=1;
 function enter(k,close){const t=layers[layers.length-1];if(t&&t.k==k){t.close=close;return}layers.push({k,close});try{history.pushState({gg:1},'')}catch(e){}}
@@ -481,7 +492,7 @@ const closeDrawer=()=>back(closeDrawerDOM);
 function closeDrawerDOM(){$('#scrim').hidden=true;$('#drawer').hidden=true;$('#hb').setAttribute('aria-expanded','false');if(drawerFrom&&drawerFrom.focus)drawerFrom.focus()}
 $('#hb').onclick=()=>$('#drawer').hidden?openDrawer():closeDrawer();
 $('#dclose').onclick=closeDrawer;$('#scrim').onclick=closeDrawer;
-document.addEventListener('keydown',e=>{if(e.key=='Escape'&&!$('#drawer').hidden)closeDrawer()});
+document.addEventListener('keydown',e=>{if(e.key!='Escape')return;if(!$('#lb').hidden||!$('#shs').hidden||!$('#drawer').hidden)back()});
 $('#mbk').onclick=()=>{closeDrawerDOM();stopScan();swapTop('v6',()=>tab(curTab));tab(6)};
 $('#bkback').onclick=()=>back(()=>tab(1));
 $('#mshop').onclick=()=>{closeDrawerDOM();stopScan();swapTop('v5',()=>tab(curTab));tab(5);shopDraw()};
@@ -489,15 +500,15 @@ $('#mshop').onclick=()=>{closeDrawerDOM();stopScan();swapTop('v5',()=>tab(curTab
 const pad=n=>String(n).padStart(2,'0'),ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 function monday(){const d=new Date();d.setHours(12);d.setDate(d.getDate()-((d.getDay()+6)%7));return ymd(d)}
 function cleanShop(s){
- const out={week:monday(),items:[]};if(!s||typeof s!='object')return out;
+ const out={week:monday(),items:[],imgs:false};if(s&&s.imgs===true)out.imgs=true;if(!s||typeof s!='object')return out;
  if(/^\d{4}-\d{2}-\d{2}$/.test(s.week))out.week=s.week;
- if(Array.isArray(s.items))s.items.slice(0,500).forEach(x=>{if(x&&typeof x.text=='string'&&x.text.trim())out.items.push({id:String(x.id||Math.random().toString(36).slice(2,9)).slice(0,20),text:x.text.trim().slice(0,200),done:x.done===true,src:typeof x.src=='string'?x.src.slice(0,80):''})});
+ if(Array.isArray(s.items))s.items.slice(0,500).forEach(x=>{if(x&&typeof x.text=='string'&&x.text.trim())out.items.push({id:String(x.id||Math.random().toString(36).slice(2,9)).slice(0,20),text:x.text.trim().slice(0,200),done:x.done===true,src:typeof x.src=='string'?x.src.slice(0,80):'',img:typeof x.img=='string'&&/^https:\/\//.test(x.img)&&x.img.length<500?x.img:'',cat:AORD.includes(x.cat)?x.cat:''})});
  return out}
 let shop=cleanShop(ls.get('gg_shop',null));
 const saveShop=()=>{ls.set('gg_shop',shop);shopBadge()};
 const nrm=t=>t.toLowerCase().replace(/\s+/g,' ').trim();
-function shopAdd(text,src){text=String(text||'').trim();if(!text)return false;if(shop.items.some(i=>nrm(i.text)==nrm(text)))return false;
- shop.items.push({id:Math.random().toString(36).slice(2,9),text:text.slice(0,200),done:false,src:src||''});return true}
+function shopAdd(text,src,img){text=String(text||'').trim();if(!text)return false;if(shop.items.some(i=>nrm(i.text)==nrm(text)))return false;
+ shop.items.push({id:Math.random().toString(36).slice(2,9),text:text.slice(0,200),done:false,src:src||'',img:img&&/^https:\/\//.test(img)&&img.length<500?img:'',cat:''});return true}
 function shopBadge(){const n=shop.items.filter(i=>!i.done).length;const b=$('#hbn');b.textContent=n>99?'99+':n;b.hidden=!n;$('#mshopn').textContent=n?n+' to buy':'empty';$('#hb').setAttribute('aria-label','Menu'+(n?', '+n+' items on shopping list':''))}
 const AISLES=[
  ['Pantry & other',/\b(broth|stock|bouillon|(?:coconut|almond|oat|soy|rice|cashew) (?:milk|cream)|(?:peanut|almond|nut|cashew|sunflower|cocoa|shea) butter|cream of tartar|powder|dried|extract|seasoning|flakes|canned|can of|jar of|paste)\b/i],
@@ -506,15 +517,15 @@ const AISLES=[
  ['Dairy & eggs',/\b(milk|cheeses?|butter|cream|yogh?urt|eggs?|ghee|half[- ]and[- ]half|sour cream|feta|parmesan|mozzarella|cheddar|ricotta)\b/i],
  ['Bakery',/\b(bread|buns?|tortillas?|bagels?|rolls?|pita|baguette|naan|muffins?)\b/i],
  ['Frozen',/\bfrozen\b/i]];
+const catOf=i=>i.cat||aisleOf(i.text);
 const aisleOf=t=>{for(const[a,re]of AISLES)if(re.test(t))return a;return'Pantry & other'};
-const AORD=['Produce','Meat & seafood','Dairy & eggs','Bakery','Frozen','Pantry & other'];
 function weekLabel(w){const[y,m,d]=w.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{month:'short',day:'numeric'})}
 let clearArm=0;
 function shopDraw(){
  const stale=shop.week!=monday(),open=shop.items.filter(i=>!i.done),done=shop.items.filter(i=>i.done);
- const by={};shop.items.forEach(i=>{(by[aisleOf(i.text)]=by[aisleOf(i.text)]||[]).push(i)});
- const row=i=>'<div class="shrow'+(i.done?' done':'')+'"><input type="checkbox" id="c'+i.id+'" data-c="'+i.id+'"'+(i.done?' checked':'')+'><label for="c'+i.id+'">'+esc(i.text)+(i.src?'<small>'+esc(i.src)+'</small>':'')+'</label><button class="x" data-r="'+i.id+'" aria-label="Remove '+esc(i.text)+'">×</button></div>';
- $('#shop').innerHTML='<button class="back" id="shback">‹ Back</button><h2 style="margin:0">Weekly Shopping List</h2><p class="legend">Week of '+esc(weekLabel(shop.week))+' · '+open.length+' to buy'+(done.length?', '+done.length+' checked':'')+'</p>'+
+ const by={};shop.items.forEach(i=>{(by[catOf(i)]=by[catOf(i)]||[]).push(i)});
+ const row=i=>'<div class="shrow'+(i.done?' done':'')+'" data-id="'+i.id+'"><input type="checkbox" id="c'+i.id+'" data-c="'+i.id+'"'+(i.done?' checked':'')+'>'+(shop.imgs&&i.img?'<img class="zm sth" src="'+esc(i.img)+'" alt="" loading="lazy" referrerpolicy="no-referrer" data-n="'+esc(i.text)+'">':'')+'<label for="c'+i.id+'">'+esc(i.text)+(i.src?'<small>'+esc(i.src)+'</small>':'')+'</label><button class="x" data-r="'+i.id+'" aria-label="Remove '+esc(i.text)+'">×</button></div>';
+ $('#shop').innerHTML='<button class="back" id="shback">‹ Back</button><h2 style="margin:0">Weekly Shopping List</h2><p class="legend">Week of '+esc(weekLabel(shop.week))+' · '+open.length+' to buy'+(done.length?', '+done.length+' checked':'')+'</p><p class="legend" style="margin-top:-6px">Tip: press and hold an item for more options.</p>'+
   (stale?'<div class="why m"><b>This list is from the week of '+esc(weekLabel(shop.week))+'.</b><p>Start a new week to carry over only what you still need.</p><div class="links"><button id="shnew">Start new week</button></div></div>':'')+
   '<div class="row"><input type="text" id="shin" placeholder="Add an item (e.g. rice flour)" aria-label="Add an item"><button id="shadd">Add</button></div>'+
   (shop.items.length?AORD.filter(a=>by[a]).map(a=>'<p class="aisle">'+a+'</p>'+by[a].map(row).join('')).join(''):'<p class="empty">Nothing here yet. Add items above, or tap “+” next to a recipe ingredient or “Add to shopping list” on a scanned product.</p>')+
@@ -538,6 +549,46 @@ async function shareText(t,title){
  try{if(navigator.share){await navigator.share({title,text:t});return}}catch(e){if(e.name=='AbortError')return}
  try{await navigator.clipboard.writeText(t);toast('Copied to your clipboard');return}catch(e){}
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/plain'}));a.download='galguard.txt';a.click()}
+// ---------- long-press menu for shopping items, and image enlarging ----------
+let lpT=null,lpAt=0,lpXY=[0,0];
+const sh=$('#shop');
+sh.addEventListener('pointerdown',e=>{const r=e.target.closest('.shrow');if(!r||e.target.closest('[data-r]'))return;lpXY=[e.clientX,e.clientY];clearTimeout(lpT);lpT=setTimeout(()=>{lpAt=Date.now();openShopSheet(r.dataset.id)},500)});
+sh.addEventListener('pointermove',e=>{if(Math.hypot(e.clientX-lpXY[0],e.clientY-lpXY[1])>10)clearTimeout(lpT)});
+['pointerup','pointercancel','pointerleave'].forEach(n=>sh.addEventListener(n,()=>clearTimeout(lpT)));
+sh.addEventListener('click',e=>{if(Date.now()-lpAt<800){e.preventDefault();e.stopPropagation()}},true);
+sh.addEventListener('contextmenu',e=>{const r=e.target.closest('.shrow');if(!r)return;e.preventDefault();if(Date.now()-lpAt>800){lpAt=Date.now();clearTimeout(lpT);openShopSheet(r.dataset.id)}});
+let shId=null;
+function closeSheetDOM(){$('#shs').hidden=true}
+function openShopSheet(id){const it=shop.items.find(i=>i.id==id);if(!it)return;shId=id;sheetMain();$('#shs').hidden=false;enter('sheet',closeSheetDOM);try{navigator.vibrate&&navigator.vibrate(25)}catch(e){}}
+function sheetMain(){
+ const it=shop.items.find(i=>i.id==shId);if(!it)return;const scanned=it.src=='Scanned product'||!!it.img;
+ $('#shsb').innerHTML='<h3 style="margin:0 0 10px;font-size:17px;text-transform:none;letter-spacing:0;color:var(--ink)">'+esc(it.text)+'</h3>'+
+  '<button class="menub" id="shs_img"'+(it.img?'':' disabled')+'><span aria-hidden="true">🖼️</span> View Enlarged Image</button>'+(it.img?'':'<p class="legend" style="margin:4px 0 0">Only scanned products have an image.</p>')+
+  '<button class="menub" id="shs_cat" style="margin-top:8px"><span aria-hidden="true">🏷️</span> Edit category <small>'+esc(it.cat||'Automatic: '+aisleOf(it.text))+'</small></button>'+
+  (scanned?'<button class="menub" id="shs_imgs" style="margin-top:8px"><span aria-hidden="true">'+(shop.imgs?'🙈':'🖼️')+'</span> '+(shop.imgs?'Turn off images for all scanned products':'Turn on images for all scanned products')+'</button>':'')+
+  '<button class="menub" id="shs_x" style="margin-top:8px;justify-content:center">Close</button>'}
+function sheetCats(){
+ const it=shop.items.find(i=>i.id==shId);if(!it)return;
+ $('#shsb').innerHTML='<button class="back" id="shs_back">‹ Back</button><h3 style="margin:0 0 10px;font-size:17px;text-transform:none;letter-spacing:0;color:var(--ink)">Category for “'+esc(it.text)+'”</h3>'+
+  AORD.map(a=>'<button class="menub" data-cat="'+esc(a)+'" style="margin-bottom:8px">'+(it.cat==a?'✓ ':'')+esc(a)+'</button>').join('')+
+  '<button class="menub" data-cat="" style="margin-bottom:0">'+(it.cat?'':'✓ ')+'Automatic ('+esc(aisleOf(it.text))+')</button>'}
+$('#shs').onclick=e=>{
+ if(e.target.id=='shs'){back(closeSheetDOM);return}
+ const b=e.target.closest('button');if(!b||b.disabled)return;const it=shop.items.find(i=>i.id==shId);if(!it)return;
+ if(b.id=='shs_x'){back(closeSheetDOM);return}
+ if(b.id=='shs_back'){sheetMain();return}
+ if(b.id=='shs_cat'){sheetCats();return}
+ if(b.dataset.cat!==undefined){it.cat=AORD.includes(b.dataset.cat)?b.dataset.cat:'';saveShop();shopDraw();back(closeSheetDOM);return}
+ if(b.id=='shs_img'){closeSheetDOM();swapTop('lb',closeLbDOM);showLb(it.img,it.text);return}
+ if(b.id=='shs_imgs'){shop.imgs=!shop.imgs;saveShop();shopDraw();toast(shop.imgs?'Images turned on for scanned products':'Images turned off');back(closeSheetDOM)}};
+function closeLbDOM(){$('#lb').hidden=true;$('#lbi').removeAttribute('src')}
+function showLb(src,name){const big=String(src).replace(/\.(?:100|200)\.jpg(?=$|\?)/,'.400.jpg'),im=$('#lbi');im.onerror=()=>{im.onerror=null;im.src=src};im.src=big;$('#lbc').textContent=name||'';$('#lb').hidden=false}
+$('#lb').onclick=()=>back(closeLbDOM);
+document.addEventListener('click',e=>{
+ const im=e.target.closest('.top img,.item img,img.zm');if(!im||!im.getAttribute('src'))return;
+ e.preventDefault();e.stopPropagation();
+ const nm=im.dataset.n||(im.closest('.top,.item')&&im.closest('.top,.item').querySelector('b')||{}).textContent||'';
+ enter('lb',closeLbDOM);showLb(im.getAttribute('src'),nm)},true);
 // ---------- recipes ----------
 let rcache={};const rcacheReset=()=>{rcache={}};loadRecipes();
 let rfavs=(a=>Array.isArray(a)?a.filter(id=>RBY[id]):[])(ls.get('gg_rfavs',[]));
@@ -678,7 +729,7 @@ $('#fp').onclick=()=>favSub('p');$('#fr').onclick=()=>favSub('r');
 // ---------- add scanned product to shopping list ----------
 document.addEventListener('click',e=>{const b=e.target.closest('#fsh');if(!b||!cur)return;
  const t=cur.name+(cur.brand?' ('+cur.brand.split(',')[0]+')':'');
- if(shopAdd(t,'Scanned product')){saveShop();toast('Added to your shopping list')}else toast('Already on your shopping list')});
+ if(shopAdd(t,'Scanned product',cur.img)){saveShop();toast('Added to your shopping list')}else toast('Already on your shopping list')});
 // ---------- ingredient-list scanner (OCR) ----------
 const OCRL={eng:'English',deu:'German (Deutsch)',fra:'French (Français)',spa:'Spanish (Español)',ita:'Italian (Italiano)'};
 const OS=[1,.8,.6];let ostage=0,tessP=null,ocrW=null,ocrLang='',ocrNow=false;
@@ -761,7 +812,7 @@ function importExtra(d){
  if(Array.isArray(d.myRecipes)){const m=cleanMy(d.myRecipes);m.forEach(x=>{if(!myrec.some(y=>y.id==x.id))myrec.push(x)});if(m.length){saveMy();loadRecipes()}}
  if(d.theme)setTheme(d.theme);
  if(Array.isArray(d.recipeFavorites)){d.recipeFavorites.slice(0,500).forEach(id=>{if(typeof id=='string'&&RBY[id]&&!rfavs.includes(id))rfavs.push(id)});ls.set('gg_rfavs',rfavs)}
- if(d.shopping&&typeof d.shopping=='object'){const s=cleanShop(d.shopping);s.items.forEach(i=>{if(!shop.items.some(x=>nrm(x.text)==nrm(i.text)))shop.items.push(i)});if(!shop.items.length||s.week>shop.week)shop.week=s.week;saveShop()}
+ if(d.shopping&&typeof d.shopping=='object'){const s=cleanShop(d.shopping);s.items.forEach(i=>{if(!shop.items.some(x=>nrm(x.text)==nrm(i.text)))shop.items.push(i)});if(s.imgs)shop.imgs=true;if(!shop.items.length||s.week>shop.week)shop.week=s.week;saveShop()}
  rcacheReset();drawOcr();rlist();rfavDraw()}
 // ---------- init ----------
 initRecipeUI();drawOcr();rlist();rfavDraw();shopBadge();favSub('p');lists();

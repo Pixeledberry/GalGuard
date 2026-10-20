@@ -6,8 +6,8 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "2.2"
-    CURRENT_PROJECT_VERSION: "13"
+    MARKETING_VERSION: "2.4"
+    CURRENT_PROJECT_VERSION: "15"
 targets:
   GalGuard:
     type: application
@@ -18,7 +18,7 @@ targets:
       path: GalGuard/Info.plist
       properties:
         CFBundleDisplayName: GalGuard
-        NSCameraUsageDescription: GalGuard uses the camera to scan product barcodes and QR codes.
+        NSCameraUsageDescription: GalGuard uses the camera to scan product barcodes, QR codes and ingredient lists.
         UILaunchScreen: {}
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait

@@ -33,7 +33,21 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v2.2 (latest)
+### v2.4 (latest)
+- **Your own recipes.** The Recipe tab has a **+ New recipe** button: name, category, prep/cook/total time, servings, a photo, ingredients (end a line with ":" for a group heading), instructions and notes. Your recipes get the same red/yellow ingredient checking, can be favorited, added to the shopping list, shared, edited and deleted. They are saved on the device and included in Export Settings and Import Settings.
+
+### v2.3
+- **Menu button (top right).** A hamburger button opens a side menu with **Themes**, **Custom colors**, and the **Weekly Shopping List**. A small red number on the button shows how many items are still left to buy.
+- **Themes.** Auto (follows your device), Light and Dark, five masculine presets (Midnight Navy, Steel Blue, Forest, Graphite Amber, Deep Ocean) and five feminine presets (Rose Quartz, Lavender Mist, Peach Blush, Orchid Night, Berry Dusk). **Custom colors** has a background and an accent color picker; text, card and line colors are worked out automatically so everything stays readable. Your choice is remembered and included in Export Settings.
+- **Weekly Shopping List.** Add items by hand, tap "+" next to any recipe ingredient, use "Add all to list" on a recipe, or tap "Add to shopping list" on a scanned product. Items are grouped by store aisle, can be checked off, removed, copied or shared. "Start new week" clears checked items and keeps the rest; a banner appears when the list is from a previous week.
+- **New Recipe tab** (between Scan and History) where you can add your own recipes, with the photo at the very top of each, times, servings, ingredients (with red and yellow highlights and tap-for-reason), instructions and notes. Search and filter by category or safety rating, and mark favorites.
+- **Favorite recipes.** Tap the star on a recipe card or page. They are listed under the **★ Favorites** switch inside the Recipe tab and under **Favorites → Recipes**.
+- **Favorites tab now has "Products" and "Recipes"** sub-tabs. Products is the default.
+- **Scan ingredient list.** A new button under "Scan barcode" uses the same camera view and resizing box, but reads the printed ingredient list with text recognition, pastes it into "Paste an ingredient list", and analyzes it automatically. It stops at "Contains", "Allergen", "Manufactured by" and similar text. There is also a "Photo of ingredient list" option (web and iPhone) and a language setting under My settings (English, German, French, Spanish, Italian). The first use downloads the text reader (about 15 MB) and needs internet.
+- **Rating fixes.** Chicken, turkey and poultry sausage, bacon, hot dogs and ham are now yellow instead of red (the meat is poultry, but casings and processing can involve pork or beef). Dairy-free, non-dairy and plant-based milk, butter, cheese and cream are no longer flagged; "hot dog buns", "butternut squash", "butter lettuce", jalapeño "ribs", goat cheese (now yellow as cheese, not red as goat), "avoid bone char" and marine collagen are handled correctly. Many more cheeses (parmesan, feta, mozzarella, cheddar and others) and half-and-half are now recognized as dairy.
+- **Export and Import Settings** now also carry your theme, favorite and created recipes and shopping list.
+
+### v2.2
 - **Automatic releases:** both build workflows now publish a GitHub Release when a build succeeds. The Android APK and the unsigned iOS IPA are attached to a release named after the app version (for example, v2.2), so anyone can download them from the Releases page without signing in. The files are still saved as workflow Artifacts too.
 - **README wording:** the public README now points people to "available releases", and the Apple note about needing a sideloading tool is shown in red.
 
@@ -65,8 +79,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 - **v1.7:** Dairy is now yellow by default and red when you check it in settings, like the other sensitivities.
 - **v1.6:** Clear button for the barcode field; sensitivity settings that turn items red; mammal by-products and hidden animal-derived ingredients flagged yellow; tap any flagged ingredient for the reason; QR code scanning; longer-range scanning with zoom; the code nearest the center of the frame is read first.
 - **v1.5:** Fixed highlighting not appearing in some browsers and a lookup problem; added a "Try a sample" button and a version label in the footer.
-- **v1.4:** Fixed words wrapped in underscores not being matched; added French, Spanish, German, and Italian terms; builds an ingredient list from database tags when no text exists; added flag counts.
-- **v1.3:** Visible "searching" status after a scan, retries for barcode format variants, request timeout, clearer error messages.
 ---
 
 ## Features
@@ -120,10 +132,11 @@ Beef, pork, lamb, mutton, veal, venison, bison, goat, rabbit, horse, ham, bacon,
 | Fatty acids and stearates | stearic acid, magnesium/calcium/sodium stearate, polysorbates, oleic acid, E481–E495, E570–E572 |
 | Flavors | "natural flavors" and translations |
 | Lanolin | lanolin, vitamin D3 / cholecalciferol |
-| Cheese and whey | cheese, whey, casein, curds (often made with animal rennet) |
-| Dairy | milk, butter, cream, yogurt, ghee, lactose |
+| Cheese and whey | cheese (parmesan, feta, mozzarella, cheddar and many more), whey, casein, curds (often made with animal rennet) |
+| Poultry sausage and bacon | chicken, turkey or poultry sausage, bacon, hot dogs, ham (casings and processing can involve pork or beef) |
+| Dairy | milk, butter, cream, half-and-half, yogurt, ghee, lactose |
 
-Plant-based look-alikes are **not** flagged: vegetable glycerin, plant-based mono- and diglycerides, coconut/almond/oat milk, cocoa/shea butter, cream of tartar, kidney beans, cod liver, and similar. Any ingredient that starts with the word "vegan" or "meatless" (for example "Vegan Pepperoni" or "Meatless Pepperoni") is skipped as well, along with the German "vegane", "fleischlose", "pflanzliches", and "mikrobielles".
+Plant-based look-alikes are **not** flagged (including anything labeled dairy-free, non-dairy or plant-based milk, butter or cheese): vegetable glycerin, plant-based mono- and diglycerides, coconut/almond/oat milk, cocoa/shea butter, cream of tartar, kidney beans, cod liver, and similar. Any ingredient that starts with the word "vegan" or "meatless" (for example "Vegan Pepperoni" or "Meatless Pepperoni") is skipped as well, along with the German "vegane", "fleischlose", "pflanzliches", and "mikrobielles".
 
 **Languages.** Ingredient lists in English, French, Spanish, Italian, and German are checked. German has the fullest coverage. If a product has no English list, GalGuard reads its original-language or German list.
 
@@ -131,10 +144,30 @@ Plant-based look-alikes are **not** flagged: vegetable glycerin, plant-based mon
 - **Sensitivities.** Some things affect people with AGS differently. Check any of these to flag them **red** instead of yellow: dairy, gelatin, glycerin and mono/diglycerides, stearic acid and stearates, natural flavors, lanolin and vitamin D3, rennet and animal enzymes. Unchecked, they show as yellow.
 - **Custom lists.** Add your own ingredients to always flag red or always flag yellow (comma separated).
 - **Rating overrides.** On any result, "Rating wrong?" lets you mark a product safe or do-not-eat, or reset it. There's also a link to fix the ingredients on Open Food Facts.
-- **Export Settings / Import Settings.** Two buttons under "My settings" create a backup of your settings, favorites, history, and rating overrides (a small text file) and restore it on another device. You can save or share the backup, copy it, and import it from a file or by pasting the text.
+- **Export Settings / Import Settings.** Two buttons under "My settings" create a backup of your settings, favorites, history, rating overrides, theme, favorite and created recipes and shopping list (a small text file) and restore it on another device. You can save or share the backup, copy it, and import it from a file or by pasting the text.
+
+### Recipes
+- **Add your own recipes** with the **+ New recipe** button: name, category, prep, cook and total time, servings, a photo (shown at the top of the recipe), ingredients, instructions and notes. Edit or delete them any time.
+- **Search and filters.** Search by recipe name or ingredient; filter by category or by safety rating (hide "Do not eat" or show only "Likely OK").
+- **Same ingredient checking as products.** Every ingredient is checked with your sensitivities and custom lists, highlighted red or yellow, and tappable for the reason. Each recipe card shows its rating.
+- **Favorite recipes** are listed under "★ Favorites" in the Recipe tab and under Favorites → Recipes.
+- Recipes and photos are saved on your device only. Use Export Settings to back them up.
+
+### Weekly shopping list
+- Open it from the menu (top right). Add items by hand, with the "+" next to a recipe ingredient, "Add all to list" on a recipe, or "Add to shopping list" on a scanned product.
+- Items are grouped by aisle (produce, meat and seafood, dairy and eggs, bakery, frozen, pantry and other), can be checked off or removed, and the list can be copied or shared.
+- Each list is tied to a week (Monday start). "Start new week" removes checked items and keeps the rest. Duplicates are ignored.
+
+### Menu and themes
+- The hamburger button at the top right opens the menu. Pick a preset (Auto, Light, Dark, five masculine, five feminine) or choose your own background and accent colors. Red and yellow highlight colors stay readable in every theme.
+
+### Scan an ingredient list
+- The "Scan ingredient list" button under "Scan barcode" opens the camera, reads the printed ingredient list with text recognition, fills the "Paste an ingredient list" box and analyzes it. The box starts large and shrinks while it looks, like the barcode scanner. "Capture now" uses whatever is in view.
+- Where the camera can't be used, "Photo of ingredient list" reads a photo instead. The reading language is chosen under My settings.
+- The text reader (Tesseract.js) is downloaded the first time and needs internet. Printed text on curved or shiny packaging can be misread, so check the pasted text.
 
 ### Favorites, history, and export
-- **Favorites.** Add products with the star button. They show their current rating and re-rate automatically when you change settings. Tap to reopen, or remove with the **×**.
+- **Favorites.** The Favorites tab has **Products** (the default) and **Recipes** sub-tabs. Add products with the star button. They show their current rating and re-rate automatically when you change settings. Tap to reopen, or remove with the **×**.
 - **History.** The last 40 scanned products, with a Clear history button.
 - **Export.** Export favorites as a text list using the device's share sheet, the clipboard, or a downloaded `.txt` file, whichever is available.
 
@@ -149,7 +182,11 @@ Everything personal is stored **in the visitor's own browser** using `localStora
 | `gg_favs` | Favorite products (name, brand, barcode, image link, ingredient text) |
 | `gg_hist` | Last 40 scanned products |
 | `gg_ovr` | Your safe / do-not-eat rating overrides |
-| `gg_cfg` | Sensitivities and custom flag lists |
+| `gg_cfg` | Sensitivities, custom flag lists and ingredient-scan language |
+| `gg_rfavs` | Favorite recipe ids |
+| `gg_myrec` | Recipes you created |
+| `gg_shop` | Weekly shopping list |
+| `gg_theme` | Selected theme or custom colors |
 
 **Moving to a new device:** tap **Export Settings** (under My settings) on the old device to create a backup, then **Import Settings** on the new one. Importing adds the backup's favorites and history to anything already there and replaces the sensitivity settings.
 
@@ -195,6 +232,9 @@ GalGuardAndroid/
 ```
 
 ## Known limitations
+- Recipes you add are stored in your browser or app on that device only (about 5 MB total, shared with other saved data). Large photos are shrunk automatically.
+- The ingredient-list scanner needs internet the first time to download the text reader, and has not been tested on a real phone camera in every lighting or packaging situation. Always check the pasted text.
+- Chicken, turkey and poultry sausage and bacon are shown yellow (avoid), not red, because of possible pork or beef casings; check the label.
 - The German word "Rind" on its own (beef) is not flagged, because the same word means rind or peel in English ("orange rind"). Words like "Rindfleisch", "Rindertalg", and "vom Rind" are flagged.
 - Ingredient data depends on Open Food Facts; products missing from it need a pasted ingredient list.
 - Hidden sources can't be detected from a label (for example sugar refined with bone char, or an unnamed "natural flavor"). GalGuard flags the ingredient names it can see.
@@ -204,4 +244,4 @@ GalGuardAndroid/
 - The Android project has not been published to the Play Store; it builds as a debug APK.
 
 ## Credits
-Product data: Open Food Facts contributors. QR/barcode fallback scanning: html5-qrcode. Android scanning: Google ML Kit code scanner.
+Product data: Open Food Facts contributors. Ingredient text recognition: Tesseract.js. QR/barcode fallback scanning: html5-qrcode. Android scanning: Google ML Kit code scanner.

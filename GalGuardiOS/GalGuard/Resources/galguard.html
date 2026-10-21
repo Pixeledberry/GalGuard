@@ -130,6 +130,9 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
 #mlsb{width:100%;max-width:560px;margin:0 auto;background:var(--card);color:var(--ink);border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:85vh;overflow:auto;animation:slidein .18s ease}
 #mls[hidden]{display:none}
 @media(max-width:360px){.btns3{gap:4px}.btns3 button{font-size:12px!important;padding:11px 2px!important}}
+
+/* v3.3 */
+.links button.pri{background:var(--acc);color:var(--accink);border-color:var(--acc)}
 </style></head><body>
 <header><h1><img id="logo" alt="" width="36" height="36" style="vertical-align:-8px;margin-right:8px">GalGuard</h1><p>Scan a barcode. See how risky it is for alpha-gal.</p><button id="hb" aria-label="Menu" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span><i id="hbn" hidden></i></button></header>
 <main>
@@ -172,7 +175,7 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
 <section id="v5" hidden><div id="shop"></div></section>
 <section id="v6" hidden><button class="back" id="bkback">‹ Back</button><h2 style="margin:0">Export / Import Settings</h2><p class="legend">Back up your settings, favorites, history, rating overrides, theme, recipes and shopping list, or restore them on a new device.</p><div class="row"><button id="xs" style="flex:1">Export Settings</button><button id="is" style="flex:1">Import Settings</button></div><div id="bk" class="why" hidden></div><input type="file" id="bf" accept=".json,application/json,text/plain" hidden></section>
 </main>
-<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.2</footer>
+<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.3</footer>
 <div id="scrim" hidden></div>
 <aside id="drawer" hidden aria-label="Menu">
  <div class="dh"><h2>Menu</h2><button id="dclose" aria-label="Close menu">×</button></div>
@@ -278,15 +281,16 @@ $('#result').onclick=e=>{const mk=e.target.closest('mark[data-i]');if(mk){showWh
  const b=e.target.closest('[data-o]');if(!b||!cur)return;if(b.dataset.o=='x')delete ovr[cur.code];else ovr[cur.code]=b.dataset.o;ls.set('gg_ovr',ovr);render();lists()};
 $('#result').onkeydown=e=>{if((e.key=='Enter'||e.key==' ')&&e.target.matches('mark[data-i]')){e.preventDefault();showWhy(+e.target.dataset.i)}};
 function items(arr,fav,empty){return arr.length?arr.map((f,i)=>'<div class="item" data-i="'+i+'" tabindex="0">'+(f.img?'<img src="'+esc(f.img)+'" alt="">':'')+'<div><b>'+esc(f.name)+'</b><span style="color:var(--mut);font-size:14px">'+esc(f.brand)+'</span></div>'+badge(rating(f).v)+(fav?'<button class="x" data-x="'+i+'" aria-label="Remove '+esc(f.name)+'">×</button>':'')+'</div>').join(''):'<p class="empty">'+empty+'</p>'}
+let chAsk=false;
 function lists(){
  if(typeof mlHub=='function')mlHub();
  $('#favs').innerHTML=(favs.length?'<div class="links"><button id="ex">Export favorites</button></div>':'')+items(favs,1,'No favorites yet. Scan a product and tap “Add to favorites”.');
  if(window.rfavDraw)rfavDraw();
- $('#hist').innerHTML=(hist.length?'<div class="links"><button id="ch">Clear history</button></div>':'')+items(hist,0,'Nothing scanned yet.');
+ $('#hist').innerHTML=(hist.length?(chAsk?'<div class="why"><b>Clear your whole history?</b><p>This removes every scanned product from History. It can’t be undone.</p><div class="links"><button id="chy" class="pri">Yes, clear history</button><button id="chn">Cancel</button></div></div>':'<div class="links"><button id="ch" class="pri">Clear history</button></div>'):'')+items(hist,0,'Nothing scanned yet.');
 }
 function pick(arr){return e=>{const x=e.target.closest('[data-x]');if(x){favs.splice(+x.dataset.x,1);ls.set('gg_favs',favs);lists();return}const it=e.target.closest('.item');if(it){cur=arr()[+it.dataset.i];tab(1);render()}}}
 $('#favs').onclick=e=>{if(e.target.id=='ex'){exportFavs();return}pick(()=>favs)(e)};
-$('#hist').onclick=e=>{if(e.target.id=='ch'){hist=[];ls.set('gg_hist',hist);lists();return}pick(()=>hist)(e)};
+$('#hist').onclick=e=>{const i=e.target.id;if(i=='ch'){chAsk=true;lists();return}if(i=='chn'){chAsk=false;lists();return}if(i=='chy'){chAsk=false;hist=[];ls.set('gg_hist',hist);lists();return}pick(()=>hist)(e)};
 async function exportFavs(){
  const t=favs.map(f=>f.name+(f.brand?' ('+f.brand+')':'')+' | '+f.code+' | '+LBL[rating(f).v]).join('\n');
 
@@ -296,7 +300,7 @@ async function exportFavs(){
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/plain'}));a.download='galguard-favorites.txt';a.click();
 }
 function tab(n){['v1','v2','v3','v4','v5','v6'].forEach((v,i)=>$('#'+v).hidden=n!=i+1);[1,2,3,4].forEach(i=>$('#t'+i).className=n==i?'on':'');window.scrollTo(0,0)}
-$('#t1').onclick=()=>tab(1);$('#t2').onclick=()=>{stopScan();tab(2);lists()};$('#t3').onclick=()=>{stopScan();tab(3);lists()};$('#t4').onclick=()=>{stopScan();tab(4)};
+$('#t1').onclick=()=>tab(1);$('#t2').onclick=()=>{stopScan();tab(2);lists()};$('#t3').onclick=()=>{stopScan();chAsk=false;tab(3);lists()};$('#t4').onclick=()=>{stopScan();tab(4)};
 async function lookup(code){
  code=(code||'').replace(/\D/g,'');if(!code)return;
  note('Scanned <b>'+code+'</b>. Searching the database…');$('#result').scrollIntoView({behavior:'smooth',block:'start'});
@@ -454,16 +458,16 @@ const TH=[
  {id:'auto',n:'Auto (device)',g:'Basic'},
  {id:'light',n:'Light',g:'Basic',bg:'#f0f0f1',card:'#ffffff',ink:'#1c1c1e',mut:'#636366',line:'#dcdcde',acc:'#2a2a2c'},
  {id:'dark',n:'Dark',g:'Basic',dk:1,bg:'#141414',card:'#1e1e1e',ink:'#efefef',mut:'#9a9a9a',line:'#333333',acc:'#efefef'},
- {id:'navy',n:'Midnight Navy',g:'Masculine',dk:1,bg:'#0b1220',card:'#131c2e',ink:'#e6edf7',mut:'#8fa0b8',line:'#243049',acc:'#4f8cff'},
- {id:'steel',n:'Steel Blue',g:'Masculine',bg:'#e8eef4',card:'#ffffff',ink:'#12263a',mut:'#52667a',line:'#cdd8e2',acc:'#2b5f8a'},
- {id:'forest',n:'Forest',g:'Masculine',dk:1,bg:'#0e1a14',card:'#16251d',ink:'#e4efe8',mut:'#8fa79a',line:'#263b2f',acc:'#4caf7a'},
- {id:'graphite',n:'Graphite Amber',g:'Masculine',dk:1,bg:'#141414',card:'#1e1e1e',ink:'#efefef',mut:'#9a9a9a',line:'#333333',acc:'#f0a830'},
- {id:'ocean',n:'Deep Ocean',g:'Masculine',dk:1,bg:'#07191f',card:'#0e2830',ink:'#dff1f4',mut:'#86a9b1',line:'#1c3e48',acc:'#22b8cf'},
- {id:'rose',n:'Rose Quartz',g:'Feminine',bg:'#fbeff1',card:'#ffffff',ink:'#3a1f28',mut:'#85606c',line:'#f0d4da',acc:'#d6577a'},
- {id:'lav',n:'Lavender Mist',g:'Feminine',bg:'#f1eefb',card:'#ffffff',ink:'#271f3d',mut:'#6d6590',line:'#ddd6f3',acc:'#7c5cd6'},
- {id:'peach',n:'Peach Blush',g:'Feminine',bg:'#fff1ea',card:'#ffffff',ink:'#3d241b',mut:'#8a6a5e',line:'#f6d9cb',acc:'#e8775a'},
- {id:'orchid',n:'Orchid Night',g:'Feminine',dk:1,bg:'#1a1024',card:'#261833',ink:'#f3e9fa',mut:'#b49ac8',line:'#3a2850',acc:'#d672e8'},
- {id:'berry',n:'Berry Dusk',g:'Feminine',dk:1,bg:'#1f0f1a',card:'#2c1825',ink:'#fbe9f1',mut:'#c297ae',line:'#43263a',acc:'#ee5f98'},
+ {id:'navy',n:'Midnight Navy',g:'HIGH CONTRAST',dk:1,bg:'#000814',card:'#00122b',ink:'#ffffff',mut:'#cddcf2',line:'#5b82b8',acc:'#6fb1ff'},
+ {id:'steel',n:'Steel Blue',g:'HIGH CONTRAST',bg:'#f4f7fa',card:'#ffffff',ink:'#000000',mut:'#2b3c4d',line:'#4a5f75',acc:'#0b3d66'},
+ {id:'forest',n:'Forest',g:'HIGH CONTRAST',dk:1,bg:'#000d05',card:'#03170b',ink:'#ffffff',mut:'#d2ebdb',line:'#4f9a6b',acc:'#3ddc84'},
+ {id:'graphite',n:'Graphite Amber',g:'HIGH CONTRAST',dk:1,bg:'#000000',card:'#0d0d0d',ink:'#ffffff',mut:'#d4d4d4',line:'#6e6e6e',acc:'#ffb52e'},
+ {id:'ocean',n:'Deep Ocean',g:'HIGH CONTRAST',dk:1,bg:'#00090d',card:'#021a22',ink:'#ffffff',mut:'#d0ecf2',line:'#3fa7bd',acc:'#2fe0f5'},
+ {id:'rose',n:'Rose Quartz',g:'LOW CONTRAST',bg:'#fdf0f3',card:'#fffafb',ink:'#7a4a5a',mut:'#a8808d',line:'#f3d9e0',acc:'#e8a0b4'},
+ {id:'lav',n:'Lavender Mist',g:'LOW CONTRAST',bg:'#f4f1fc',card:'#fbfaff',ink:'#6a5f8a',mut:'#8d84ad',line:'#e3ddf4',acc:'#b8a5ee'},
+ {id:'peach',n:'Peach Blush',g:'LOW CONTRAST',bg:'#fff4ee',card:'#fffaf7',ink:'#8a5f4e',mut:'#a98777',line:'#f8e0d2',acc:'#f5b79e'},
+ {id:'orchid',n:'Orchid Haze',g:'LOW CONTRAST',bg:'#f8effb',card:'#fdf9fe',ink:'#7d5a8a',mut:'#9f85ad',line:'#ecdcf3',acc:'#dba6ec'},
+ {id:'berry',n:'Berry Sorbet',g:'LOW CONTRAST',bg:'#fdeff5',card:'#fff9fc',ink:'#8a5470',mut:'#a8808f',line:'#f6d9e6',acc:'#f2a3c4'},
  {id:'spring',n:'Spring Meadow',g:'Seasonal',bg:'#eef7ea',card:'#ffffff',ink:'#1f3320',mut:'#5f7a5c',line:'#d3e8cc',acc:'#3f8f3a'},
  {id:'summer',n:'Summer Sunshine',g:'Seasonal',bg:'#fff8e1',card:'#ffffff',ink:'#3b2f0b',mut:'#8a7440',line:'#f3e3a8',acc:'#c25e00'},
  {id:'autumn',n:'Autumn Harvest',g:'Seasonal',dk:1,bg:'#1f1510',card:'#2b1d15',ink:'#f5e6d8',mut:'#b89a82',line:'#43301f',acc:'#e07a2f'},
@@ -498,7 +502,7 @@ function cleanTheme(t){
 let theme=cleanTheme(ls.get('gg_theme',null));
 function setTheme(t,quiet){theme=cleanTheme(t);ls.set('gg_theme',theme);applyTheme(theme.id=='custom'?theme:TH.find(x=>x.id==theme.id));drawThemes()}
 function drawThemes(){
- const groups=['Basic','Masculine','Feminine','Seasonal'];
+ const groups=['Basic','HIGH CONTRAST','LOW CONTRAST','Seasonal'];
  $('#thl').innerHTML=groups.map(g=>'<p class="aisle" style="margin:12px 0 6px">'+g+'</p><div class="swg">'+TH.filter(x=>x.g==g).map(x=>{
   const sw=x.id=='auto'?'<span class="dots"><i style="background:#f0f0f1"></i><i style="background:#2a2a2c"></i><i style="background:#141414"></i></span>':'<span class="dots"><i style="background:'+x.bg+'"></i><i style="background:'+x.card+'"></i><i style="background:'+x.acc+'"></i></span>';
   return'<button class="sw" data-t="'+x.id+'" aria-pressed="'+(theme.id==x.id)+'">'+sw+'<span>'+esc(x.n)+'</span></button>'}).join('')+'</div>').join('');

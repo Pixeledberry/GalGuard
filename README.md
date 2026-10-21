@@ -37,7 +37,12 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v3.2 (latest)
+### v3.3 (latest)
+- **Clear history button restyled.** It now uses the same color as the other main buttons (white in dark mode) and in every theme.
+- **"Are you sure?" before clearing history.** Pressing "Clear history" now asks "Clear your whole history?" with **Yes, clear history** and **Cancel**.
+- **Themes: HIGH CONTRAST and LOW CONTRAST.** The "Masculine" and "Feminine" groups are renamed. **HIGH CONTRAST** keeps the five dark-and-bold colors (Midnight Navy, Steel Blue, Forest, Graphite Amber, Deep Ocean) but they now use pure white or black text, brighter accents and stronger borders. **LOW CONTRAST** keeps the five rose/lavender/peach/orchid/berry colors as soft pastels (Rose Quartz, Lavender Mist, Peach Blush, Orchid Haze, Berry Sorbet). The two former dark ones, Orchid Night and Berry Dusk, are now light pastels. If you had one of these themes selected, it stays selected.
+
+### v3.2
 - **Product photos in shopping lists are on by default.** Scanned products show their small photo in every shopping list. You can still turn them off from the press-and-hold menu of a scanned item, and your choice is remembered. (If you had photos off before, this version turns them on once.)
 - **Camera zoom slider no longer scrolls the page.** Moving the slider on a phone now only changes the zoom.
 - **Scan box locked at 70%.** The barcode scan box stays at 70% and no longer shrinks. If nothing is found for a few tries, the automatic zoom still steps in, unless you are using the zoom slider.
@@ -82,17 +87,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ### v2.4
 - **Your own recipes.** The Recipe tab has a **+ New recipe** button: name, category, prep/cook/total time, servings, a photo, ingredients (end a line with ":" for a group heading), instructions and notes. Your recipes get the same red/yellow ingredient checking, can be favorited, added to the shopping list, shared, edited and deleted. They are saved on the device and included in Export Settings and Import Settings.
-
-### v2.3
-- **Menu button (top right).** A hamburger button opens a side menu with **Themes**, **Custom colors**, and the **Weekly Shopping List**. A small red number on the button shows how many items are still left to buy.
-- **Themes.** Auto (follows your device), Light and Dark, five masculine presets (Midnight Navy, Steel Blue, Forest, Graphite Amber, Deep Ocean) and five feminine presets (Rose Quartz, Lavender Mist, Peach Blush, Orchid Night, Berry Dusk) and six seasonal ones (Spring Meadow, Summer Sunshine, Autumn Harvest, Winter Frost, Halloween, Holiday). **Custom colors** has a background and an accent color picker; text, card and line colors are worked out automatically so everything stays readable. Your choice is remembered and included in Export Settings.
-- **Weekly Shopping List.** Add items by hand, tap "+" next to any recipe ingredient, use "Add all to list" on a recipe, or tap "Add to shopping list" on a scanned product. Items are grouped by store aisle, can be checked off, removed, copied or shared. "Start new week" clears checked items and keeps the rest; a banner appears when the list is from a previous week.
-- **New Recipe tab** (between Scan and History) where you can add your own recipes, with the photo at the very top of each, times, servings, ingredients (with red and yellow highlights and tap-for-reason), instructions and notes. Search and filter by category or safety rating, and mark favorites.
-- **Favorite recipes.** Tap the star on a recipe card or page. They are listed under the **★ Favorites** switch inside the Recipe tab and under **Favorites → Recipes**.
-- **Favorites tab now has "Products" and "Recipes"** sub-tabs. Products is the default.
-- **Scan ingredient list.** A new button under "Scan barcode" uses the same camera view and resizing box, but reads the printed ingredient list with text recognition, pastes it into "Paste an ingredient list", and analyzes it automatically. It starts at the word "Ingredients" and keeps everything after it, including the "Contains" line. There is also a "Photo of ingredient list" option (web and iPhone) and a language setting under My settings (English, German, French, Spanish, Italian). The first use downloads the text reader (about 15 MB) and needs internet.
-- **Rating fixes.** Chicken, turkey and poultry sausage, bacon, hot dogs and ham are now yellow instead of red (the meat is poultry, but casings and processing can involve pork or beef). Dairy-free, non-dairy and plant-based milk, butter, cheese and cream are no longer flagged; "hot dog buns", "butternut squash", "butter lettuce", jalapeño "ribs", goat cheese (now yellow as cheese, not red as goat), "avoid bone char" and marine collagen are handled correctly. Many more cheeses (parmesan, feta, mozzarella, cheddar and others) and half-and-half are now recognized as dairy.
-- **Export and Import Settings** now also carry your theme, favorite and created recipes and shopping list.
 
 ---
 
@@ -175,7 +169,7 @@ Plant-based look-alikes are **not** flagged (including anything labeled dairy-fr
 - Each list is tied to a week (Monday start). "Start new week" removes checked items and keeps the rest. Duplicates are ignored.
 
 ### Menu and themes
-- The hamburger button at the top right opens the menu. Pick a preset (Auto, Light, Dark, five masculine, five feminine) or choose your own background and accent colors. Red and yellow highlight colors stay readable in every theme.
+- The hamburger button at the top right opens the menu. Pick a preset (Auto, Light, Dark, five high contrast, five low contrast pastel) or choose your own background and accent colors. Red and yellow highlight colors stay readable in every theme.
 
 ### Scan an ingredient list
 - In the Android and iPhone apps, "Scan ingredient list" uses Google's document scanner (Android) or Apple's document camera (iPhone), with on-device text recognition. On the web it uses the camera view below. It reads the printed ingredient list, fills the "Paste an ingredient list" box and analyzes it. The box starts large and shrinks while it looks, like the barcode scanner. "Capture now" uses whatever is in view.

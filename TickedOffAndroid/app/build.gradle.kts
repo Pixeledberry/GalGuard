@@ -11,8 +11,8 @@ android {
         applicationId = "com.galguard.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 27
-        versionName = "3.5"
+        versionCode = 28
+        versionName = "3.5.1"
     }
 
     // One fixed signing key for every build, so a new version installs over an older one and keeps its data.

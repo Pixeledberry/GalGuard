@@ -37,8 +37,13 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v3.5 (latest)
-- **Turn off a sensitivity you don't react to.** Each sensitivity in "My settings" (dairy, gelatin, glycerin, stearates, natural flavors, lanolin, rennet) now has three choices: **Ignore** (not flagged), **Caution** (yellow, the default) and **Avoid** (red). Your old settings convert automatically: anything you had checked is now Avoid, and the rest stay Caution.
+### v3.5.1 (latest)
+- **Sensitivity buttons renamed.** The three choices for each sensitivity are now **Ignore | Avoid | Don’t eat**. "Avoid" (yellow) is the old "Caution" and is still the default, and "Don’t eat" (red) is the old "Avoid". The explanation panel buttons, messages and help text use the same names.
+- **Hint text in the "always flag" boxes now fits.** The grey hint text in the two boxes under "My settings" (and in the product name box) shrinks automatically to fit the width of your screen, so it is no longer cut off.
+- **Wording:** the red box now says "Always flag red / don’t eat (comma separated)".
+
+### v3.5
+- **Turn off a sensitivity you don't react to.** Each sensitivity in "My settings" (dairy, gelatin, glycerin, stearates, natural flavors, lanolin, rennet) now has three choices: **Ignore** (not flagged), **Avoid** (yellow, the default) and **Don’t eat** (red). Your old settings convert automatically: anything you had checked is now Avoid, and the rest stay Caution.
 - **"Not a problem for me" shortcut.** Tap a flagged ingredient in a result and its explanation panel has a **Not a problem for me** button (it also offers **Flag red (Avoid)** or **Back to Caution**). A message confirms the change and has an **Undo** button.
 - **Ignored ingredients stay visible.** They are shown in grey with a dotted underline, tapping one says it is ignored and lets you change it back, and a result with nothing else flagged says how many were ignored ("1 ignored by your settings"), so a "Likely OK" can't be mistaken for a clean label. Reactions can change, so the app reminds you to check with your allergist. Core triggers (mammal meat and similar) can't be turned off. History, Favorites and recipe ratings update automatically, and Export and Import Settings carry the new choices.
 - **New "Default" theme.** It is the dark theme with the app icon's mint color for the main buttons and highlights, it is now the starting theme for new installs, and it sits under "Auto (device)" in the Basic themes (Dark moved to its right). If you already picked a theme, it is kept.
@@ -82,10 +87,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 - **Press and hold a shopping list item** to open a menu with **View Enlarged Image** and **Edit category** (move the item to another aisle, or go back to Automatic). For scanned products the menu also has an option to **turn images on or off for all scanned products**; when on, each scanned product shows a small version of its picture in the list.
 - **Tap any scanned product's picture to enlarge it**: on the result page, in Favorites and History, and in the shopping list. The back button, Esc or a tap closes it.
 - **README:** the public README now tells people to use the standalone apps (shown in red).
-
-### v2.7
-- **Shopping list buttons.** "Clear checked" is now **Uncheck all**: it keeps every item and just clears the check marks. "Start new week" and "Copy or share list" swapped places ("Start new week" is now in the top row). A hint at the bottom of the page explains what "Start new week" does.
-- **Seasonal themes.** A new "Seasonal" group under the Feminine themes in the menu: Spring Meadow, Summer Sunshine, Autumn Harvest, Winter Frost, Halloween and Holiday.
 
 ---
 
@@ -149,7 +150,7 @@ Plant-based look-alikes are **not** flagged (including anything labeled dairy-fr
 **Languages.** Ingredient lists in English, French, Spanish, Italian, and German are checked. German has the fullest coverage. If a product has no English list, TickedOff reads its original-language or German list.
 
 ### Personal settings
-- **Sensitivities.** Some things affect people with AGS differently. For each of these choose **Ignore** (not flagged), **Caution** (yellow, the default) or **Avoid** (red): dairy, gelatin, glycerin and mono/diglycerides, stearic acid and stearates, natural flavors, lanolin and vitamin D3, rennet and animal enzymes.
+- **Sensitivities.** Some things affect people with AGS differently. For each of these choose **Ignore** (not flagged), **Avoid** (yellow, the default) or **Don’t eat** (red): dairy, gelatin, glycerin and mono/diglycerides, stearic acid and stearates, natural flavors, lanolin and vitamin D3, rennet and animal enzymes.
 - **Custom lists.** Add your own ingredients to always flag red or always flag yellow (comma separated).
 - **Rating overrides.** On any result, "Rating wrong?" lets you mark a product safe or do-not-eat, or reset it. There's also a link to fix the ingredients on Open Food Facts.
 - **Export Settings / Import Settings.** A button at the bottom of the menu (top right) opens a page with two buttons that create a backup of your settings, favorites, history, rating overrides, theme, favorite and created recipes and shopping list (a small text file) and restore it on another device. You can save or share the backup, copy it, and import it from a file or by pasting the text.

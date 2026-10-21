@@ -135,7 +135,7 @@ ul.ri .pl{flex:none;width:30px;height:30px;border-radius:8px;border:1px solid va
 /* v3.3 */
 .links button.pri{background:var(--acc);color:var(--accink);border-color:var(--acc)}
 
-/* v3.5 sensitivities: Ignore | Caution | Avoid */
+/* v3.5 sensitivities: Ignore | Avoid | Don’t eat */
 mark.i{background:transparent;color:var(--mut);text-decoration:underline dotted;text-underline-offset:3px;font-weight:500}
 .why.i{border-color:var(--mut)}
 #sens fieldset.sg{border:0;margin:10px 0 0;padding:0;min-width:0}#sens legend{padding:0;font-size:15px;margin-bottom:4px}
@@ -147,6 +147,9 @@ mark.i{background:transparent;color:var(--mut);text-decoration:underline dotted;
 .seg3 label.m input:checked+span{background:var(--hy);color:var(--hyt);border-color:var(--hy)}
 .seg3 label.r input:checked+span{background:var(--hr);color:var(--hrt);border-color:var(--hr)}
 .seg3 input:focus-visible+span{outline:3px solid var(--warn);outline-offset:1px}
+
+/* v3.5.1 */
+#ca::placeholder,#cc::placeholder,#pn::placeholder{font-size:var(--phs,15px)}
 </style></head><body>
 <header><h1><img id="logo" alt="" width="36" height="36" style="vertical-align:-8px;margin-right:8px">TickedOff</h1><p>Scan a barcode. See how risky it is for alpha-gal.</p><button id="hb" aria-label="Menu" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span><i id="hbn" hidden></i></button></header>
 <main>
@@ -161,9 +164,9 @@ mark.i{background:transparent;color:var(--mut);text-decoration:underline dotted;
  <div class="row"><input id="code" inputmode="numeric" placeholder="Barcode digits" aria-label="Barcode digits"><button id="go">Check</button><button id="cl" aria-label="Clear barcode">Clear</button></div>
  <details><summary>Paste an ingredient list</summary><input type="text" id="pn" placeholder="Product name (optional)" aria-label="Product name"><textarea id="pt" placeholder="Paste ingredients from the label"></textarea><div class="btns3"><button id="pa">Analyze</button><button id="ps">Try a sample</button><button id="par">Add as recipe</button></div></details>
  <details><summary>My settings</summary>
-  <p class="legend">Sensitivities: things some people with AGS react to and others don’t. For each one choose <b>Avoid</b> (flagged red, do not eat), <b>Caution</b> (flagged yellow, the default) or <b>Ignore</b> (not flagged, for things you know you don’t react to). Reactions can change, so check with your allergist.</p>
+  <p class="legend">Sensitivities: things some people with AGS react to and others don’t. For each one choose <b>Don’t eat</b> (flagged red), <b>Avoid</b> (flagged yellow, the default) or <b>Ignore</b> (not flagged, for things you know you don’t react to). Reactions can change, so check with your allergist.</p>
   <div id="sens"></div>
-  <input type="text" id="ca" placeholder="Always flag red / do not eat (comma separated)" aria-label="Always avoid">
+  <input type="text" id="ca" placeholder="Always flag red / don’t eat (comma separated)" aria-label="Always avoid">
   <input type="text" id="cc" placeholder="Always flag yellow / avoid (comma separated)" aria-label="Always caution">
   <label style="margin-top:10px">Ingredient scanner language<select id="ocrl" style="width:100%;margin-top:4px"></select></label>
   <p class="legend">On the web, the first ingredient scan downloads the text reader (about 15 MB) and needs internet. The Android and iPhone apps use the phone’s built-in text reader.</p></details>
@@ -189,7 +192,7 @@ mark.i{background:transparent;color:var(--mut);text-decoration:underline dotted;
 <section id="v5" hidden><div id="shop"></div></section>
 <section id="v6" hidden><button class="back" id="bkback">‹ Back</button><h2 style="margin:0">Export / Import Settings</h2><p class="legend">Back up your settings, favorites, history, rating overrides, theme, recipes and shopping list, or restore them on a new device.</p><div class="row"><button id="xs" style="flex:1">Export Settings</button><button id="is" style="flex:1">Import Settings</button></div><div id="bk" class="why" hidden></div><input type="file" id="bf" accept=".json,application/json,text/plain" hidden></section>
 </main>
-<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.5</footer>
+<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.5.1</footer>
 <div id="scrim" hidden></div>
 <aside id="drawer" hidden aria-label="Menu">
  <div class="dh"><h2>Menu</h2><button id="dclose" aria-label="Close menu">×</button></div>
@@ -288,7 +291,7 @@ function showWhy(i,A,W){
  A=A||LA;const h=A&&A.hits[i],w=W||$('#why');if(!h||!w)return;const red=h.k=='r';
  const ign=h.k=='i',status=ign?'You set “'+SENS[h.key].split(' (')[0]+'” to Ignore, so it is not flagged. Reactions can change, so check with your allergist.':red?(h.sens?'You marked “'+SENS[h.key]+'” as a sensitivity, so it is flagged red: do not eat.':h.custom?'This is on your always-red list: do not eat.':'Red means do not eat. This is a mammal-derived ingredient.'):(h.custom?'This is on your always-yellow list: avoid.':h.g=='dairy'?'Yellow means avoid. Dairy comes from mammals, and some people with AGS react to it while others do not.':'Yellow means avoid. It may be made from, or processed with, mammal products, and the label does not say. Contact the maker, or look for a version labeled vegan or plant-based.');
  const bt=(m,t)=>'<button data-sens="'+m+'" data-key="'+h.key+'">'+t+'</button>';
- let tip='';if(h.key){tip=ign?'<div class="links">'+bt('m','Flag yellow (Caution)')+bt('r','Flag red (Avoid)')+'</div>':red?'<div class="links">'+bt('i','Not a problem for me')+bt('m','Back to Caution')+'</div>':'<div class="links">'+bt('i','Not a problem for me')+bt('r','Flag red (Avoid)')+'</div>'}
+ let tip='';if(h.key){tip=ign?'<div class="links">'+bt('m','Flag yellow (Avoid)')+bt('r','Flag red (Don’t eat)')+'</div>':red?'<div class="links">'+bt('i','Not a problem for me')+bt('m','Back to Avoid')+'</div>':'<div class="links">'+bt('i','Not a problem for me')+bt('r','Flag red (Don’t eat)')+'</div>'}
  else if(!h.custom)tip='<p class="legend">This is a core trigger, so it can’t be turned off.</p>';
  w.className='why '+h.k;w.innerHTML='<b>'+esc(h.t)+'</b> <span>'+(ign?'Grey · Ignored':red?'Red · Do not eat':'Yellow · Avoid')+'</span><p>'+esc(h.custom?'Added by you.':GR[h.g])+'</p><p>'+esc(status)+'</p>'+tip;w.hidden=false;
  w.scrollIntoView({behavior:'smooth',block:'nearest'});
@@ -340,15 +343,20 @@ function applyCfg(){ls.set('gg_cfg',cfg);rcacheReset();render();lists();if(!$('#
 const saveCfg=()=>{cfg.sens={};document.querySelectorAll('#sens input:checked').forEach(i=>{if(i.value=='r'||i.value=='i')cfg.sens[i.dataset.s]=i.value});cfg.avoid=$('#ca').value;cfg.caution=$('#cc').value;applyCfg()};
 // Used by the "Not a problem for me" shortcut in the explanation panel and by Undo.
 function setSens(key,mode,quiet){if(!SENS[key])return;const prev=cfg.sens[key]||'m';if(mode=='r'||mode=='i')cfg.sens[key]=mode;else delete cfg.sens[key];applyCfg();drawSettings();
- if(!quiet&&mode=='i'){const e=$('#toast');e.innerHTML=esc('Ignoring “'+SENS[key].split(' (')[0]+'”. Reactions can change, so check with your allergist.')+' <button id="tundo" style="margin-left:6px;padding:4px 10px;border-radius:8px;border:1px solid currentColor;background:none;color:inherit;font:inherit;font-weight:700">Undo</button>';e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,8000);$('#tundo').onclick=()=>{setSens(key,prev,true);toast('Back to '+(prev=='r'?'Avoid':prev=='i'?'Ignore':'Caution'))}}
- else if(!quiet)toast('“'+SENS[key].split(' (')[0]+'” is now '+(mode=='r'?'Avoid (red)':'Caution (yellow)'))}
+ if(!quiet&&mode=='i'){const e=$('#toast');e.innerHTML=esc('Ignoring “'+SENS[key].split(' (')[0]+'”. Reactions can change, so check with your allergist.')+' <button id="tundo" style="margin-left:6px;padding:4px 10px;border-radius:8px;border:1px solid currentColor;background:none;color:inherit;font:inherit;font-weight:700">Undo</button>';e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,8000);$('#tundo').onclick=()=>{setSens(key,prev,true);toast('Back to '+(prev=='r'?'Don’t eat':prev=='i'?'Ignore':'Avoid'))}}
+ else if(!quiet)toast('“'+SENS[key].split(' (')[0]+'” is now '+(mode=='r'?'Don’t eat (red)':'Avoid (yellow)'))}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-sens]');if(b)setSens(b.dataset.key,b.dataset.sens)});
+// Shrinks the hint text in these boxes so it always fits, whatever the screen width.
+const fitCv=document.createElement('canvas').getContext('2d');
+function fitHints(){document.querySelectorAll('#ca,#cc,#pn').forEach(i=>{const w=i.clientWidth;if(!w)return;const cs=getComputedStyle(i),pad=parseFloat(cs.paddingLeft)+parseFloat(cs.paddingRight),avail=w-pad-4;
+ fitCv.font='400 16px '+cs.fontFamily;const tw=fitCv.measureText(i.placeholder).width||1;i.style.setProperty('--phs',Math.max(9,Math.min(16,Math.floor(16*avail/tw*10)/10))+'px')})}
+addEventListener('resize',fitHints);addEventListener('orientationchange',fitHints);document.addEventListener('toggle',fitHints,true);setTimeout(fitHints,0);
 $('#sens').onchange=saveCfg;$('#ca').onchange=$('#cc').onchange=saveCfg;
 $('#cl').onclick=()=>{$('#code').value='';$('#result').innerHTML='';$('#code').focus()};
 
 // ---- backup: export / import settings, favorites, history and rating overrides ----
 const IOSAPP=!!(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.ios);
-function drawSettings(){$('#sens').innerHTML=Object.entries(SENS).map(([k,l])=>{const v=cfg.sens[k]||'m';return'<fieldset class="sg"><legend>'+esc(l)+'</legend><div class="seg3">'+[['i','Ignore'],['m','Caution'],['r','Avoid']].map(([x,n])=>'<label class="'+x+'"><input type="radio" name="sg_'+k+'" data-s="'+k+'" value="'+x+'"'+(v==x?' checked':'')+'><span>'+n+'</span></label>').join('')+'</div></fieldset>'}).join('');$('#ca').value=cfg.avoid;$('#cc').value=cfg.caution}
+function drawSettings(){$('#sens').innerHTML=Object.entries(SENS).map(([k,l])=>{const v=cfg.sens[k]||'m';return'<fieldset class="sg"><legend>'+esc(l)+'</legend><div class="seg3">'+[['i','Ignore'],['m','Avoid'],['r','Don’t eat']].map(([x,n])=>'<label class="'+x+'"><input type="radio" name="sg_'+k+'" data-s="'+k+'" value="'+x+'"'+(v==x?' checked':'')+'><span>'+n+'</span></label>').join('')+'</div></fieldset>'}).join('');$('#ca').value=cfg.avoid;$('#cc').value=cfg.caution}
 function backupText(){return JSON.stringify({app:'TickedOff',version:1,exported:new Date().toISOString(),settings:cfg,favorites:favs,history:hist,overrides:ovr,theme:theme,recipeFavorites:rfavs,shopping:SH,myRecipes:myrec},null,1)}
 function bkPanel(html){const b=$('#bk');b.className='why';b.innerHTML=html;b.hidden=false;b.scrollIntoView({behavior:'smooth',block:'nearest'})}
 async function saveBackup(t){

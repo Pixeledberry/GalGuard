@@ -1,4 +1,4 @@
-# TickedOff (Android) v3.4
+# TickedOff (Android) v3.4.1
 1. Install Android Studio (Koala or newer). File > Open > select this folder and let Gradle sync.
 2. Run on a phone with USB debugging on, or build an installable file: Build > Build APK(s). Copy app/build/outputs/apk/debug/app-debug.apk to your phone and open it.
 Scanning uses Google built-in scanner; if it cannot start, the app falls back to an in-app camera view (asks for camera permission). Product data needs internet.
@@ -33,3 +33,5 @@ New in 3.2: shopping list photos on by default, zoom slider no longer scrolls th
 New in 3.3: Clear history button style and confirmation, HIGH CONTRAST and LOW CONTRAST themes.
 
 New in 3.4: the app is now called TickedOff, with a new icon.
+
+New in 3.4.1: smaller shield in the Android app icon.

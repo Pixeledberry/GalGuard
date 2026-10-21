@@ -37,7 +37,10 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v3.4 (latest)
+### v3.4.1 (latest)
+- **Android icon fixed.** The shield on the Android home-screen icon was too big, because Android crops and masks app icons. It is now smaller, so it looks the same as the icon on the web app (a shield with space around it) with round, square or rounded-square icon shapes.
+
+### v3.4
 - **The app is now called TickedOff** (it was GalGuard), with a new icon: a dark shield on mint with a tick that cuts through it. The web page, the Android and iPhone apps, the file names and these notes all use the new name. Nothing else changes for you: the Android and iPhone apps keep the same internal ID, so they still **update over your existing install and keep your data**. Backups made in the old GalGuard app still import.
 - **Repository name:** the web address is now `https://pixeledberry.github.io/TickedOff/` (rename the GitHub repository to TickedOff to match). GitHub redirects the old repository address, but the old web address `.../GalGuard/` stops working, so use Export Settings on the old page and Import Settings on the new one to move your data.
 
@@ -83,11 +86,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 - **Device back button.** Pressing back on your phone (or the browser's back button) now leaves a sub-screen instead of closing the app: it closes the menu, the Shopping List, the Export / Import page, a recipe, and the recipe editor, one step at a time. On iPhone you can swipe in from the left edge.
 - **Graphite look.** The Dark theme and the Auto theme (in both light and dark mode) now use graphite grey instead of blue-black. The colored dark presets (Midnight Navy, Forest, Deep Ocean, Orchid Night, Berry Dusk) keep their own colors.
 - **Smaller fixes.** The footer now reads "v2.6" (the word "Web" is gone); the main tab is named "Recipes"; the barcode box hint is smaller so it is no longer cut off; the recipe ingredient box label now reads: Ingredients (one per line; end a line with enter key. ":" to start a group, like "Sauce:").
-
-### v2.5
-- **Better ingredient-list scanner in the apps.** On Android, "Scan ingredient list" now opens Google's document scanner (it finds the label, crops it and lets you retake or choose a photo) and reads it with Google's on-device text recognition. On iPhone and iPad it uses Apple's document camera and Apple's on-device text recognition. Both are more accurate than the web reader and work offline. If the built-in scanner can't start, the app falls back to the camera view. The web page still uses the camera reader (Tesseract.js), which needs internet the first time.
-- **Reads everything after "Ingredients".** The list now starts at the word "Ingredients" and includes everything after it, including the "Contains:" allergen line and anything printed below. If the word "Ingredients" can't be found, the full text is pasted so you can trim it.
-- **Export / Import Settings moved into the menu.** A single "Export / Import Settings" button at the bottom of the hamburger menu (below "Reset to automatic") opens a page with the Export Settings and Import Settings buttons.
 
 ---
 

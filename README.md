@@ -25,19 +25,23 @@ $\color{red}{\text{the standalone apps. They use the Google and Apple scanners r
 
 ---
 
-# GalGuard
+# TickedOff
 
-A barcode scanner that checks food ingredients for people with **alpha-gal syndrome (AGS)**. Scan a product, and GalGuard shows its ingredient list with problem ingredients highlighted in red or yellow, plus a one-glance rating.
+A barcode scanner that checks food ingredients for people with **alpha-gal syndrome (AGS)**. Scan a product, and TickedOff shows its ingredient list with problem ingredients highlighted in red or yellow, plus a one-glance rating.
 
 It runs as a single static web page (`index.html`, no build step, no backend) and also ships as an Android wrapper app.
 
-> **Disclaimer:** GalGuard is a screening aid, not medical advice. Ingredient data is crowdsourced and can be missing or wrong, and some ingredients (such as "natural flavors") never reveal their source. Always read the label and follow your allergist's guidance.
+> **Disclaimer:** TickedOff is a screening aid, not medical advice. Ingredient data is crowdsourced and can be missing or wrong, and some ingredients (such as "natural flavors") never reveal their source. Always read the label and follow your allergist's guidance.
 
 ---
 
 ## Changelog
 
-### v3.3 (latest)
+### v3.4 (latest)
+- **The app is now called TickedOff** (it was GalGuard), with a new icon: a dark shield on mint with a tick that cuts through it. The web page, the Android and iPhone apps, the file names and these notes all use the new name. Nothing else changes for you: the Android and iPhone apps keep the same internal ID, so they still **update over your existing install and keep your data**. Backups made in the old GalGuard app still import.
+- **Repository name:** the GitHub repository and web address (`.../GalGuard/`) are unchanged. If you rename the repository to TickedOff on GitHub, the web address becomes `.../TickedOff/`, and GitHub redirects the old repository address.
+
+### v3.3
 - **Clear history button restyled.** It now uses the same color as the other main buttons (white in dark mode) and in every theme.
 - **"Are you sure?" before clearing history.** Pressing "Clear history" now asks "Clear your whole history?" with **Yes, clear history** and **Cancel**.
 - **Themes: HIGH CONTRAST and LOW CONTRAST.** The "Masculine" and "Feminine" groups are renamed. **HIGH CONTRAST** keeps the five dark-and-bold colors (Midnight Navy, Steel Blue, Forest, Graphite Amber, Deep Ocean) but they now use pure white or black text, brighter accents and stronger borders. **LOW CONTRAST** keeps the five rose/lavender/peach/orchid/berry colors as soft pastels (Rose Quartz, Lavender Mist, Peach Blush, Orchid Haze, Berry Sorbet). The two former dark ones, Orchid Night and Berry Dusk, are now light pastels. If you had one of these themes selected, it stays selected.
@@ -84,9 +88,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 - **Better ingredient-list scanner in the apps.** On Android, "Scan ingredient list" now opens Google's document scanner (it finds the label, crops it and lets you retake or choose a photo) and reads it with Google's on-device text recognition. On iPhone and iPad it uses Apple's document camera and Apple's on-device text recognition. Both are more accurate than the web reader and work offline. If the built-in scanner can't start, the app falls back to the camera view. The web page still uses the camera reader (Tesseract.js), which needs internet the first time.
 - **Reads everything after "Ingredients".** The list now starts at the word "Ingredients" and includes everything after it, including the "Contains:" allergen line and anything printed below. If the word "Ingredients" can't be found, the full text is pasted so you can trim it.
 - **Export / Import Settings moved into the menu.** A single "Export / Import Settings" button at the bottom of the hamburger menu (below "Reset to automatic") opens a page with the Export Settings and Import Settings buttons.
-
-### v2.4
-- **Your own recipes.** The Recipe tab has a **+ New recipe** button: name, category, prep/cook/total time, servings, a photo, ingredients (end a line with ":" for a group heading), instructions and notes. Your recipes get the same red/yellow ingredient checking, can be favorited, added to the shopping list, shared, edited and deleted. They are saved on the device and included in Export Settings and Import Settings.
 
 ---
 
@@ -147,7 +148,7 @@ Beef, pork, lamb, mutton, veal, venison, bison, goat, rabbit, horse, ham, bacon,
 
 Plant-based look-alikes are **not** flagged (including anything labeled dairy-free, non-dairy or plant-based milk, butter or cheese): vegetable glycerin, plant-based mono- and diglycerides, coconut/almond/oat milk, cocoa/shea butter, cream of tartar, kidney beans, cod liver, and similar. Any ingredient that starts with the word "vegan" or "meatless" (for example "Vegan Pepperoni" or "Meatless Pepperoni") is skipped as well, along with the German "vegane", "fleischlose", "pflanzliches", and "mikrobielles".
 
-**Languages.** Ingredient lists in English, French, Spanish, Italian, and German are checked. German has the fullest coverage. If a product has no English list, GalGuard reads its original-language or German list.
+**Languages.** Ingredient lists in English, French, Spanish, Italian, and German are checked. German has the fullest coverage. If a product has no English list, TickedOff reads its original-language or German list.
 
 ### Personal settings
 - **Sensitivities.** Some things affect people with AGS differently. Check any of these to flag them **red** instead of yellow: dairy, gelatin, glycerin and mono/diglycerides, stearic acid and stearates, natural flavors, lanolin and vitamin D3, rennet and animal enzymes. Unchecked, they show as yellow.
@@ -226,17 +227,17 @@ index.html                  The entire web app (HTML, CSS, JavaScript)
 manifest.webmanifest        Optional: lets "Add to Home screen" install it as an app
 apple-touch-icon.png        Optional: home screen icon on iPhone and iPad
 icon-192.png, icon-512.png  Optional: app icons for the manifest
-galguard-icon.svg           Source artwork for the icon
+tickedoff-icon.svg          Source artwork for the icon
 .github/workflows/         build-android.yml and build-ios.yml (optional cloud builds)
-GalGuardiOS/
+TickedOffiOS/
   project.yml               XcodeGen project definition
-  GalGuard/                 Swift source, bundled page, and app icon
-GalGuardAndroid/
+  TickedOff/                Swift source, bundled page, and app icon
+TickedOffAndroid/
   app/src/main/
     AndroidManifest.xml
-    assets/galguard.html    Copy of the web app
+    assets/tickedoff.html   Copy of the web app
     java/com/galguard/app/MainActivity.kt
-    res/                    App icon resources (shield and silver G)
+    res/                    App icon resources (dark shield with a tick)
   store-icon-512.png        512 px icon for store listings
   build.gradle.kts, settings.gradle.kts, gradle/wrapper/
 ```
@@ -247,7 +248,7 @@ GalGuardAndroid/
 - Chicken, turkey and poultry sausage and bacon are shown yellow (avoid), not red, because of possible pork or beef casings; check the label.
 - The German word "Rind" on its own (beef) is not flagged, because the same word means rind or peel in English ("orange rind"). Words like "Rindfleisch", "Rindertalg", and "vom Rind" are flagged.
 - Ingredient data depends on Open Food Facts; products missing from it need a pasted ingredient list.
-- Hidden sources can't be detected from a label (for example sugar refined with bone char, or an unnamed "natural flavor"). GalGuard flags the ingredient names it can see.
+- Hidden sources can't be detected from a label (for example sugar refined with bone char, or an unnamed "natural flavor"). TickedOff flags the ingredient names it can see.
 - Camera range depends on the phone's camera. Browsers without a built-in barcode detector use a library fallback that scans the whole frame and can't prefer the center code.
 - On iPhone and iPad, the web page uses the library fallback scanner, which scans the whole frame and doesn't pick the code nearest the center or offer a zoom slider. The iOS app uses Apple's scanner instead.
 - Favorites and settings don't sync automatically between devices; use Export Settings and Import Settings to move them.

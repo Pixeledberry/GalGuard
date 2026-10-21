@@ -1,0 +1,34 @@
+name: TickedOff
+options:
+  bundleIdPrefix: com.galguard
+  deploymentTarget:
+    iOS: "15.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "3.4"
+    CURRENT_PROJECT_VERSION: "25"
+targets:
+  TickedOff:
+    type: application
+    platform: iOS
+    sources:
+      - TickedOff
+    info:
+      path: TickedOff/Info.plist
+      properties:
+        CFBundleDisplayName: TickedOff
+        NSCameraUsageDescription: TickedOff uses the camera to scan product barcodes, QR codes and ingredient lists, and to take recipe photos.
+        NSPhotoLibraryUsageDescription: TickedOff lets you pick a photo from your library for your own recipes.
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.galguard.app
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        TARGETED_DEVICE_FAMILY: "1,2"

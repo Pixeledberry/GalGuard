@@ -1,11 +1,11 @@
 {
-  "name": "GalGuard",
-  "short_name": "GalGuard",
+  "name": "TickedOff",
+  "short_name": "TickedOff",
   "description": "Barcode checker for alpha-gal syndrome",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#101C27",
-  "theme_color": "#101C27",
+  "background_color": "#BFF0D8",
+  "theme_color": "#BFF0D8",
   "icons": [
     {
       "src": "icon-192.png",

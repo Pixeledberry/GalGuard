@@ -2,7 +2,7 @@
 
 This app has an HTML web version, an Android, and an Apple version. $\color{red}{\text{(Apple version needs a sideloading tool to install because the app is not signed. If unable, just use the web app)}}$ I do not own an apple device so if there's issues then I apologize, but you'll just have to use the web app.
 
-Here's the public HTML for the app. https://pixeledberry.github.io/GalGuard/ Either just leave the page open in your browser or you can install the web version of the app by:
+Here's the public HTML for the app. https://pixeledberry.github.io/TickedOff/ Either just leave the page open in your browser or you can install the web version of the app by:
 
 Go to the app webpage then:
 
@@ -39,7 +39,7 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ### v3.4 (latest)
 - **The app is now called TickedOff** (it was GalGuard), with a new icon: a dark shield on mint with a tick that cuts through it. The web page, the Android and iPhone apps, the file names and these notes all use the new name. Nothing else changes for you: the Android and iPhone apps keep the same internal ID, so they still **update over your existing install and keep your data**. Backups made in the old GalGuard app still import.
-- **Repository name:** the GitHub repository and web address (`.../GalGuard/`) are unchanged. If you rename the repository to TickedOff on GitHub, the web address becomes `.../TickedOff/`, and GitHub redirects the old repository address.
+- **Repository name:** the web address is now `https://pixeledberry.github.io/TickedOff/` (rename the GitHub repository to TickedOff to match). GitHub redirects the old repository address, but the old web address `.../GalGuard/` stops working, so use Export Settings on the old page and Import Settings on the new one to move your data.
 
 ### v3.3
 - **Clear history button restyled.** It now uses the same color as the other main buttons (white in dark mode) and in every theme.

@@ -37,7 +37,13 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v3.4.1 (latest)
+### v3.5 (latest)
+- **Turn off a sensitivity you don't react to.** Each sensitivity in "My settings" (dairy, gelatin, glycerin, stearates, natural flavors, lanolin, rennet) now has three choices: **Ignore** (not flagged), **Caution** (yellow, the default) and **Avoid** (red). Your old settings convert automatically: anything you had checked is now Avoid, and the rest stay Caution.
+- **"Not a problem for me" shortcut.** Tap a flagged ingredient in a result and its explanation panel has a **Not a problem for me** button (it also offers **Flag red (Avoid)** or **Back to Caution**). A message confirms the change and has an **Undo** button.
+- **Ignored ingredients stay visible.** They are shown in grey with a dotted underline, tapping one says it is ignored and lets you change it back, and a result with nothing else flagged says how many were ignored ("1 ignored by your settings"), so a "Likely OK" can't be mistaken for a clean label. Reactions can change, so the app reminds you to check with your allergist. Core triggers (mammal meat and similar) can't be turned off. History, Favorites and recipe ratings update automatically, and Export and Import Settings carry the new choices.
+- **New "Default" theme.** It is the dark theme with the app icon's mint color for the main buttons and highlights, it is now the starting theme for new installs, and it sits under "Auto (device)" in the Basic themes (Dark moved to its right). If you already picked a theme, it is kept.
+
+### v3.4.1
 - **Android icon fixed.** The shield on the Android home-screen icon was too big, because Android crops and masks app icons. It is now smaller, so it looks the same as the icon on the web app (a shield with space around it) with round, square or rounded-square icon shapes.
 
 ### v3.4
@@ -80,12 +86,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 ### v2.7
 - **Shopping list buttons.** "Clear checked" is now **Uncheck all**: it keeps every item and just clears the check marks. "Start new week" and "Copy or share list" swapped places ("Start new week" is now in the top row). A hint at the bottom of the page explains what "Start new week" does.
 - **Seasonal themes.** A new "Seasonal" group under the Feminine themes in the menu: Spring Meadow, Summer Sunshine, Autumn Harvest, Winter Frost, Halloween and Holiday.
-
-### v2.6
-- **Add as Recipe.** A new button next to "Try a sample" in "Paste an ingredient list" turns the pasted or scanned list into a new recipe: it opens the New recipe page with the ingredients already filled in, one ingredient per line (split at the commas, keeping anything in brackets together). Add a name, photo and steps, then save.
-- **Device back button.** Pressing back on your phone (or the browser's back button) now leaves a sub-screen instead of closing the app: it closes the menu, the Shopping List, the Export / Import page, a recipe, and the recipe editor, one step at a time. On iPhone you can swipe in from the left edge.
-- **Graphite look.** The Dark theme and the Auto theme (in both light and dark mode) now use graphite grey instead of blue-black. The colored dark presets (Midnight Navy, Forest, Deep Ocean, Orchid Night, Berry Dusk) keep their own colors.
-- **Smaller fixes.** The footer now reads "v2.6" (the word "Web" is gone); the main tab is named "Recipes"; the barcode box hint is smaller so it is no longer cut off; the recipe ingredient box label now reads: Ingredients (one per line; end a line with enter key. ":" to start a group, like "Sauce:").
 
 ---
 
@@ -149,7 +149,7 @@ Plant-based look-alikes are **not** flagged (including anything labeled dairy-fr
 **Languages.** Ingredient lists in English, French, Spanish, Italian, and German are checked. German has the fullest coverage. If a product has no English list, TickedOff reads its original-language or German list.
 
 ### Personal settings
-- **Sensitivities.** Some things affect people with AGS differently. Check any of these to flag them **red** instead of yellow: dairy, gelatin, glycerin and mono/diglycerides, stearic acid and stearates, natural flavors, lanolin and vitamin D3, rennet and animal enzymes. Unchecked, they show as yellow.
+- **Sensitivities.** Some things affect people with AGS differently. For each of these choose **Ignore** (not flagged), **Caution** (yellow, the default) or **Avoid** (red): dairy, gelatin, glycerin and mono/diglycerides, stearic acid and stearates, natural flavors, lanolin and vitamin D3, rennet and animal enzymes.
 - **Custom lists.** Add your own ingredients to always flag red or always flag yellow (comma separated).
 - **Rating overrides.** On any result, "Rating wrong?" lets you mark a product safe or do-not-eat, or reset it. There's also a link to fix the ingredients on Open Food Facts.
 - **Export Settings / Import Settings.** A button at the bottom of the menu (top right) opens a page with two buttons that create a backup of your settings, favorites, history, rating overrides, theme, favorite and created recipes and shopping list (a small text file) and restore it on another device. You can save or share the backup, copy it, and import it from a file or by pasting the text.

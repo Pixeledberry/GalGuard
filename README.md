@@ -27,7 +27,7 @@ $\color{red}{\text{the standalone apps. They use the Google and Apple scanners r
 
 # TickedOff
 
-A barcode scanner that checks food ingredients for people with **alpha-gal syndrome (AGS)**. Scan a product, and TickedOff shows its ingredient list with problem ingredients highlighted in red or yellow, plus a one-glance rating.
+A barcode scanner that checks food ingredients against **your allergies and conditions**: alpha-gal syndrome (AGS), celiac disease and common food allergies. Scan a product, and TickedOff shows its ingredient list with problem ingredients highlighted in red or yellow, plus a one-glance rating.
 
 It runs as a single static web page (`index.html`, no build step, no backend) and also ships as an Android wrapper app.
 
@@ -37,7 +37,17 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v3.5.1 (latest)
+### v3.6 (latest)
+- **Now for allergies too, not just alpha-gal.** A new **My allergies** section (under Scan) lets you tap what you need to avoid: milk, egg, peanut, tree nuts, soy, wheat, **gluten (celiac)**, fish, shellfish and sesame, plus a box for anything else. Alpha-gal is one choice among equals, and you can turn alpha-gal checking off if it doesn’t apply to you.
+- **First-run question.** New installs are asked "What do you need to avoid?" with alpha-gal and every allergy as equal choices (or Skip). Existing users are not asked, and nothing changes for them until they add an allergy.
+- **Two-line results.** When you have allergies set, each result shows **Alpha-gal** and **Your allergies** separately, and the overall verdict is Do not eat if either one is bad. Allergy matches are highlighted **purple** so they can’t be confused with the red/yellow alpha-gal flags.
+- **Hidden names and other languages.** Each allergy also matches its derivatives (for example casein and whey for milk, albumin for egg, tahini for sesame) plus common German, French and Spanish words. Plant milks, "peanut butter" vs "cocoa butter", flours like rice flour and "free from" claims are handled so they don’t cause false alarms.
+- **"May contain" and Open Food Facts allergen data.** Warnings like "may contain traces of…" show as a softer purple and lower the rating to Avoid, and the allergens and traces recorded by Open Food Facts are used too. A "gluten-free" or other "free from" claim never overrides the ingredient check.
+- **Per-allergy severity.** Choose **Avoid completely** (Do not eat) or **Just flag it** (Avoid) for each allergy. Celiac detail: wheat, barley, rye, malt and brewer’s yeast are flagged, and oats are flagged as "may contain" because of cross-contamination.
+- **Everywhere else.** Recipe cards show your allergy match, adding a conflicting item or recipe to the shopping list gives a heads-up, and Favorites, History and recipes re-rate automatically. Your allergy choices are included in Export/Import Settings, and older backups still import.
+- **More general wording** across the app, and the Recipes tab now refreshes right after you change your settings.
+
+### v3.5.1
 - **Sensitivity buttons renamed.** The three choices for each sensitivity are now **Ignore | Avoid | Don’t eat**. "Avoid" (yellow) is the old "Caution" and is still the default, and "Don’t eat" (red) is the old "Avoid". The explanation panel buttons, messages and help text use the same names.
 - **Hint text in the "always flag" boxes now fits.** The grey hint text in the two boxes under "My settings" (and in the product name box) shrinks automatically to fit the width of your screen, so it is no longer cut off.
 - **Wording:** the red box now says "Always flag red / don’t eat (comma separated)".
@@ -82,13 +92,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 - **More shopping categories.** Items can now be sorted into Produce, Meat & seafood, Deli, Dairy & eggs, Bakery, Frozen, Pantry & canned, Spices & baking, Condiments & sauces, Breakfast & cereal, Snacks, Beverages, **Hygiene**, Health & pharmacy, Baby, Household & cleaning, Paper goods, **Pet** and Other. New items are sorted automatically, and you can change any item with "Edit category". (The old "Pantry & other" is now "Other".)
 - **Long-press highlight fixed.** Pressing and holding a shopping list item no longer leaves its text highlighted.
 - **Export favorites for recipes.** Favorites → Recipes and the "★ Favorites" view in the Recipes tab now have an **Export favorites** button, the same as for products. It lists each recipe with its rating (and the link, or the ingredients for recipes you created).
-
-### v2.8
-- **Press and hold a shopping list item** to open a menu with **View Enlarged Image** and **Edit category** (move the item to another aisle, or go back to Automatic). For scanned products the menu also has an option to **turn images on or off for all scanned products**; when on, each scanned product shows a small version of its picture in the list.
-- **Tap any scanned product's picture to enlarge it**: on the result page, in Favorites and History, and in the shopping list. The back button, Esc or a tap closes it.
-- **README:** the public README now tells people to use the standalone apps (shown in red).
-
----
 
 ## Features
 
@@ -150,6 +153,7 @@ Plant-based look-alikes are **not** flagged (including anything labeled dairy-fr
 **Languages.** Ingredient lists in English, French, Spanish, Italian, and German are checked. German has the fullest coverage. If a product has no English list, TickedOff reads its original-language or German list.
 
 ### Personal settings
+- **My allergies.** Pick the allergies you need to avoid (milk, egg, peanut, tree nuts, soy, wheat, gluten/celiac, fish, shellfish, sesame, or your own). Each can be set to **Avoid completely** or **Just flag it**, and alpha-gal checking can be switched off. Results show purple allergy highlights and separate Alpha-gal and Your allergies lines.
 - **Sensitivities.** Some things affect people with AGS differently. For each of these choose **Ignore** (not flagged), **Avoid** (yellow, the default) or **Don’t eat** (red): dairy, gelatin, glycerin and mono/diglycerides, stearic acid and stearates, natural flavors, lanolin and vitamin D3, rennet and animal enzymes.
 - **Custom lists.** Add your own ingredients to always flag red or always flag yellow (comma separated).
 - **Rating overrides.** On any result, "Rating wrong?" lets you mark a product safe or do-not-eat, or reset it. There's also a link to fix the ingredients on Open Food Facts.

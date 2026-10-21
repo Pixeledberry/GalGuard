@@ -1,7 +1,7 @@
 {
   "name": "TickedOff",
   "short_name": "TickedOff",
-  "description": "Barcode checker for alpha-gal syndrome",
+  "description": "Ingredient and allergy checker for food",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#BFF0D8",

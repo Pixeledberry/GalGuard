@@ -37,7 +37,10 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v3.6 (latest)
+### v3.6.1 (latest)
+- **New sensitivity: carrageenan.** Carrageenan (a seaweed thickener, also written E407) is now in the sensitivities list under "My settings" with the usual **Ignore | Avoid | Don’t eat** choice. It is on by default as **Avoid** (yellow) because some people with AGS report reacting to it, and it is not a mammal product. German, French and Spanish spellings are matched too. Set it to Ignore if it doesn’t bother you.
+
+### v3.6
 - **Now for allergies too, not just alpha-gal.** A new **My allergies** section (under Scan) lets you tap what you need to avoid: milk, egg, peanut, tree nuts, soy, wheat, **gluten (celiac)**, fish, shellfish and sesame, plus a box for anything else. Alpha-gal is one choice among equals, and you can turn alpha-gal checking off if it doesn’t apply to you.
 - **First-run question.** New installs are asked "What do you need to avoid?" with alpha-gal and every allergy as equal choices (or Skip). Existing users are not asked, and nothing changes for them until they add an allergy.
 - **Two-line results.** When you have allergies set, each result shows **Alpha-gal** and **Your allergies** separately, and the overall verdict is Do not eat if either one is bad. Allergy matches are highlighted **purple** so they can’t be confused with the red/yellow alpha-gal flags.
@@ -53,7 +56,7 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 - **Wording:** the red box now says "Always flag red / don’t eat (comma separated)".
 
 ### v3.5
-- **Turn off a sensitivity you don't react to.** Each sensitivity in "My settings" (dairy, gelatin, glycerin, stearates, natural flavors, lanolin, rennet) now has three choices: **Ignore** (not flagged), **Avoid** (yellow, the default) and **Don’t eat** (red). Your old settings convert automatically: anything you had checked is now Avoid, and the rest stay Caution.
+- **Turn off a sensitivity you don't react to.** Each sensitivity in "My settings" (dairy, gelatin, glycerin, stearates, natural flavors, carrageenan, lanolin, rennet) now has three choices: **Ignore** (not flagged), **Avoid** (yellow, the default) and **Don’t eat** (red). Your old settings convert automatically: anything you had checked is now Avoid, and the rest stay Caution.
 - **"Not a problem for me" shortcut.** Tap a flagged ingredient in a result and its explanation panel has a **Not a problem for me** button (it also offers **Flag red (Avoid)** or **Back to Caution**). A message confirms the change and has an **Undo** button.
 - **Ignored ingredients stay visible.** They are shown in grey with a dotted underline, tapping one says it is ignored and lets you change it back, and a result with nothing else flagged says how many were ignored ("1 ignored by your settings"), so a "Likely OK" can't be mistaken for a clean label. Reactions can change, so the app reminds you to check with your allergist. Core triggers (mammal meat and similar) can't be turned off. History, Favorites and recipe ratings update automatically, and Export and Import Settings carry the new choices.
 - **New "Default" theme.** It is the dark theme with the app icon's mint color for the main buttons and highlights, it is now the starting theme for new installs, and it sits under "Auto (device)" in the Basic themes (Dark moved to its right). If you already picked a theme, it is kept.
@@ -86,12 +89,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 - **Updating the Android app now works.** Before this version, each build was signed with a different random key, so Android refused to install a new version over an older one and you had to uninstall first. From this version on, every build uses the same fixed key, so future updates install over the old one and keep your settings, favorites, history and shopping lists. **One last time:** if you have a version older than 3.0, Android will still ask you to uninstall it, which erases its data. Before you do that, open the menu, choose **Export / Import Settings** and copy or save your backup, then import it into 3.0. After that, updates are automatic. (On iPhone, a sideloading tool such as AltStore or Sideloadly keeps your data when it re-installs over the older version, as long as you use the same Apple ID.)
 - **Zoom slider on the camera.** The barcode camera view has a vertical zoom slider on the right side. Moving it takes over from the automatic zooming for that scan. Phones whose camera does not allow zoom control use a digital zoom, so the slider works everywhere.
 - **Scan box starts at 70%.** The scan box now starts at 70% of the view and shrinks from there. The 100% size is gone.
-
-### v2.9
-- **Multiple shopping lists.** The Weekly Shopping List now has a list picker and a **+ New list** button (up to 20 lists, for example "Costco" or "Pharmacy"). You can rename or delete a list, and each list has its own week and items. Press and hold an item and choose **Move to another list** to move it. Items you add from a recipe or a scanned product go to the list that is currently open, and the message tells you which one. Your existing list is kept as "Shopping list". Export Settings and Import Settings carry all of your lists; imported lists with the same name are merged.
-- **More shopping categories.** Items can now be sorted into Produce, Meat & seafood, Deli, Dairy & eggs, Bakery, Frozen, Pantry & canned, Spices & baking, Condiments & sauces, Breakfast & cereal, Snacks, Beverages, **Hygiene**, Health & pharmacy, Baby, Household & cleaning, Paper goods, **Pet** and Other. New items are sorted automatically, and you can change any item with "Edit category". (The old "Pantry & other" is now "Other".)
-- **Long-press highlight fixed.** Pressing and holding a shopping list item no longer leaves its text highlighted.
-- **Export favorites for recipes.** Favorites → Recipes and the "★ Favorites" view in the Recipes tab now have an **Export favorites** button, the same as for products. It lists each recipe with its rating (and the link, or the ingredients for recipes you created).
 
 ## Features
 

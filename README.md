@@ -37,7 +37,16 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v3.7 (latest)
+### v3.8 (latest)
+- **Update notices.** TickedOff now tells you when a new version is out.
+  - **Web:** a banner says "A new version of TickedOff is available" with a **Reload** button.
+  - **Android (public version):** tap **Update** and the app downloads the new version and opens Android's installer. You only tap **Install**, and your favorites and settings are kept. The first time, Android asks you to allow TickedOff to install apps; the notice walks you through it.
+  - **Android (private version) and Apple:** a notice with a **Get it** link to the new release. Apple users install it with their sideloading tool.
+- **Not now** hides the notice for 3 days. If an even newer version comes out, it shows again right away. The notice never blocks the app.
+- **Menu → Check for updates** checks right away and shows which version you have.
+- The apps check at most every 12 hours and only after the new download is ready. Updates are checked starting from this version, so v3.7 and older still need one manual update to get here.
+
+### v3.7
 - **Four product databases instead of one.** A scanned barcode is now looked up in **Open Food Facts**, **Open Beauty Facts** (soap, shampoo, lotion, toothpaste, deodorant and other personal care), **Open Products Facts** (cleaners and other everyday non-food products) and **Open Pet Food Facts** at the same time, and the first match is used. Results from the sister databases are checked exactly like food: same highlights, ratings, allergy checks, favorites, history, shopping list and backups.
 - **"From Open Beauty Facts" label** on results that did not come from the food database, and the "Fix the ingredients" link now opens the right database.
 - **A few cosmetic ingredients added** to the mammal-derived list (keratin, elastin, placenta). Sodium tallowate, lanolin, glycerin, stearates and collagen were already flagged.
@@ -83,13 +92,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 - **Product photos in shopping lists are on by default.** Scanned products show their small photo in every shopping list. You can still turn them off from the press-and-hold menu of a scanned item, and your choice is remembered. (If you had photos off before, this version turns them on once.)
 - **Camera zoom slider no longer scrolls the page.** Moving the slider on a phone now only changes the zoom.
 - **Scan box locked at 70%.** The barcode scan box stays at 70% and no longer shrinks. If nothing is found for a few tries, the automatic zoom still steps in, unless you are using the zoom slider.
-
-### v3.1
-- **My Lists tab.** The "Favorites" tab is now **My Lists**, and the red number bubble on it is gone. It shows all of your lists: **Products** and **Recipes** (your favorites, each with its count in brackets, like Recipes) and every shopping list, including ones you create with **+ New list**. Tap a list to open it; the others are hidden until you go back. Press and hold a list for **Merge lists**, **Rename**, **Clear list** and **Delete list**. Products and Recipes are built-in, so they can only be cleared. The Weekly Shopping List is still in the menu too.
-- **Recipe photos work on Android.** "Choose photo" now opens your phone's gallery, and there is a new **Take photo** button, to the left of it, that opens the camera.
-- **Missing-photo picture centered.** The placeholder plate shown when a recipe has no photo is now centered in the photo frame.
-- **Analyze, Try a sample and Add as recipe** are now on one line (the button now reads "Add as recipe").
-- **Release notes:** the Android install note now mentions tapping **More info**, then **Install anyway**, if Android blocks the install.
 
 ## Features
 
@@ -184,6 +186,11 @@ Plant-based look-alikes are **not** flagged (including anything labeled dairy-fr
 - **Export.** Export favorites as a text list using the device's share sheet, the clipboard, or a downloaded `.txt` file, whichever is available.
 
 ---
+
+### Updates
+- **Web version:** when a newer version is published, a banner offers a **Reload**.
+- **Android and Apple apps:** they check GitHub for a newer release (at most every 12 hours, or any time from **Menu → Check for updates**). On Android (public version), **Update** downloads the new version and opens the installer for you. On Apple, and in the private Android version, the notice links to the release so you can install it.
+- **Not now** hides the notice for 3 days. Nothing is ever blocked.
 
 ## How favorites and settings are stored
 

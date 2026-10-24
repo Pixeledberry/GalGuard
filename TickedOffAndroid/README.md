@@ -1,4 +1,4 @@
-# TickedOff (Android) v3.7
+# TickedOff (Android) v3.8
 1. Install Android Studio (Koala or newer). File > Open > select this folder and let Gradle sync.
 2. Run on a phone with USB debugging on, or build an installable file: Build > Build APK(s). Copy app/build/outputs/apk/debug/app-debug.apk to your phone and open it.
 Scanning uses Google built-in scanner; if it cannot start, the app falls back to an in-app camera view (asks for camera permission). Product data needs internet.
@@ -38,4 +38,4 @@ New in 3.4.1: smaller shield in the Android app icon.
 
 New in 3.5: Ignore / Caution / Avoid for each sensitivity, "Not a problem for me" shortcut, new Default theme.
 
-New in 3.7: barcodes are also looked up in Open Beauty Facts, Open Products Facts and Open Pet Food Facts.
+New in 3.8: update notices. The public version can download and install updates itself (Android always asks you to confirm), and needs the "Install unknown apps" permission for TickedOff the first time.

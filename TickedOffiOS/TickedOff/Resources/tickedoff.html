@@ -172,9 +172,12 @@ mark.p{background:var(--hxs);color:var(--hxst);text-decoration:underline dashed;
 #alx::placeholder,#frx::placeholder{font-size:var(--phs,15px)}
 
 .srcn{display:block;font-size:12px;color:var(--mut);margin-top:2px}
+.upd{border-left-color:var(--acc);margin-top:10px}.upd p{margin:0 0 4px}.links a.pri{background:var(--acc);color:var(--accink);border-color:var(--acc);text-decoration:none}
+.upd button:disabled{opacity:.5}
 </style></head><body>
 <header><h1><img id="logo" alt="" width="36" height="36" style="vertical-align:-8px;margin-right:8px">TickedOff</h1><p>Scan a barcode. Check it against your allergies.</p><button id="hb" aria-label="Menu" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span><i id="hbn" hidden></i></button></header>
 <main>
+<div id="upd" class="why upd" hidden role="status"></div>
 <nav><button id="t1" class="on">Scan</button><button id="t4">Recipes</button><button id="t3">History</button><button id="t2">My Lists</button></nav>
 <section id="v1">
  <div class="cam off" id="cam"><video id="vid" playsinline muted></video><div id="reader"></div><div id="sb"></div><input type="range" id="zm" hidden aria-label="Zoom"><span id="zl" hidden></span></div>
@@ -221,7 +224,7 @@ mark.p{background:var(--hxs);color:var(--hxst);text-decoration:underline dashed;
 <section id="v5" hidden><div id="shop"></div></section>
 <section id="v6" hidden><button class="back" id="bkback">‹ Back</button><h2 style="margin:0">Export / Import Settings</h2><p class="legend">Back up your settings, favorites, history, rating overrides, theme, recipes and shopping list, or restore them on a new device.</p><div class="row"><button id="xs" style="flex:1">Export Settings</button><button id="is" style="flex:1">Import Settings</button></div><div id="bk" class="why" hidden></div><input type="file" id="bf" accept=".json,application/json,text/plain" hidden></section>
 </main>
-<footer>Ingredient data comes from Open Food Facts and its sister projects Open Beauty Facts, Open Products Facts and Open Pet Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.7</footer>
+<footer>Ingredient data comes from Open Food Facts and its sister projects Open Beauty Facts, Open Products Facts and Open Pet Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.8</footer>
 <div id="scrim" hidden></div>
 <aside id="drawer" hidden aria-label="Menu">
  <div class="dh"><h2>Menu</h2><button id="dclose" aria-label="Close menu">×</button></div>
@@ -234,6 +237,8 @@ mark.p{background:var(--hxs);color:var(--hxst);text-decoration:underline dashed;
  <button class="smallb" id="crs">Reset to automatic</button>
  <h3>Backup</h3>
  <button class="menub" id="mbk"><span aria-hidden="true">💾</span> Export / Import Settings</button>
+ <h3>App</h3>
+ <button class="menub" id="mupd"><span aria-hidden="true">🔄</span> Check for updates <small id="mupdv"></small></button>
 </aside>
 <div id="toast" hidden style="z-index:30"></div>
 <div id="mls" hidden><div id="mlsb" role="dialog" aria-label="List options"></div></div>
@@ -495,6 +500,7 @@ $('#sens').onchange=saveCfg;$('#ca').onchange=$('#cc').onchange=saveCfg;
 $('#cl').onclick=()=>{$('#code').value='';$('#result').innerHTML='';$('#code').focus()};
 
 // ---- backup: export / import settings, favorites, history and rating overrides ----
+const APPV='3.8',EDITION='public';
 const IOSAPP=!!(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.ios);
 function drawSettings(){$('#sens').innerHTML=Object.entries(SENS).map(([k,l])=>{const v=cfg.sens[k]||'m';return'<fieldset class="sg"><legend>'+esc(l)+'</legend><div class="seg3">'+[['i','Ignore'],['m','Avoid'],['r','Don’t eat']].map(([x,n])=>'<label class="'+x+'"><input type="radio" name="sg_'+k+'" data-s="'+k+'" value="'+x+'"'+(v==x?' checked':'')+'><span>'+n+'</span></label>').join('')+'</div></fieldset>'}).join('');$('#ca').value=cfg.avoid;$('#cc').value=cfg.caution;if(window.drawAl)drawAl()}
 function backupText(){return JSON.stringify({app:'TickedOff',version:1,exported:new Date().toISOString(),settings:cfg,favorites:favs,history:hist,overrides:ovr,theme:theme,recipeFavorites:rfavs,shopping:SH,myRecipes:myrec},null,1)}
@@ -1187,6 +1193,56 @@ function showFirstRun(){
 (function(){let old=false;try{old=['gg_cfg','gg_favs','gg_hist'].some(k=>localStorage.getItem(k)!==null)}catch(e){}
  if(!ls.get('gg_setup',0)){if(old)ls.set('gg_setup',1);else showFirstRun()}})();
 
+// ---------- update notices (v3.8) ----------
+// Web: compares this page with the live copy and offers a reload. Apps: checks the latest public GitHub release.
+const UPD={api:'https://api.github.com/repos/Pixeledberry/TickedOff/releases/latest',priv:'https://github.com/Pixeledberry/TickedOff-Private/releases/latest',snoozeDays:3,every:12*36e5};
+const APPKIND=IOSAPP?'ios':window.Android?'android':'web';
+const vcmp=(a,b)=>{const p=s=>String(s).replace(/^v/i,'').split('.').map(n=>parseInt(n,10)||0),x=p(a),y=p(b);for(let i=0;i<Math.max(x.length,y.length);i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0?1:-1}return 0};
+let updSt=(o=>o&&typeof o=='object'&&!Array.isArray(o)?o:{})(ls.get('gg_upd',{}));
+const saveUpd=()=>ls.set('gg_upd',updSt);
+const canAutoInstall=()=>APPKIND=='android'&&EDITION=='public'&&!!updSt.apk&&!!(window.Android&&Android.installUpdate);
+async function fetchT(url,ms){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms||12000);try{return await fetch(url,{signal:c.signal,cache:'no-store'})}finally{clearTimeout(t)}}
+async function latestInfo(){
+ if(APPKIND=='web'){const r=await fetchT(location.href.split('#')[0]);if(!r.ok)throw new Error('http '+r.status);const m=(await r.text()).match(/const APPV='([^']+)'/);if(!m)throw new Error('no version');return{v:m[1],ready:true}}
+ const r=await fetchT(UPD.api);if(!r.ok)throw new Error('http '+r.status);const j=await r.json();
+ const as=Array.isArray(j.assets)?j.assets:[],file=ext=>{const a=as.find(a=>a&&typeof a.name=='string'&&a.name.toLowerCase().endsWith(ext));return a&&/^https:\/\/github\.com\/Pixeledberry\/TickedOff\/releases\/download\//.test(a.browser_download_url)?a.browser_download_url:''};
+ const apk=file('.apk'),ipa=file('.ipa');
+ return{v:String(j.tag_name||'').replace(/^v/i,''),url:EDITION=='private'?UPD.priv:(/^https:\/\/github\.com\//.test(j.html_url)?j.html_url:''),apk,ready:APPKIND=='android'?!!apk:!!ipa}}
+async function checkUpdates(manual){
+ if(APPKIND=='web'&&!/^https?:$/.test(location.protocol)){if(manual)toast('Update checks only work on the online version.');return}
+ try{const i=await latestInfo();updSt.t=Date.now();
+  if(!i.v||vcmp(i.v,APPV)<=0){delete updSt.v;saveUpd();hideUpd();if(manual)toast('You have the latest version (v'+APPV+').');return}
+  if(!i.ready){saveUpd();if(manual)toast('Version '+i.v+' is still being built. Check again in a few minutes.');return}
+  updSt.v=i.v;updSt.url=i.url||'';updSt.apk=i.apk||'';saveUpd();showUpd(manual)
+ }catch(e){if(manual)toast('Couldn’t check for updates. Check your connection.')}}
+function hideUpd(){const b=$('#upd');if(b){b.hidden=true;b.innerHTML=''}}
+function showUpd(force){
+ const v=updSt.v,b=$('#upd');if(!b)return;if(!v||vcmp(v,APPV)<=0){hideUpd();return}
+ const sz=updSt.snooze;if(!force&&sz&&sz.v==v&&Date.now()<sz.until)return;
+ let msg,btn;
+ if(APPKIND=='web'){msg='A new version of TickedOff is available.';btn='<button class="pri" id="updgo">Reload</button>'}
+ else if(canAutoInstall()){msg='TickedOff v'+esc(v)+' is available.';btn='<button class="pri" id="updgo">Update</button>'}
+ else{msg='TickedOff v'+esc(v)+' is available.'+(APPKIND=='ios'?' Install it with your sideloading tool (AltStore, SideStore or Sideloadly).':' Download the new .apk from GitHub and open it to install.');btn=updSt.url?'<a class="pri" id="updget" href="'+esc(updSt.url)+'">Get it</a>':''}
+ b.innerHTML='<p id="updm">'+msg+'</p><div class="links">'+btn+'<button id="updno">Not now</button></div>';b.hidden=false}
+function updBusy(on,text){const m=$('#updm');if(m&&text)m.textContent=text;document.querySelectorAll('#upd button').forEach(x=>x.disabled=!!on)}
+$('#upd').onclick=e=>{const t=e.target.closest('button,a');if(!t)return;
+ if(t.id=='updno'){updSt.snooze={v:updSt.v,until:Date.now()+UPD.snoozeDays*864e5};saveUpd();hideUpd();toast('Okay. We’ll remind you again in '+UPD.snoozeDays+' days.');return}
+ if(t.id=='updallow'){try{Android.allowUpdates()}catch(x){}t.id='updgo';t.textContent='Update';return}
+ if(t.id!='updgo')return;
+ if(APPKIND=='web'){location.reload();return}
+ if(!canAutoInstall())return;
+ let ok=true;try{ok=Android.canInstallUpdates()}catch(x){}
+ if(!ok){$('#updm').textContent='To update, TickedOff needs permission to install apps. Tap Allow, switch on “Allow from this source”, then come back here and tap Update.';t.id='updallow';t.textContent='Allow';return}
+ updBusy(true,'Downloading the update… 0%');
+ try{Android.installUpdate(updSt.apk)}catch(x){window.onUpdateError(x.message)}};
+window.onUpdateProgress=p=>{const m=$('#updm');if(m)m.textContent='Downloading the update… '+Math.max(0,Math.min(100,p|0))+'%'};
+window.onUpdateReady=()=>updBusy(false,'Download finished. Tap Install on the next screen to finish updating. Your favorites and settings are kept.');
+window.onUpdateError=m=>updBusy(false,'The update didn’t download'+(m?' ('+String(m).slice(0,80)+')':'')+'. Check your connection and tap Update to try again.');
+$('#mupd').onclick=()=>{back(closeDrawerDOM);checkUpdates(true)};
+$('#mupdv').textContent='v'+APPV;
+showUpd(false);
+if(!updSt.t||Date.now()-updSt.t>(APPKIND=='web'?30*6e4:UPD.every))setTimeout(()=>checkUpdates(false),4000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState=='visible'&&Date.now()-(updSt.t||0)>(APPKIND=='web'?30*6e4:UPD.every))checkUpdates(false)});
 $('#t4').onclick=()=>{stopScan();tab(4);if(!rs.open)rlist()};
 initRecipeUI();drawOcr();rlist();rfavDraw();shopBadge();favSub('p');lists();drawAl();
 </script>

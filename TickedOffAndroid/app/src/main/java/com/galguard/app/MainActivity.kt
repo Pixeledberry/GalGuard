@@ -7,6 +7,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.MediaStore
+import android.provider.Settings
+import java.net.HttpURLConnection
+import java.net.URL
 import android.webkit.ValueCallback
 import androidx.core.content.FileProvider
 import java.io.File
@@ -126,6 +129,11 @@ class MainActivity : Activity() {
         startActivityForResult(i, reqFile)
     }
 
+    // Sends an update status message to the page (onUpdateError, onUpdateReady, ...).
+    private fun updateJs(fn: String, message: String?) {
+        runOnUiThread { web.evaluateJavascript("window.$fn && window.$fn(${JSONObject.quote(message ?: "")})", null) }
+    }
+
     private fun textError(message: String?) {
         web.evaluateJavascript("window.onNativeTextError && window.onNativeTextError(${JSONObject.quote(message ?: "")})", null)
     }
@@ -193,6 +201,81 @@ class MainActivity : Activity() {
                     .addOnSuccessListener { sender -> startIntentSenderForResult(sender, reqDoc, null, 0, 0, 0) }
                     .addOnFailureListener { e -> textError(e.message) }
             }
+        }
+
+        // ---- In-app updates (public edition) ----
+        // True when Android lets TickedOff open the installer ("Install unknown apps" is allowed for it).
+        @JavascriptInterface
+        fun canInstallUpdates(): Boolean = packageManager.canRequestPackageInstalls()
+
+        // Opens the Android settings page where the user can allow TickedOff to install updates.
+        @JavascriptInterface
+        fun allowUpdates() {
+            runOnUiThread {
+                try {
+                    startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName")))
+                } catch (e: Exception) {
+                    updateJs("onUpdateError", e.message)
+                }
+            }
+        }
+
+        // Downloads the new APK from this project's public GitHub releases, then opens Android's installer.
+        // Android always asks the user to confirm. The fixed signing key lets it install over this version and keep all data.
+        @JavascriptInterface
+        fun installUpdate(url: String) {
+            if (!url.startsWith("https://github.com/Pixeledberry/TickedOff/releases/download/") || !url.endsWith(".apk")) {
+                updateJs("onUpdateError", "not an official TickedOff download")
+                return
+            }
+            Thread {
+                try {
+                    val dir = File(cacheDir, "updates").apply { mkdirs() }
+                    dir.listFiles()?.forEach { it.delete() }
+                    val file = File(dir, "TickedOff-update.apk")
+                    val conn = URL(url).openConnection() as HttpURLConnection
+                    conn.instanceFollowRedirects = true
+                    conn.connectTimeout = 15000
+                    conn.readTimeout = 30000
+                    if (conn.responseCode != HttpURLConnection.HTTP_OK) throw Exception("HTTP ${conn.responseCode}")
+                    val total = conn.contentLengthLong
+                    conn.inputStream.use { input ->
+                        file.outputStream().use { output ->
+                            val buf = ByteArray(64 * 1024)
+                            var done = 0L
+                            var last = -1
+                            while (true) {
+                                val n = input.read(buf)
+                                if (n < 0) break
+                                output.write(buf, 0, n)
+                                done += n
+                                if (total > 0) {
+                                    val pct = (done * 100 / total).toInt()
+                                    if (pct != last) {
+                                        last = pct
+                                        runOnUiThread { web.evaluateJavascript("window.onUpdateProgress && window.onUpdateProgress($pct)", null) }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    conn.disconnect()
+                    runOnUiThread {
+                        try {
+                            val uri = FileProvider.getUriForFile(this@MainActivity, "$packageName.files", file)
+                            val install = Intent(Intent.ACTION_VIEW)
+                                .setDataAndType(uri, "application/vnd.android.package-archive")
+                                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            web.evaluateJavascript("window.onUpdateReady && window.onUpdateReady()", null)
+                            startActivity(install)
+                        } catch (e: Exception) {
+                            updateJs("onUpdateError", e.message)
+                        }
+                    }
+                } catch (e: Exception) {
+                    updateJs("onUpdateError", e.message)
+                }
+            }.start()
         }
 
         @JavascriptInterface

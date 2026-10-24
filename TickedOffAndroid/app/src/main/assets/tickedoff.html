@@ -174,6 +174,9 @@ mark.p{background:var(--hxs);color:var(--hxst);text-decoration:underline dashed;
 .srcn{display:block;font-size:12px;color:var(--mut);margin-top:2px}
 .upd{border-left-color:var(--acc);margin-top:10px}.upd p{margin:0 0 4px}.links a.pri{background:var(--acc);color:var(--accink);border-color:var(--acc);text-decoration:none}
 .upd button:disabled{opacity:.5}
+/* v3.8.1: ingredient box scrolls instead of resizing */
+#pt{resize:none;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;min-height:96px;max-height:min(45vh,320px);box-sizing:border-box}
+#ci::placeholder{font-size:var(--phs,15px)}
 </style></head><body>
 <header><h1><img id="logo" alt="" width="36" height="36" style="vertical-align:-8px;margin-right:8px">TickedOff</h1><p>Scan a barcode. Check it against your allergies.</p><button id="hb" aria-label="Menu" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span><i id="hbn" hidden></i></button></header>
 <main>
@@ -200,6 +203,7 @@ mark.p{background:var(--hxs);color:var(--hxst);text-decoration:underline dashed;
   <div id="sens"></div>
   <input type="text" id="ca" placeholder="Always flag red / don’t eat (comma separated)" aria-label="Always avoid">
   <input type="text" id="cc" placeholder="Always flag yellow / avoid (comma separated)" aria-label="Always caution">
+  <input type="text" id="ci" placeholder="Always ignore / never flag (comma separated)" aria-label="Always ignore">
   <label style="margin-top:10px">Ingredient scanner language<select id="ocrl" style="width:100%;margin-top:4px"></select></label>
   <p class="legend">On the web, the first ingredient scan downloads the text reader (about 15 MB) and needs internet. The Android and iPhone apps use the phone’s built-in text reader.</p></details>
  <div id="result"></div>
@@ -224,7 +228,7 @@ mark.p{background:var(--hxs);color:var(--hxst);text-decoration:underline dashed;
 <section id="v5" hidden><div id="shop"></div></section>
 <section id="v6" hidden><button class="back" id="bkback">‹ Back</button><h2 style="margin:0">Export / Import Settings</h2><p class="legend">Back up your settings, favorites, history, rating overrides, theme, recipes and shopping list, or restore them on a new device.</p><div class="row"><button id="xs" style="flex:1">Export Settings</button><button id="is" style="flex:1">Import Settings</button></div><div id="bk" class="why" hidden></div><input type="file" id="bf" accept=".json,application/json,text/plain" hidden></section>
 </main>
-<footer>Ingredient data comes from Open Food Facts and its sister projects Open Beauty Facts, Open Products Facts and Open Pet Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.8</footer>
+<footer>Ingredient data comes from Open Food Facts and its sister projects Open Beauty Facts, Open Products Facts and Open Pet Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.8.1</footer>
 <div id="scrim" hidden></div>
 <aside id="drawer" hidden aria-label="Menu">
  <div class="dh"><h2>Menu</h2><button id="dclose" aria-label="Close menu">×</button></div>
@@ -249,7 +253,7 @@ mark.p{background:var(--hxs);color:var(--hxst);text-decoration:underline dashed;
 const $=s=>document.querySelector(s);
 function cleanAl(o){const ids=['milk','egg','peanut','treenut','soy','wheat','gluten','fish','shellfish','sesame'],r={};if(o&&typeof o=='object')ids.forEach(k=>{if(o[k]==='a'||o[k]==='f')r[k]=o[k];else if(o[k]===true)r[k]='a'});return r}
 const ls={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-let favs=ls.get('gg_favs',[]),hist=ls.get('gg_hist',[]),ovr=ls.get('gg_ovr',{}),cfg=(c=>{c=Object.assign({sens:{},avoid:'',caution:'',ag:true,al:{},alx:''},c);c.ag=c.ag!==false;c.al=cleanAl(c.al);c.alx=typeof c.alx=='string'?c.alx.slice(0,500):'';if(c.dairy)c.sens.dairy=true;delete c.dairy;delete c.strict;const n={};Object.keys(c.sens||{}).forEach(k=>{const v=c.sens[k];if(v==='i')n[k]='i';else if(v)n[k]='r'});c.sens=n;return c})(ls.get('gg_cfg',{})),LA=null,cur=null,stream=null,timer=null,h5=null,h5p=null;
+let favs=ls.get('gg_favs',[]),hist=ls.get('gg_hist',[]),ovr=ls.get('gg_ovr',{}),cfg=(c=>{c=Object.assign({sens:{},avoid:'',caution:'',ignore:'',ag:true,al:{},alx:''},c);if(typeof c.ignore!='string')c.ignore='';c.ag=c.ag!==false;c.al=cleanAl(c.al);c.alx=typeof c.alx=='string'?c.alx.slice(0,500):'';if(c.dairy)c.sens.dairy=true;delete c.dairy;delete c.strict;const n={};Object.keys(c.sens||{}).forEach(k=>{const v=c.sens[k];if(v==='i')n[k]='i';else if(v)n[k]='r'});c.sens=n;return c})(ls.get('gg_cfg',{})),LA=null,cur=null,stream=null,timer=null,h5=null,h5p=null;
 // Groups: [id, default color, pattern, sensitivity key, reason]. Yellow by default; red when the matching sensitivity is checked.
 // red = mammal-derived (do not eat). yellow = mammal by-product or may be processed with mammal products (avoid).
 const MEAT='beef|pork|lamb|mutton|veal|venison|bison|goat|rabbit|elk|moose|horse|kangaroo|bovine|porcine|ovine|caprine|ham|bacon|sausages?|pepperoni|salami|prosciutto|pancetta|chorizo|bologna|mortadella|hot dogs?|jerky|brisket|steaks?|ribs|liver|kidney|tripe|oxtail|pork rinds?|bone broth|bone marrow|beef extract|meat extract|lard|tallow|tallowate|suet|mammal\\w*|meat|natural casings?|hog casings?|sheep casings?|boeuf|bœuf|porc|agneau|veau|jambon|saindoux|suif|viande|carne|cerdo|puerco|cordero|ternera|jamón|tocino|manteca de cerdo|sebo|rindfleisch|schweinefleisch|schwein|schinken|schmalz|talg|fleisch|manzo|maiale|agnello|strutto';
@@ -382,8 +386,8 @@ function analyze(text,tags){
  text=text.replace(/_/g,'');
  const masked=text.replace(EX,m=>'\u0001'.repeat(m.length));
  const cl=s=>s.split(',').map(x=>x.trim()).filter(Boolean).map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
- const sets=[],ca=cl(cfg.avoid),cc=cl(cfg.caution),agOn=cfg.ag!==false;
- if(ca)sets.push({g:'cust',k:'r',src:ca,custom:1});if(cc)sets.push({g:'cust',k:'m',src:cc,custom:1});
+ const sets=[],ca=cl(cfg.avoid),cc=cl(cfg.caution),ci=cl(cfg.ignore||''),agOn=cfg.ag!==false;
+ if(ca)sets.push({g:'cust',k:'r',src:ca,custom:1});if(cc)sets.push({g:'cust',k:'m',src:cc,custom:1});if(ci)sets.push({g:'cust',k:'i',src:ci,custom:1});
  if(agOn)G.forEach(([g,base,src,key])=>{const md=key&&cfg.sens[key],sens=md=='r',k=sens?'r':md=='i'?'i':base;if(k)sets.push({g,k,src:DE[g]?src+'|'+DE[g]:src,key,sens})});
  let ah=[];
  sets.forEach((S,pri)=>{const re=new RegExp('(^|[^\\p{L}\\p{N}])('+S.src+')(?![\\p{L}\\p{N}])','giu');let m;
@@ -428,7 +432,7 @@ function showWhy(i,A,W){
   const tb=id=='custom'?'':'<div class="links">'+(sv=='a'?'<button data-alsev="f" data-alid="'+id+'">Just flag it</button>':'<button data-alsev="a" data-alid="'+id+'">Avoid completely</button>')+'<button data-aloff="'+id+'">Remove from my allergies</button></div>';
   w.className='why '+h.k;w.innerHTML='<b>'+esc(h.t)+'</b> <span>'+(x?'Purple · Your allergy':'Purple · May contain')+'</span><p>'+esc(id=='custom'?GR['al:custom']:AL[id].note)+'</p><p>'+esc(st)+(h.also?' It is also flagged for alpha-gal.':'')+'</p>'+tb+'<p class="legend">Reactions and labels can change. Check the pack and ask your allergist.</p>';w.hidden=false;w.scrollIntoView({behavior:'smooth',block:'nearest'});return}
  const red=h.k=='r';
- const ign=h.k=='i',status=ign?'You set “'+SENS[h.key].split(' (')[0]+'” to Ignore, so it is not flagged. Reactions can change, so check with your allergist.':red?(h.sens?'You marked “'+SENS[h.key]+'” as a sensitivity, so it is flagged red: do not eat.':h.custom?'This is on your always-red list: do not eat.':'Red means do not eat. This is a mammal-derived ingredient.'):(h.custom?'This is on your always-yellow list: avoid.':h.g=='dairy'?'Yellow means avoid. Dairy comes from mammals, and some people with AGS react to it while others do not.':'Yellow means avoid. It may be made from, or processed with, mammal products, and the label does not say. Contact the maker, or look for a version labeled vegan or plant-based.');
+ const ign=h.k=='i',status=ign?(h.custom?'This is on your always-ignore list, so it is not flagged.':'You set “'+SENS[h.key].split(' (')[0]+'” to Ignore, so it is not flagged.')+' Reactions can change, so check with your allergist.':red?(h.sens?'You marked “'+SENS[h.key]+'” as a sensitivity, so it is flagged red: do not eat.':h.custom?'This is on your always-red list: do not eat.':'Red means do not eat. This is a mammal-derived ingredient.'):(h.custom?'This is on your always-yellow list: avoid.':h.g=='dairy'?'Yellow means avoid. Dairy comes from mammals, and some people with AGS react to it while others do not.':'Yellow means avoid. It may be made from, or processed with, mammal products, and the label does not say. Contact the maker, or look for a version labeled vegan or plant-based.');
  const bt=(m,t)=>'<button data-sens="'+m+'" data-key="'+h.key+'">'+t+'</button>';
  let tip='';if(h.key){tip=ign?'<div class="links">'+bt('m','Flag yellow (Avoid)')+bt('r','Flag red (Don’t eat)')+'</div>':red?'<div class="links">'+bt('i','Not a problem for me')+bt('m','Back to Avoid')+'</div>':'<div class="links">'+bt('i','Not a problem for me')+bt('r','Flag red (Don’t eat)')+'</div>'}
  else if(!h.custom)tip='<p class="legend">This is a core trigger, so it can’t be turned off.</p>';
@@ -485,7 +489,7 @@ $('#ps').onclick=()=>{$('#pn').value='Sample gummies';$('#pt').value='Sugar, glu
 $('#pa').onclick=()=>{const t=$('#pt').value;if(t.trim().length<3)return;cur={code:'manual-'+Date.now(),name:$('#pn').value.trim()||'Pasted ingredients',brand:'',img:'',text:t};render()};
 drawSettings();
 function applyCfg(){ls.set('gg_cfg',cfg);rcacheReset();render();lists();if(!$('#v4').hidden){if(rs.open&&window.showRecipe)showRecipe(rs.open);else if(window.rlist)rlist()}}
-const saveCfg=()=>{cfg.sens={};document.querySelectorAll('#sens input:checked').forEach(i=>{if(i.value=='r'||i.value=='i')cfg.sens[i.dataset.s]=i.value});cfg.avoid=$('#ca').value;cfg.caution=$('#cc').value;applyCfg()};
+const saveCfg=()=>{cfg.sens={};document.querySelectorAll('#sens input:checked').forEach(i=>{if(i.value=='r'||i.value=='i')cfg.sens[i.dataset.s]=i.value});cfg.avoid=$('#ca').value;cfg.caution=$('#cc').value;cfg.ignore=$('#ci').value.slice(0,500);applyCfg()};
 // Used by the "Not a problem for me" shortcut in the explanation panel and by Undo.
 function setSens(key,mode,quiet){if(!SENS[key])return;const prev=cfg.sens[key]||'m';if(mode=='r'||mode=='i')cfg.sens[key]=mode;else delete cfg.sens[key];applyCfg();drawSettings();
  if(!quiet&&mode=='i'){const e=$('#toast');e.innerHTML=esc('Ignoring “'+SENS[key].split(' (')[0]+'”. Reactions can change, so check with your allergist.')+' <button id="tundo" style="margin-left:6px;padding:4px 10px;border-radius:8px;border:1px solid currentColor;background:none;color:inherit;font:inherit;font-weight:700">Undo</button>';e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,8000);$('#tundo').onclick=()=>{setSens(key,prev,true);toast('Back to '+(prev=='r'?'Don’t eat':prev=='i'?'Ignore':'Avoid'))}}
@@ -493,16 +497,16 @@ function setSens(key,mode,quiet){if(!SENS[key])return;const prev=cfg.sens[key]||
 document.addEventListener('click',e=>{const b=e.target.closest('[data-sens]');if(b)setSens(b.dataset.key,b.dataset.sens)});
 // Shrinks the hint text in these boxes so it always fits, whatever the screen width.
 const fitCv=document.createElement('canvas').getContext('2d');
-function fitHints(){document.querySelectorAll('#ca,#cc,#pn,#alx,#frx').forEach(i=>{const w=i.clientWidth;if(!w)return;const cs=getComputedStyle(i),pad=parseFloat(cs.paddingLeft)+parseFloat(cs.paddingRight),avail=w-pad-4;
+function fitHints(){document.querySelectorAll('#ca,#cc,#ci,#pn,#alx,#frx').forEach(i=>{const w=i.clientWidth;if(!w)return;const cs=getComputedStyle(i),pad=parseFloat(cs.paddingLeft)+parseFloat(cs.paddingRight),avail=w-pad-4;
  fitCv.font='400 16px '+cs.fontFamily;const tw=fitCv.measureText(i.placeholder).width||1;i.style.setProperty('--phs',Math.max(9,Math.min(16,Math.floor(16*avail/tw*10)/10))+'px')})}
 addEventListener('resize',fitHints);addEventListener('orientationchange',fitHints);document.addEventListener('toggle',fitHints,true);setTimeout(fitHints,0);
-$('#sens').onchange=saveCfg;$('#ca').onchange=$('#cc').onchange=saveCfg;
+$('#sens').onchange=saveCfg;$('#ca').onchange=$('#cc').onchange=$('#ci').onchange=saveCfg;
 $('#cl').onclick=()=>{$('#code').value='';$('#result').innerHTML='';$('#code').focus()};
 
 // ---- backup: export / import settings, favorites, history and rating overrides ----
-const APPV='3.8',EDITION='public';
+const APPV='3.8.1',EDITION='public';
 const IOSAPP=!!(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.ios);
-function drawSettings(){$('#sens').innerHTML=Object.entries(SENS).map(([k,l])=>{const v=cfg.sens[k]||'m';return'<fieldset class="sg"><legend>'+esc(l)+'</legend><div class="seg3">'+[['i','Ignore'],['m','Avoid'],['r','Don’t eat']].map(([x,n])=>'<label class="'+x+'"><input type="radio" name="sg_'+k+'" data-s="'+k+'" value="'+x+'"'+(v==x?' checked':'')+'><span>'+n+'</span></label>').join('')+'</div></fieldset>'}).join('');$('#ca').value=cfg.avoid;$('#cc').value=cfg.caution;if(window.drawAl)drawAl()}
+function drawSettings(){$('#sens').innerHTML=Object.entries(SENS).map(([k,l])=>{const v=cfg.sens[k]||'m';return'<fieldset class="sg"><legend>'+esc(l)+'</legend><div class="seg3">'+[['i','Ignore'],['m','Avoid'],['r','Don’t eat']].map(([x,n])=>'<label class="'+x+'"><input type="radio" name="sg_'+k+'" data-s="'+k+'" value="'+x+'"'+(v==x?' checked':'')+'><span>'+n+'</span></label>').join('')+'</div></fieldset>'}).join('');$('#ca').value=cfg.avoid;$('#cc').value=cfg.caution;$('#ci').value=cfg.ignore||'';if(window.drawAl)drawAl()}
 function backupText(){return JSON.stringify({app:'TickedOff',version:1,exported:new Date().toISOString(),settings:cfg,favorites:favs,history:hist,overrides:ovr,theme:theme,recipeFavorites:rfavs,shopping:SH,myRecipes:myrec},null,1)}
 function bkPanel(html){const b=$('#bk');b.className='why';b.innerHTML=html;b.hidden=false;b.scrollIntoView({behavior:'smooth',block:'nearest'})}
 async function saveBackup(t){
@@ -525,7 +529,7 @@ function importBackup(raw){
  const item=x=>x&&typeof x=='object'&&x.code?{code:str(String(x.code),40),name:str(x.name,200)||'Unnamed product',brand:str(x.brand,200),img:/^https?:\/\//.test(x.img)?str(x.img,500):'',text:str(x.text,6000),...(cleanOffTags(x.al)?{al:cleanOffTags(x.al)}:{}),...(DBS.some(d=>d[0]==x.db&&d[0]!='food')?{db:x.db}:{})}:null;
  const list=a=>Array.isArray(a)?a.slice(0,500).map(item).filter(Boolean):[];
  const st=d.settings||{},sens={};Object.keys(SENS).forEach(k=>{const v=st.sens&&st.sens[k];if(v===true||v==='r')sens[k]='r';else if(v==='i')sens[k]='i'});
- cfg={sens,avoid:str(st.avoid,500),caution:str(st.caution,500),ag:st.ag!==false,al:cleanAl(st.al),alx:str(st.alx,500)};ls.set('gg_setup',1);if(OCRL[st.ocr])cfg.ocr=st.ocr;
+ cfg={sens,avoid:str(st.avoid,500),caution:str(st.caution,500),ignore:str(st.ignore,500),ag:st.ag!==false,al:cleanAl(st.al),alx:str(st.alx,500)};ls.set('gg_setup',1);if(OCRL[st.ocr])cfg.ocr=st.ocr;
  const nf=list(d.favorites).filter(f=>!favs.some(x=>x.code==f.code));favs=[...favs,...nf];
  hist=[...hist,...list(d.history).filter(h=>!hist.some(x=>x.code==h.code))].slice(0,40);
  if(d.overrides&&typeof d.overrides=='object')Object.keys(d.overrides).forEach(k=>{const v=d.overrides[k];if(v=='o'||v=='a')ovr[String(k).slice(0,40)]=v});
@@ -1243,6 +1247,10 @@ $('#mupdv').textContent='v'+APPV;
 showUpd(false);
 if(!updSt.t||Date.now()-updSt.t>(APPKIND=='web'?30*6e4:UPD.every))setTimeout(()=>checkUpdates(false),4000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState=='visible'&&Date.now()-(updSt.t||0)>(APPKIND=='web'?30*6e4:UPD.every))checkUpdates(false)});
+// ---------- ingredient box: grows with the text up to a limit, then scrolls on its own (v3.8.1) ----------
+function fitPt(){const t=$('#pt');if(!t||!t.offsetParent)return;t.style.height='auto';t.style.height=(t.scrollHeight+2)+'px'}
+$('#pt').addEventListener('input',fitPt);document.addEventListener('toggle',fitPt,true);addEventListener('resize',fitPt);
+(()=>{const d=Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value'),t=$('#pt');Object.defineProperty(t,'value',{configurable:true,get(){return d.get.call(this)},set(v){d.set.call(this,v);requestAnimationFrame(fitPt)}})})();
 $('#t4').onclick=()=>{stopScan();tab(4);if(!rs.open)rlist()};
 initRecipeUI();drawOcr();rlist();rfavDraw();shopBadge();favSub('p');lists();drawAl();
 </script>

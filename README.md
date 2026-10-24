@@ -37,7 +37,11 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v3.8 (latest)
+### v3.8.1 (latest)
+- **The ingredient box scrolls instead of stretching.** The box where you paste or type an ingredient list can no longer be resized by dragging. It grows with the text up to a set height, then scrolls on its own. Scrolling inside it moves only the box, not the rest of the app.
+- **New "Always ignore" box** in "My settings", under "Always flag yellow / avoid". Add your own ingredients (comma separated) and they are never flagged; they show in grey as ignored, the same way an ignored sensitivity does. Your "Always flag red" list still wins if an ingredient is in both. It only affects the alpha-gal flags: anything set in **My allergies** is still flagged. The list is included in Export/Import Settings, and older backups still import.
+
+### v3.8
 - **Update notices.** TickedOff now tells you when a new version is out.
   - **Web:** a banner says "A new version of TickedOff is available" with a **Reload** button.
   - **Android (public version):** tap **Update** and the app downloads the new version and opens Android's installer. You only tap **Install**, and your favorites and settings are kept. The first time, Android asks you to allow TickedOff to install apps; the notice walks you through it.
@@ -87,11 +91,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 - **Clear history button restyled.** It now uses the same color as the other main buttons (white in dark mode) and in every theme.
 - **"Are you sure?" before clearing history.** Pressing "Clear history" now asks "Clear your whole history?" with **Yes, clear history** and **Cancel**.
 - **Themes: HIGH CONTRAST and LOW CONTRAST.** The "Masculine" and "Feminine" groups are renamed. **HIGH CONTRAST** keeps the five dark-and-bold colors (Midnight Navy, Steel Blue, Forest, Graphite Amber, Deep Ocean) but they now use pure white or black text, brighter accents and stronger borders. **LOW CONTRAST** keeps the five rose/lavender/peach/orchid/berry colors as soft pastels (Rose Quartz, Lavender Mist, Peach Blush, Orchid Haze, Berry Sorbet). The two former dark ones, Orchid Night and Berry Dusk, are now light pastels. If you had one of these themes selected, it stays selected.
-
-### v3.2
-- **Product photos in shopping lists are on by default.** Scanned products show their small photo in every shopping list. You can still turn them off from the press-and-hold menu of a scanned item, and your choice is remembered. (If you had photos off before, this version turns them on once.)
-- **Camera zoom slider no longer scrolls the page.** Moving the slider on a phone now only changes the zoom.
-- **Scan box locked at 70%.** The barcode scan box stays at 70% and no longer shrinks. If nothing is found for a few tries, the automatic zoom still steps in, unless you are using the zoom slider.
 
 ## Features
 
@@ -155,7 +154,7 @@ Plant-based look-alikes are **not** flagged (including anything labeled dairy-fr
 ### Personal settings
 - **My allergies.** Pick the allergies you need to avoid (milk, egg, peanut, tree nuts, soy, wheat, gluten/celiac, fish, shellfish, sesame, or your own). Each can be set to **Avoid completely** or **Just flag it**, and alpha-gal checking can be switched off. Results show purple allergy highlights and separate Alpha-gal and Your allergies lines.
 - **Sensitivities.** Some things affect people with AGS differently. For each of these choose **Ignore** (not flagged), **Avoid** (yellow, the default) or **Don’t eat** (red): dairy, gelatin, glycerin and mono/diglycerides, stearic acid and stearates, natural flavors, lanolin and vitamin D3, rennet and animal enzymes.
-- **Custom lists.** Add your own ingredients to always flag red or always flag yellow (comma separated).
+- **Custom lists.** Add your own ingredients to always flag red, always flag yellow, or always ignore (comma separated). The ignore list never hides an allergy you set in My allergies.
 - **Rating overrides.** On any result, "Rating wrong?" lets you mark a product safe or do-not-eat, or reset it. There's also a link to fix the ingredients on Open Food Facts.
 - **Export Settings / Import Settings.** A button at the bottom of the menu (top right) opens a page with two buttons that create a backup of your settings, favorites, history, rating overrides, theme, favorite and created recipes and shopping list (a small text file) and restore it on another device. You can save or share the backup, copy it, and import it from a file or by pasting the text.
 

@@ -191,6 +191,8 @@ mark.p{background:var(--hxs);color:var(--hxst);text-decoration:underline dashed;
 .chfull{margin-top:18px;padding-top:12px;border-top:1px solid var(--line)}.chfull a{color:var(--acc);font-weight:600}
 html.nosc,html.nosc body{overflow:hidden}
 .upd .links{flex-wrap:wrap}.upd .links>*{flex:1 1 auto;min-width:0}
+.pph{display:inline-flex;align-items:center;justify-content:center;flex:none;background:var(--line);color:var(--mut)}
+.top .pph{width:64px;height:64px;border-radius:8px;font-size:30px}.item .pph{width:48px;height:48px;border-radius:6px;font-size:22px}.shrow .pph{width:40px;height:40px;border-radius:8px;font-size:18px}
 </style></head><body>
 <header><h1><img id="logo" alt="" width="36" height="36" style="vertical-align:-8px;margin-right:8px">TickedOff</h1><p>Scan a barcode. Check it against your allergies.</p><button id="hb" aria-label="Menu" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span><i id="hbn" hidden></i></button></header>
 <main>
@@ -242,7 +244,7 @@ html.nosc,html.nosc body{overflow:hidden}
 <section id="v5" hidden><div id="shop"></div></section>
 <section id="v6" hidden><button class="back" id="bkback">‹ Back</button><h2 style="margin:0">Export / Import Settings</h2><p class="legend">Back up your settings, favorites, history, rating overrides, theme, recipes and shopping list, or restore them on a new device.</p><div class="row"><button id="xs" style="flex:1">Export Settings</button><button id="is" style="flex:1">Import Settings</button></div><div id="bk" class="why" hidden></div><input type="file" id="bf" accept=".json,application/json,text/plain" hidden></section>
 </main>
-<footer>Ingredient data comes from Open Food Facts and its sister projects Open Beauty Facts, Open Products Facts and Open Pet Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.8.2</footer>
+<footer>Ingredient data comes from Open Food Facts and its sister projects Open Beauty Facts, Open Products Facts and Open Pet Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.8.3</footer>
 <div id="scrim" hidden></div>
 <aside id="drawer" hidden aria-label="Menu">
  <div class="dh"><h2>Menu</h2><button id="dclose" aria-label="Close menu">×</button></div>
@@ -264,7 +266,12 @@ html.nosc,html.nosc body{overflow:hidden}
 <div id="shs" hidden><div id="shsb" role="dialog" aria-label="Item options"></div></div>
 <div id="lb" hidden role="dialog" aria-label="Enlarged image"><img id="lbi" alt=""><p id="lbc"></p></div>
 <script type="text/markdown" id="chlog">
-### v3.8.2 (latest)
+### v3.8.3 (latest)
+- **Clearer messages when a product can’t be looked up.** Instead of always blaming your connection, TickedOff now tells you whether you’re offline, whether the product databases aren’t responding (usually a problem on their side, so try again later), or whether the product simply isn’t listed. If only some databases don’t answer, it names them, because the product might be listed there.
+- **Placeholder for missing product photos.** If a product photo has moved or been deleted on the database site, favorites, history, results and the shopping list show a 📦 placeholder instead of a broken image.
+- **Updates survive a repo rename.** The Android updater now accepts new versions from any repository on the Pixeledberry GitHub account, so renaming the repo won’t stop updates. It still refuses downloads from anywhere else.
+
+### v3.8.2
 - **"Don’t remind me" for updates.** The update notice now has a **Don’t remind me** button next to **Not now**. It turns off automatic update reminders for good. **Menu → Check for updates** still checks when you tap it, and the notice it shows has a button to turn reminders back on.
 - **In-app changelog.** **Menu → Show Changelog** (under Check for updates) opens a window with the last 5 updates and a link to GitHub for older ones. Close it with the × button, by tapping outside the window, or with your phone’s back button. Scrolling inside it only scrolls the window.
 
@@ -286,9 +293,6 @@ html.nosc,html.nosc body{overflow:hidden}
 - **"From Open Beauty Facts" label** on results that did not come from the food database, and the "Fix the ingredients" link now opens the right database.
 - **A few cosmetic ingredients added** to the mammal-derived list (keratin, elastin, placenta). Sodium tallowate, lanolin, glycerin, stearates and collagen were already flagged.
 - Non-food entries often have missing or incomplete ingredient lists, so you will see more "Can’t tell" results. Paste the ingredient list from the pack if that happens.
-
-### v3.6.1
-- **New sensitivity: carrageenan.** Carrageenan (a seaweed thickener, also written E407) is now in the sensitivities list under "My settings" with the usual **Ignore | Avoid | Don’t eat** choice. It is on by default as **Avoid** (yellow) because some people with AGS report reacting to it, and it is not a mammal product. German, French and Spanish spellings are matched too. Set it to Ignore if it doesn’t bother you.
 </script>
 <script type="application/json" id="rdata">[]</script>
 <script>
@@ -511,20 +515,23 @@ async function lookup(code){
  code=(code||'').replace(/\D/g,'');if(!code)return;
  note('Scanned <b>'+code+'</b>. Searching the databases…');$('#result').scrollIntoView({behavior:'smooth',block:'start'});
  const tries=[code];if(code.length==14&&code[0]=='0')tries.unshift(code.slice(1));if(code.length==12)tries.push('0'+code);if(code.length==13&&code[0]=='0')tries.push(code.slice(1));
- let failed=false;
- const search=async([k,host])=>{
+ // Each database answers "found", "not found" (a proper reply without the product) or not at all (error).
+ const search=async([k,host])=>{let answered=false;
   for(const c of tries){
    try{const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),12000);
     const r=await fetch('https://'+host+'/api/v2/product/'+c+'.json?fields=product_name,brands,ingredients_text,ingredients_text_en,image_front_small_url,ingredients_text_de,ingredients_tags,allergens_tags,traces_tags',{signal:ctl.signal});clearTimeout(to);
-    const j=await r.json();if(j.status===1)return{k,p:j.product}
-   }catch(e){failed=true}}
-  return null};
- const found=(await Promise.all(DBS.map(search))).find(Boolean);
+    const j=await r.json();if(j&&j.status===1&&j.product)return{k,p:j.product};if(j&&'status' in j)answered=true
+   }catch(e){}}
+  return answered?{k,none:1}:{k,err:1}};
+ const res=await Promise.all(DBS.map(search)),found=res.find(x=>x.p);
  if(found){const p=found.p,ot=offTags(p);
   cur={code,name:p.product_name||'Unnamed product',brand:p.brands||'',img:p.image_front_small_url||'',text:p.ingredients_text_en||p.ingredients_text||p.ingredients_text_de||(p.ingredients_tags||[]).map(t=>t.replace(/^[a-z]{2}:/,'').replace(/-/g,' ')).join(', ')};
   if(ot.c.length||ot.t.length)cur.al=ot;if(found.k!='food')cur.db=found.k;
   hist=[cur,...hist.filter(h=>h.code!=code)].slice(0,40);ls.set('gg_hist',hist);try{lists();render()}catch(e){note('Found <b>'+esc(cur.name)+'</b> but couldn’t display it: '+esc(e.message))}return}
- note(failed?'Couldn’t reach the product databases for <b>'+code+'</b>. Check your connection.<br><br><button class="pri" onclick="lookup(\''+code+'\')">Try again</button>':'Barcode <b>'+code+'</b> isn’t in Open Food Facts, Open Beauty Facts, Open Products Facts or Open Pet Food Facts. Paste the ingredient list from the label above instead.');
+ const down=res.filter(x=>x.err).map(x=>dbOf(x.k)[2]),again='<br><br><button class="pri" onclick="lookup(\''+code+'\')">Try again</button>';
+ if(navigator.onLine===false)note('You’re offline, so <b>'+code+'</b> couldn’t be looked up. Check your internet connection, then try again. You can still paste the ingredient list from the label above.'+again);
+ else if(down.length==DBS.length)note('The product databases aren’t responding right now, so <b>'+code+'</b> couldn’t be looked up. This is usually a problem on their side, not yours. Try again in a few minutes, or paste the ingredient list from the label above. If other apps can’t connect either, check your internet.'+again);
+ else note('Barcode <b>'+code+'</b> isn’t in '+DBS.filter(d=>!down.includes(d[2])).map(d=>d[2]).join(', ').replace(/, ([^,]*)$/,' or $1')+'. Paste the ingredient list from the label above instead.'+(down.length?'<br><br>'+down.join(' and ')+(down.length==1?' isn’t':' aren’t')+' responding right now, so it might be listed there. Try again in a few minutes.'+again:''));
 }
 $('#go').onclick=()=>lookup($('#code').value);$('#code').onkeydown=e=>{if(e.key=='Enter')lookup(e.target.value)};
 $('#ps').onclick=()=>{$('#pn').value='Sample gummies';$('#pt').value='Sugar, glucose syrup, beef gelatin, glycerin, natural flavors, citric acid, milk';$('#pa').click()};
@@ -546,7 +553,7 @@ $('#sens').onchange=saveCfg;$('#ca').onchange=$('#cc').onchange=$('#ci').onchang
 $('#cl').onclick=()=>{$('#code').value='';$('#result').innerHTML='';$('#code').focus()};
 
 // ---- backup: export / import settings, favorites, history and rating overrides ----
-const APPV='3.8.2',EDITION='public';
+const APPV='3.8.3',EDITION='public';
 const IOSAPP=!!(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.ios);
 function drawSettings(){$('#sens').innerHTML=Object.entries(SENS).map(([k,l])=>{const v=cfg.sens[k]||'m';return'<fieldset class="sg"><legend>'+esc(l)+'</legend><div class="seg3">'+[['i','Ignore'],['m','Avoid'],['r','Don’t eat']].map(([x,n])=>'<label class="'+x+'"><input type="radio" name="sg_'+k+'" data-s="'+k+'" value="'+x+'"'+(v==x?' checked':'')+'><span>'+n+'</span></label>').join('')+'</div></fieldset>'}).join('');$('#ca').value=cfg.avoid;$('#cc').value=cfg.caution;$('#ci').value=cfg.ignore||'';if(window.drawAl)drawAl()}
 function backupText(){return JSON.stringify({app:'TickedOff',version:1,exported:new Date().toISOString(),settings:cfg,favorites:favs,history:hist,overrides:ovr,theme:theme,recipeFavorites:rfavs,shopping:SH,myRecipes:myrec},null,1)}
@@ -898,6 +905,10 @@ function initRecipeUI(){
 const tm=s=>s?String(s).replace(/\s*\(.*$/,'').replace(/minutes?/i,'min').replace(/hours?/i,'hr').replace(/hr\s*s/i,'hr'):'';
 const timeOf=r=>tm(r.tt)||(tm(r.pr)&&tm(r.ck)?tm(r.pr)+' + '+tm(r.ck):tm(r.ck)||tm(r.pr)||'');
 function imgTag(r,cls){return r.im?'<img class="rimg" '+(cls||'')+' loading="lazy" referrerpolicy="no-referrer" alt="" src="'+esc(r.im)+'">':'<div class="rph" role="img" aria-label="No photo available">🍽️</div>'}
+// Product photos that fail to load (moved or deleted on the database site) become a placeholder (v3.8.3).
+document.addEventListener('error',e=>{
+ const im=e.target;if(!im||im.tagName!='IMG'||!im.closest('.top,.item,.shrow')||im.classList.contains('rimg'))return;
+ const ph=document.createElement('span');ph.className='pph';ph.setAttribute('role','img');ph.setAttribute('aria-label','Photo unavailable');ph.textContent='📦';im.replaceWith(ph)},true);
 document.addEventListener('error',e=>{
  const im=e.target;if(!(im&&im.tagName=='IMG'&&im.classList.contains('rimg')))return;
  const m=im.src.match(/^https?:\/\/alphagalcooking\.com\/wp-content\/uploads\/(\d{4}\/\d{2}\/[^?]+)/);
@@ -1251,7 +1262,7 @@ async function fetchT(url,ms){const c=new AbortController(),t=setTimeout(()=>c.a
 async function latestInfo(){
  if(APPKIND=='web'){const r=await fetchT(location.href.split('#')[0]);if(!r.ok)throw new Error('http '+r.status);const m=(await r.text()).match(/const APPV='([^']+)'/);if(!m)throw new Error('no version');return{v:m[1],ready:true}}
  const r=await fetchT(UPD.api);if(!r.ok)throw new Error('http '+r.status);const j=await r.json();
- const as=Array.isArray(j.assets)?j.assets:[],file=ext=>{const a=as.find(a=>a&&typeof a.name=='string'&&a.name.toLowerCase().endsWith(ext));return a&&/^https:\/\/github\.com\/Pixeledberry\/TickedOff\/releases\/download\//.test(a.browser_download_url)?a.browser_download_url:''};
+ const as=Array.isArray(j.assets)?j.assets:[],file=ext=>{const a=as.find(a=>a&&typeof a.name=='string'&&a.name.toLowerCase().endsWith(ext));return a&&/^https:\/\/github\.com\/pixeledberry\/[\w.-]+\/releases\/download\//i.test(a.browser_download_url)?a.browser_download_url:''};
  const apk=file('.apk'),ipa=file('.ipa');
  return{v:String(j.tag_name||'').replace(/^v/i,''),url:EDITION=='private'?UPD.priv:(/^https:\/\/github\.com\//.test(j.html_url)?j.html_url:''),apk,ready:APPKIND=='android'?!!apk:!!ipa}}
 async function checkUpdates(manual){

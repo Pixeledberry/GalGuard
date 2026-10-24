@@ -220,11 +220,13 @@ class MainActivity : Activity() {
             }
         }
 
-        // Downloads the new APK from this project's public GitHub releases, then opens Android's installer.
+        // Downloads the new APK from the project's GitHub releases, then opens Android's installer.
         // Android always asks the user to confirm. The fixed signing key lets it install over this version and keep all data.
         @JavascriptInterface
         fun installUpdate(url: String) {
-            if (!url.startsWith("https://github.com/Pixeledberry/TickedOff/releases/download/") || !url.endsWith(".apk")) {
+            // Only APKs from the owner's own GitHub account are accepted. Any repo name is allowed, so a renamed repo keeps working.
+            val official = Regex("^https://github\\.com/pixeledberry/[A-Za-z0-9._-]+/releases/download/[^?#]+\\.apk$", RegexOption.IGNORE_CASE)
+            if (!official.matches(url)) {
                 updateJs("onUpdateError", "not an official TickedOff download")
                 return
             }

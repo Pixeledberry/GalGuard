@@ -37,7 +37,12 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v3.8.2 (latest)
+### v3.8.3 (latest)
+- **Clearer messages when a product can’t be looked up.** Instead of always blaming your connection, TickedOff now tells you whether you’re offline, whether the product databases aren’t responding (usually a problem on their side, so try again later), or whether the product simply isn’t listed. If only some databases don’t answer, it names them, because the product might be listed there.
+- **Placeholder for missing product photos.** If a product photo has moved or been deleted on the database site, favorites, history, results and the shopping list show a 📦 placeholder instead of a broken image.
+- **Updates survive a repo rename.** The Android updater now accepts new versions from any repository on the Pixeledberry GitHub account, so renaming the repo won’t stop updates. It still refuses downloads from anywhere else.
+
+### v3.8.2
 - **"Don’t remind me" for updates.** The update notice now has a **Don’t remind me** button next to **Not now**. It turns off automatic update reminders for good. **Menu → Check for updates** still checks when you tap it, and the notice it shows has a button to turn reminders back on.
 - **In-app changelog.** **Menu → Show Changelog** (under Check for updates) opens a window with the last 5 updates and a link to GitHub for older ones. Close it with the × button, by tapping outside the window, or with your phone’s back button. Scrolling inside it only scrolls the window.
 
@@ -86,10 +91,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ### v3.4.1
 - **Android icon fixed.** The shield on the Android home-screen icon was too big, because Android crops and masks app icons. It is now smaller, so it looks the same as the icon on the web app (a shield with space around it) with round, square or rounded-square icon shapes.
-
-### v3.4
-- **The app is now called TickedOff** (it was GalGuard), with a new icon: a dark shield on mint with a tick that cuts through it. The web page, the Android and iPhone apps, the file names and these notes all use the new name. Nothing else changes for you: the Android and iPhone apps keep the same internal ID, so they still **update over your existing install and keep your data**. Backups made in the old GalGuard app still import.
-- **Repository name:** the web address is now `https://pixeledberry.github.io/TickedOff/` (rename the GitHub repository to TickedOff to match). GitHub redirects the old repository address, but the old web address `.../GalGuard/` stops working, so use Export Settings on the old page and Import Settings on the new one to move your data.
 
 ## Features
 

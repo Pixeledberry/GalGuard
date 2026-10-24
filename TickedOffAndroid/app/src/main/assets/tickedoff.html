@@ -170,6 +170,8 @@ mark.p{background:var(--hxs);color:var(--hxst);text-decoration:underline dashed;
 #fr1 h2{margin:0 0 6px;font-size:22px}#fr1 input[type=text]{width:100%;margin:4px 0 10px}
 #fr1 button:disabled{opacity:.5}
 #alx::placeholder,#frx::placeholder{font-size:var(--phs,15px)}
+
+.srcn{display:block;font-size:12px;color:var(--mut);margin-top:2px}
 </style></head><body>
 <header><h1><img id="logo" alt="" width="36" height="36" style="vertical-align:-8px;margin-right:8px">TickedOff</h1><p>Scan a barcode. Check it against your allergies.</p><button id="hb" aria-label="Menu" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span><i id="hbn" hidden></i></button></header>
 <main>
@@ -219,7 +221,7 @@ mark.p{background:var(--hxs);color:var(--hxst);text-decoration:underline dashed;
 <section id="v5" hidden><div id="shop"></div></section>
 <section id="v6" hidden><button class="back" id="bkback">‹ Back</button><h2 style="margin:0">Export / Import Settings</h2><p class="legend">Back up your settings, favorites, history, rating overrides, theme, recipes and shopping list, or restore them on a new device.</p><div class="row"><button id="xs" style="flex:1">Export Settings</button><button id="is" style="flex:1">Import Settings</button></div><div id="bk" class="why" hidden></div><input type="file" id="bf" accept=".json,application/json,text/plain" hidden></section>
 </main>
-<footer>Ingredient data comes from Open Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.6.1</footer>
+<footer>Ingredient data comes from Open Food Facts and its sister projects Open Beauty Facts, Open Products Facts and Open Pet Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.7</footer>
 <div id="scrim" hidden></div>
 <aside id="drawer" hidden aria-label="Menu">
  <div class="dh"><h2>Menu</h2><button id="dclose" aria-label="Close menu">×</button></div>
@@ -250,7 +252,7 @@ const G=[
 ['polym','m','(?:chicken|turkey|poultry)\\s+(?:sausages?|bacon|hot ?dogs?|franks?|ham|pepperoni|salami|bologna|jerky)',null,'The meat is poultry, but sausage and bacon products can use pork or beef casings, binders or processing. Check the label or the maker.'],
 ['meat','r',MEAT,null,'Mammal meat, fat or tissue. It carries alpha-gal directly, which is what triggers AGS reactions.'],
 ['gel','m','gelatin|gelatine|gélatine|gelatina|e-? ?441','gelatin','Gelatin is made from the skin, bones or connective tissue of mammals (usually pigs or cows), so it can contain alpha-gal.'],
-['tissue','m','collagen|chondroitin|cartilage|bone phosphate|bone meal|bone char|glucosamine|e-? ?542',null,'Made from mammal bones, cartilage or connective tissue, or filtered through bone char. These can carry alpha-gal.'],
+['tissue','m','collagen|keratin|elastin|placenta|placental|chondroitin|cartilage|bone phosphate|bone meal|bone char|glucosamine|e-? ?542',null,'Made from mammal bones, cartilage or connective tissue, or filtered through bone char. These can carry alpha-gal.'],
 ['hidden','m','animal (?:fat|shortening|protein|derived \\w+)|hydrolyzed (?:animal )?protein|hydrolysed (?:animal )?protein|shortening|bouillon|ribonucleotides|inosinate|e-? ?(?:627|631|635)',null,'May be animal-derived, and the label does not name the animal, so it could be a mammal such as a pig or cow.'],
 ['cyst','m','l-cysteine|cysteine|cystine',null,'Often made from animal hair, feathers or hooves, which can include mammal sources.'],
 ['enz','m','pepsin|pancreatin|lipase|trypsin|chymosin|enzymes?|rennet','rennet','Rennet and many food enzymes come from the stomachs or pancreas of calves, pigs or cows. Microbial versions exist, but labels rarely say which was used.'],
@@ -405,12 +407,12 @@ function render(){
  if(!cur)return;const a=rating(cur),isFav=favs.some(f=>f.code==cur.code),man=String(cur.code).startsWith('manual');LA=a;
  const seen={},rs=a.hits.map((h,i)=>[h,i]).filter(([h])=>!seen[h.t]&&(seen[h.t]=1)).map(([h,i])=>'<li><mark class="'+h.k+'" data-i="'+i+'" tabindex="0" role="button">'+esc(h.t)+'</mark> '+esc(GL[h.g])+(h.k=='i'?' (ignored)':'')+'</li>').join('');
  const nr=a.hits.filter(h=>h.k=='r').length,ny=a.hits.filter(h=>h.k=='m').length,na=a.hits.filter(h=>h.al).length,ni=a.ign||0;
- const tagOnly=Object.keys(a.ent||{}).filter(id=>a.ent[id].tag&&!a.hits.some(h=>h.al==id)).map(id=>'<li><mark class="'+a.ent[id].k+'">'+esc(GL_AL(id))+'</mark> listed in the Open Food Facts allergen data ('+(a.ent[id].k=='x'?'contains':'may contain')+')</li>').join('');
- $('#result').innerHTML='<div class="res"><div class="top">'+(cur.img?'<img src="'+esc(cur.img)+'" alt="">':'')+'<div><b>'+esc(cur.name)+'</b><span>'+esc(cur.brand)+'</span></div></div>'+
+ const tagOnly=Object.keys(a.ent||{}).filter(id=>a.ent[id].tag&&!a.hits.some(h=>h.al==id)).map(id=>'<li><mark class="'+a.ent[id].k+'">'+esc(GL_AL(id))+'</mark> listed in the allergen data ('+(a.ent[id].k=='x'?'contains':'may contain')+')</li>').join('');
+ $('#result').innerHTML='<div class="res"><div class="top">'+(cur.img?'<img src="'+esc(cur.img)+'" alt="">':'')+'<div><b>'+esc(cur.name)+'</b><span>'+esc(cur.brand)+'</span>'+(cur.db?'<span class="srcn">From '+esc(dbOf(cur.db)[2])+'</span>':'')+'</div></div>'+
  '<div class="verdict v-'+a.v+'"><h2>'+LBL[a.v]+'</h2><p>'+(a.over?'You set this rating yourself. Highlights below are unchanged.':msgFor(a)+(a.v=='o'&&ni?' ('+ni+' ignored by your settings.)':''))+'</p><div class="meter" role="img" aria-label="Restriction level '+a.meter+' of 100"><i style="width:'+a.meter+'%"></i></div>'+(a.over?'':twoLines(a))+'</div>'+
  '<div class="body"><h3>Ingredients</h3>'+(a.html?'<p class="ing">'+a.html+'</p><p class="legend"><b>'+(nr+ny+na?[nr?nr+' red':'',ny?ny+' yellow':'',na?na+' allergy':''].filter(Boolean).join(', '):'Nothing flagged')+(ni?', '+ni+' ignored':'')+'.</b> '+(a.hits.length?'Tap a highlight to see why. ':'')+'<mark class="r">Red</mark> do not eat &nbsp; <mark class="m">Yellow</mark> avoid'+(a.alOn?' &nbsp; <mark class="x">Purple</mark> your allergy':'')+(ni?' &nbsp; <mark class="i">Grey</mark> ignored':'')+'</p><div id="why" class="why" hidden></div>':'<p class="ing">No ingredient list found. Paste one above to check it.</p>')+((rs||tagOnly)?'<ul class="reasons">'+rs+tagOnly+'</ul>':'')+
  '<button class="fav'+(isFav?' on':'')+'" id="fv">'+(isFav?'★ In favorites':'☆ Add to favorites')+'</button><button class="fav" id="fsh" style="margin-top:8px">🛒 Add to shopping list</button>'+
- '<details><summary>Rating wrong?</summary><div class="links"><button data-o="o">Mark safe</button><button data-o="a">Mark do not eat</button><button data-o="x">Reset</button></div>'+(man?'':'<div class="links"><a href="https://world.openfoodfacts.org/cgi/product.pl?type=edit&amp;code='+esc(cur.code)+'" target="_blank" rel="noopener">Fix the ingredients on Open Food Facts</a></div>')+'</details></div></div>';
+ '<details><summary>Rating wrong?</summary><div class="links"><button data-o="o">Mark safe</button><button data-o="a">Mark do not eat</button><button data-o="x">Reset</button></div>'+(man?'':'<div class="links"><a href="https://'+dbOf(cur.db)[1]+'/cgi/product.pl?type=edit&amp;code='+esc(cur.code)+'" target="_blank" rel="noopener">Fix the ingredients on '+dbOf(cur.db)[2]+'</a></div>')+'</details></div></div>';
  $('#fv').onclick=()=>{if(isFav)favs=favs.filter(f=>f.code!=cur.code);else favs.unshift({...cur});ls.set('gg_favs',favs);render();lists()};
  $('#result').scrollIntoView({behavior:'smooth',block:'start'});
 }
@@ -452,20 +454,26 @@ async function exportFavs(){
 }
 function tab(n){['v1','v2','v3','v4','v5','v6'].forEach((v,i)=>$('#'+v).hidden=n!=i+1);[1,2,3,4].forEach(i=>$('#t'+i).className=n==i?'on':'');window.scrollTo(0,0)}
 $('#t1').onclick=()=>tab(1);$('#t2').onclick=()=>{stopScan();tab(2);lists()};$('#t3').onclick=()=>{stopScan();chAsk=false;tab(3);lists()};$('#t4').onclick=()=>{stopScan();tab(4)};
+const DBS=[['food','world.openfoodfacts.org','Open Food Facts'],['beauty','world.openbeautyfacts.org','Open Beauty Facts'],['products','world.openproductsfacts.org','Open Products Facts'],['pet','world.openpetfoodfacts.org','Open Pet Food Facts']];
+const dbOf=k=>DBS.find(d=>d[0]==k)||DBS[0];
 async function lookup(code){
  code=(code||'').replace(/\D/g,'');if(!code)return;
- note('Scanned <b>'+code+'</b>. Searching the database…');$('#result').scrollIntoView({behavior:'smooth',block:'start'});
+ note('Scanned <b>'+code+'</b>. Searching the databases…');$('#result').scrollIntoView({behavior:'smooth',block:'start'});
  const tries=[code];if(code.length==14&&code[0]=='0')tries.unshift(code.slice(1));if(code.length==12)tries.push('0'+code);if(code.length==13&&code[0]=='0')tries.push(code.slice(1));
  let failed=false;
- for(const c of tries){
-  try{const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),12000);
-   const r=await fetch('https://world.openfoodfacts.org/api/v2/product/'+c+'.json?fields=product_name,brands,ingredients_text,ingredients_text_en,image_front_small_url,ingredients_text_de,ingredients_tags,allergens_tags,traces_tags',{signal:ctl.signal});clearTimeout(to);
-   const j=await r.json();
-   if(j.status===1){const p=j.product,ot=offTags(p);cur={code,name:p.product_name||'Unnamed product',brand:p.brands||'',img:p.image_front_small_url||'',text:p.ingredients_text_en||p.ingredients_text||p.ingredients_text_de||(p.ingredients_tags||[]).map(t=>t.replace(/^[a-z]{2}:/,'').replace(/-/g,' ')).join(', ')};if(ot.c.length||ot.t.length)cur.al=ot;
-    hist=[cur,...hist.filter(h=>h.code!=code)].slice(0,40);ls.set('gg_hist',hist);try{lists();render()}catch(e){note('Found <b>'+esc(cur.name)+'</b> but couldn’t display it: '+esc(e.message))}return}
-  }catch(e){failed=true}
- }
- note(failed?'Couldn’t reach the product database for <b>'+code+'</b>. Check your connection.<br><br><button class="pri" onclick="lookup(\''+code+'\')">Try again</button>':'Barcode <b>'+code+'</b> isn’t in the Open Food Facts database. Paste the ingredient list from the label above instead.');
+ const search=async([k,host])=>{
+  for(const c of tries){
+   try{const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),12000);
+    const r=await fetch('https://'+host+'/api/v2/product/'+c+'.json?fields=product_name,brands,ingredients_text,ingredients_text_en,image_front_small_url,ingredients_text_de,ingredients_tags,allergens_tags,traces_tags',{signal:ctl.signal});clearTimeout(to);
+    const j=await r.json();if(j.status===1)return{k,p:j.product}
+   }catch(e){failed=true}}
+  return null};
+ const found=(await Promise.all(DBS.map(search))).find(Boolean);
+ if(found){const p=found.p,ot=offTags(p);
+  cur={code,name:p.product_name||'Unnamed product',brand:p.brands||'',img:p.image_front_small_url||'',text:p.ingredients_text_en||p.ingredients_text||p.ingredients_text_de||(p.ingredients_tags||[]).map(t=>t.replace(/^[a-z]{2}:/,'').replace(/-/g,' ')).join(', ')};
+  if(ot.c.length||ot.t.length)cur.al=ot;if(found.k!='food')cur.db=found.k;
+  hist=[cur,...hist.filter(h=>h.code!=code)].slice(0,40);ls.set('gg_hist',hist);try{lists();render()}catch(e){note('Found <b>'+esc(cur.name)+'</b> but couldn’t display it: '+esc(e.message))}return}
+ note(failed?'Couldn’t reach the product databases for <b>'+code+'</b>. Check your connection.<br><br><button class="pri" onclick="lookup(\''+code+'\')">Try again</button>':'Barcode <b>'+code+'</b> isn’t in Open Food Facts, Open Beauty Facts, Open Products Facts or Open Pet Food Facts. Paste the ingredient list from the label above instead.');
 }
 $('#go').onclick=()=>lookup($('#code').value);$('#code').onkeydown=e=>{if(e.key=='Enter')lookup(e.target.value)};
 $('#ps').onclick=()=>{$('#pn').value='Sample gummies';$('#pt').value='Sugar, glucose syrup, beef gelatin, glycerin, natural flavors, citric acid, milk';$('#pa').click()};
@@ -508,7 +516,7 @@ function importBackup(raw){
  let d;try{d=JSON.parse(String(raw).trim())}catch(e){d=null}
  if(!d||(d.app!=='GalGuard'&&d.app!=='TickedOff')){toast('That doesn’t look like a TickedOff backup');return}
  const str=(v,n)=>typeof v=='string'?v.slice(0,n):'';
- const item=x=>x&&typeof x=='object'&&x.code?{code:str(String(x.code),40),name:str(x.name,200)||'Unnamed product',brand:str(x.brand,200),img:/^https?:\/\//.test(x.img)?str(x.img,500):'',text:str(x.text,6000),...(cleanOffTags(x.al)?{al:cleanOffTags(x.al)}:{})}:null;
+ const item=x=>x&&typeof x=='object'&&x.code?{code:str(String(x.code),40),name:str(x.name,200)||'Unnamed product',brand:str(x.brand,200),img:/^https?:\/\//.test(x.img)?str(x.img,500):'',text:str(x.text,6000),...(cleanOffTags(x.al)?{al:cleanOffTags(x.al)}:{}),...(DBS.some(d=>d[0]==x.db&&d[0]!='food')?{db:x.db}:{})}:null;
  const list=a=>Array.isArray(a)?a.slice(0,500).map(item).filter(Boolean):[];
  const st=d.settings||{},sens={};Object.keys(SENS).forEach(k=>{const v=st.sens&&st.sens[k];if(v===true||v==='r')sens[k]='r';else if(v==='i')sens[k]='i'});
  cfg={sens,avoid:str(st.avoid,500),caution:str(st.caution,500),ag:st.ag!==false,al:cleanAl(st.al),alx:str(st.alx,500)};ls.set('gg_setup',1);if(OCRL[st.ocr])cfg.ocr=st.ocr;

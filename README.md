@@ -37,7 +37,13 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v3.6.1 (latest)
+### v3.7 (latest)
+- **Four product databases instead of one.** A scanned barcode is now looked up in **Open Food Facts**, **Open Beauty Facts** (soap, shampoo, lotion, toothpaste, deodorant and other personal care), **Open Products Facts** (cleaners and other everyday non-food products) and **Open Pet Food Facts** at the same time, and the first match is used. Results from the sister databases are checked exactly like food: same highlights, ratings, allergy checks, favorites, history, shopping list and backups.
+- **"From Open Beauty Facts" label** on results that did not come from the food database, and the "Fix the ingredients" link now opens the right database.
+- **A few cosmetic ingredients added** to the mammal-derived list (keratin, elastin, placenta). Sodium tallowate, lanolin, glycerin, stearates and collagen were already flagged.
+- Non-food entries often have missing or incomplete ingredient lists, so you will see more "Can’t tell" results. Paste the ingredient list from the pack if that happens.
+
+### v3.6.1
 - **New sensitivity: carrageenan.** Carrageenan (a seaweed thickener, also written E407) is now in the sensitivities list under "My settings" with the usual **Ignore | Avoid | Don’t eat** choice. It is on by default as **Avoid** (yellow) because some people with AGS report reacting to it, and it is not a mammal product. German, French and Spanish spellings are matched too. Set it to Ignore if it doesn’t bother you.
 
 ### v3.6
@@ -84,11 +90,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 - **Missing-photo picture centered.** The placeholder plate shown when a recipe has no photo is now centered in the photo frame.
 - **Analyze, Try a sample and Add as recipe** are now on one line (the button now reads "Add as recipe").
 - **Release notes:** the Android install note now mentions tapping **More info**, then **Install anyway**, if Android blocks the install.
-
-### v3.0
-- **Updating the Android app now works.** Before this version, each build was signed with a different random key, so Android refused to install a new version over an older one and you had to uninstall first. From this version on, every build uses the same fixed key, so future updates install over the old one and keep your settings, favorites, history and shopping lists. **One last time:** if you have a version older than 3.0, Android will still ask you to uninstall it, which erases its data. Before you do that, open the menu, choose **Export / Import Settings** and copy or save your backup, then import it into 3.0. After that, updates are automatic. (On iPhone, a sideloading tool such as AltStore or Sideloadly keeps your data when it re-installs over the older version, as long as you use the same Apple ID.)
-- **Zoom slider on the camera.** The barcode camera view has a vertical zoom slider on the right side. Moving it takes over from the automatic zooming for that scan. Phones whose camera does not allow zoom control use a digital zoom, so the slider works everywhere.
-- **Scan box starts at 70%.** The scan box now starts at 70% of the view and shrinks from there. The 100% size is gone.
 
 ## Features
 

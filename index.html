@@ -177,6 +177,20 @@ mark.p{background:var(--hxs);color:var(--hxst);text-decoration:underline dashed;
 /* v3.8.1: ingredient box scrolls instead of resizing */
 #pt{resize:none;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;min-height:96px;max-height:min(45vh,320px);box-sizing:border-box}
 #ci::placeholder{font-size:var(--phs,15px)}
+/* v3.8.2: changelog popup */
+#chl{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+#chl[hidden]{display:none}
+.chp{background:var(--card);color:var(--ink);border-radius:16px;width:100%;max-width:520px;max-height:min(80vh,640px);display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.4);overflow:hidden}
+.chh{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 8px 8px 16px;border-bottom:1px solid var(--line)}
+.chh h2{margin:0;font-size:20px}
+#chlx{border:0;background:none;color:var(--ink);font-size:30px;line-height:1;min-width:44px;min-height:44px;padding:0;cursor:pointer}
+.chb{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:2px 16px 16px;flex:1;min-height:0}
+.chb h3{font-size:17px;margin:16px 0 6px}.chb h3 small{color:var(--mut);font-weight:500;font-size:13px}
+.chb ul{margin:4px 0;padding-left:20px}.chb li{margin:5px 0;line-height:1.4;font-size:15px}.chb p{font-size:15px;line-height:1.4}
+.chb code{font-size:.9em;background:var(--bg);padding:1px 4px;border-radius:4px}
+.chfull{margin-top:18px;padding-top:12px;border-top:1px solid var(--line)}.chfull a{color:var(--acc);font-weight:600}
+html.nosc,html.nosc body{overflow:hidden}
+.upd .links{flex-wrap:wrap}.upd .links>*{flex:1 1 auto;min-width:0}
 </style></head><body>
 <header><h1><img id="logo" alt="" width="36" height="36" style="vertical-align:-8px;margin-right:8px">TickedOff</h1><p>Scan a barcode. Check it against your allergies.</p><button id="hb" aria-label="Menu" aria-expanded="false" aria-controls="drawer"><span></span><span></span><span></span><i id="hbn" hidden></i></button></header>
 <main>
@@ -228,7 +242,7 @@ mark.p{background:var(--hxs);color:var(--hxst);text-decoration:underline dashed;
 <section id="v5" hidden><div id="shop"></div></section>
 <section id="v6" hidden><button class="back" id="bkback">‹ Back</button><h2 style="margin:0">Export / Import Settings</h2><p class="legend">Back up your settings, favorites, history, rating overrides, theme, recipes and shopping list, or restore them on a new device.</p><div class="row"><button id="xs" style="flex:1">Export Settings</button><button id="is" style="flex:1">Import Settings</button></div><div id="bk" class="why" hidden></div><input type="file" id="bf" accept=".json,application/json,text/plain" hidden></section>
 </main>
-<footer>Ingredient data comes from Open Food Facts and its sister projects Open Beauty Facts, Open Products Facts and Open Pet Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.8.1</footer>
+<footer>Ingredient data comes from Open Food Facts and its sister projects Open Beauty Facts, Open Products Facts and Open Pet Food Facts (crowdsourced) and can be outdated or wrong. “Natural flavors” and some additives don’t reveal their source. This is a screening aid, not medical advice: always read the label and follow your allergist’s guidance.<br>v3.8.2</footer>
 <div id="scrim" hidden></div>
 <aside id="drawer" hidden aria-label="Menu">
  <div class="dh"><h2>Menu</h2><button id="dclose" aria-label="Close menu">×</button></div>
@@ -243,11 +257,39 @@ mark.p{background:var(--hxs);color:var(--hxst);text-decoration:underline dashed;
  <button class="menub" id="mbk"><span aria-hidden="true">💾</span> Export / Import Settings</button>
  <h3>App</h3>
  <button class="menub" id="mupd"><span aria-hidden="true">🔄</span> Check for updates <small id="mupdv"></small></button>
+ <button class="menub" id="mchl"><span aria-hidden="true">📝</span> Show Changelog</button>
 </aside>
 <div id="toast" hidden style="z-index:30"></div>
 <div id="mls" hidden><div id="mlsb" role="dialog" aria-label="List options"></div></div>
 <div id="shs" hidden><div id="shsb" role="dialog" aria-label="Item options"></div></div>
 <div id="lb" hidden role="dialog" aria-label="Enlarged image"><img id="lbi" alt=""><p id="lbc"></p></div>
+<script type="text/markdown" id="chlog">
+### v3.8.2 (latest)
+- **"Don’t remind me" for updates.** The update notice now has a **Don’t remind me** button next to **Not now**. It turns off automatic update reminders for good. **Menu → Check for updates** still checks when you tap it, and the notice it shows has a button to turn reminders back on.
+- **In-app changelog.** **Menu → Show Changelog** (under Check for updates) opens a window with the last 5 updates and a link to GitHub for older ones. Close it with the × button, by tapping outside the window, or with your phone’s back button. Scrolling inside it only scrolls the window.
+
+### v3.8.1
+- **The ingredient box scrolls instead of stretching.** The box where you paste or type an ingredient list can no longer be resized by dragging. It grows with the text up to a set height, then scrolls on its own. Scrolling inside it moves only the box, not the rest of the app.
+- **New "Always ignore" box** in "My settings", under "Always flag yellow / avoid". Add your own ingredients (comma separated) and they are never flagged; they show in grey as ignored, the same way an ignored sensitivity does. Your "Always flag red" list still wins if an ingredient is in both. It only affects the alpha-gal flags: anything set in **My allergies** is still flagged. The list is included in Export/Import Settings, and older backups still import.
+
+### v3.8
+- **Update notices.** TickedOff now tells you when a new version is out.
+  - **Web:** a banner says "A new version of TickedOff is available" with a **Reload** button.
+  - **Android (public version):** tap **Update** and the app downloads the new version and opens Android's installer. You only tap **Install**, and your favorites and settings are kept. The first time, Android asks you to allow TickedOff to install apps; the notice walks you through it.
+  - **Android (private version) and Apple:** a notice with a **Get it** link to the new release. Apple users install it with their sideloading tool.
+- **Not now** hides the notice for 3 days. If an even newer version comes out, it shows again right away. The notice never blocks the app.
+- **Menu → Check for updates** checks right away and shows which version you have.
+- The apps check at most every 12 hours and only after the new download is ready. Updates are checked starting from this version, so v3.7 and older still need one manual update to get here.
+
+### v3.7
+- **Four product databases instead of one.** A scanned barcode is now looked up in **Open Food Facts**, **Open Beauty Facts** (soap, shampoo, lotion, toothpaste, deodorant and other personal care), **Open Products Facts** (cleaners and other everyday non-food products) and **Open Pet Food Facts** at the same time, and the first match is used. Results from the sister databases are checked exactly like food: same highlights, ratings, allergy checks, favorites, history, shopping list and backups.
+- **"From Open Beauty Facts" label** on results that did not come from the food database, and the "Fix the ingredients" link now opens the right database.
+- **A few cosmetic ingredients added** to the mammal-derived list (keratin, elastin, placenta). Sodium tallowate, lanolin, glycerin, stearates and collagen were already flagged.
+- Non-food entries often have missing or incomplete ingredient lists, so you will see more "Can’t tell" results. Paste the ingredient list from the pack if that happens.
+
+### v3.6.1
+- **New sensitivity: carrageenan.** Carrageenan (a seaweed thickener, also written E407) is now in the sensitivities list under "My settings" with the usual **Ignore | Avoid | Don’t eat** choice. It is on by default as **Avoid** (yellow) because some people with AGS report reacting to it, and it is not a mammal product. German, French and Spanish spellings are matched too. Set it to Ignore if it doesn’t bother you.
+</script>
 <script type="application/json" id="rdata">[]</script>
 <script>
 const $=s=>document.querySelector(s);
@@ -504,7 +546,7 @@ $('#sens').onchange=saveCfg;$('#ca').onchange=$('#cc').onchange=$('#ci').onchang
 $('#cl').onclick=()=>{$('#code').value='';$('#result').innerHTML='';$('#code').focus()};
 
 // ---- backup: export / import settings, favorites, history and rating overrides ----
-const APPV='3.8.1',EDITION='public';
+const APPV='3.8.2',EDITION='public';
 const IOSAPP=!!(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.ios);
 function drawSettings(){$('#sens').innerHTML=Object.entries(SENS).map(([k,l])=>{const v=cfg.sens[k]||'m';return'<fieldset class="sg"><legend>'+esc(l)+'</legend><div class="seg3">'+[['i','Ignore'],['m','Avoid'],['r','Don’t eat']].map(([x,n])=>'<label class="'+x+'"><input type="radio" name="sg_'+k+'" data-s="'+k+'" value="'+x+'"'+(v==x?' checked':'')+'><span>'+n+'</span></label>').join('')+'</div></fieldset>'}).join('');$('#ca').value=cfg.avoid;$('#cc').value=cfg.caution;$('#ci').value=cfg.ignore||'';if(window.drawAl)drawAl()}
 function backupText(){return JSON.stringify({app:'TickedOff',version:1,exported:new Date().toISOString(),settings:cfg,favorites:favs,history:hist,overrides:ovr,theme:theme,recipeFavorites:rfavs,shopping:SH,myRecipes:myrec},null,1)}
@@ -1222,15 +1264,18 @@ async function checkUpdates(manual){
 function hideUpd(){const b=$('#upd');if(b){b.hidden=true;b.innerHTML=''}}
 function showUpd(force){
  const v=updSt.v,b=$('#upd');if(!b)return;if(!v||vcmp(v,APPV)<=0){hideUpd();return}
+ if(!force&&updSt.off)return;
  const sz=updSt.snooze;if(!force&&sz&&sz.v==v&&Date.now()<sz.until)return;
  let msg,btn;
  if(APPKIND=='web'){msg='A new version of TickedOff is available.';btn='<button class="pri" id="updgo">Reload</button>'}
  else if(canAutoInstall()){msg='TickedOff v'+esc(v)+' is available.';btn='<button class="pri" id="updgo">Update</button>'}
  else{msg='TickedOff v'+esc(v)+' is available.'+(APPKIND=='ios'?' Install it with your sideloading tool (AltStore, SideStore or Sideloadly).':' Download the new .apk from GitHub and open it to install.');btn=updSt.url?'<a class="pri" id="updget" href="'+esc(updSt.url)+'">Get it</a>':''}
- b.innerHTML='<p id="updm">'+msg+'</p><div class="links">'+btn+'<button id="updno">Not now</button></div>';b.hidden=false}
+ b.innerHTML='<p id="updm">'+msg+'</p><div class="links">'+btn+'<button id="updno">Not now</button>'+(updSt.off?'<button id="updon">Turn update reminders back on</button>':'<button id="updoff">Don’t remind me</button>')+'</div>'+(updSt.off?'<p class="legend">Update reminders are off. This check ran because you asked for it.</p>':'');b.hidden=false}
 function updBusy(on,text){const m=$('#updm');if(m&&text)m.textContent=text;document.querySelectorAll('#upd button').forEach(x=>x.disabled=!!on)}
 $('#upd').onclick=e=>{const t=e.target.closest('button,a');if(!t)return;
  if(t.id=='updno'){updSt.snooze={v:updSt.v,until:Date.now()+UPD.snoozeDays*864e5};saveUpd();hideUpd();toast('Okay. We’ll remind you again in '+UPD.snoozeDays+' days.');return}
+ if(t.id=='updoff'){updSt.off=true;delete updSt.snooze;saveUpd();hideUpd();toast('Okay, no more update reminders. You can still check any time from the menu.');return}
+ if(t.id=='updon'){delete updSt.off;saveUpd();showUpd(true);toast('Update reminders are back on.');return}
  if(t.id=='updallow'){try{Android.allowUpdates()}catch(x){}t.id='updgo';t.textContent='Update';return}
  if(t.id!='updgo')return;
  if(APPKIND=='web'){location.reload();return}
@@ -1245,12 +1290,36 @@ window.onUpdateError=m=>updBusy(false,'The update didn’t download'+(m?' ('+Str
 $('#mupd').onclick=()=>{back(closeDrawerDOM);checkUpdates(true)};
 $('#mupdv').textContent='v'+APPV;
 showUpd(false);
-if(!updSt.t||Date.now()-updSt.t>(APPKIND=='web'?30*6e4:UPD.every))setTimeout(()=>checkUpdates(false),4000);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState=='visible'&&Date.now()-(updSt.t||0)>(APPKIND=='web'?30*6e4:UPD.every))checkUpdates(false)});
+if(!updSt.off&&(!updSt.t||Date.now()-updSt.t>(APPKIND=='web'?30*6e4:UPD.every)))setTimeout(()=>checkUpdates(false),4000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState=='visible'&&!updSt.off&&Date.now()-(updSt.t||0)>(APPKIND=='web'?30*6e4:UPD.every))checkUpdates(false)});
 // ---------- ingredient box: grows with the text up to a limit, then scrolls on its own (v3.8.1) ----------
 function fitPt(){const t=$('#pt');if(!t||!t.offsetParent)return;t.style.height='auto';t.style.height=(t.scrollHeight+2)+'px'}
 $('#pt').addEventListener('input',fitPt);document.addEventListener('toggle',fitPt,true);addEventListener('resize',fitPt);
 (()=>{const d=Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value'),t=$('#pt');Object.defineProperty(t,'value',{configurable:true,get(){return d.get.call(this)},set(v){d.set.call(this,v);requestAnimationFrame(fitPt)}})})();
+// ---------- in-app changelog (v3.8.2) ----------
+// The last 5 changelog entries live in <script type="text/markdown" id="chlog"> (copied from the README at build time).
+function mdLite(md){
+ const inl=x=>esc(x).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\[([^\]]+)\]\((https:\/\/[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+ let html='',depth=-1;const close=d=>{while(depth>d){html+='</li></ul>';depth--}};
+ String(md||'').split('\n').forEach(line=>{
+  const h=line.match(/^#{2,4}\s+(.*)/);
+  if(h){close(-1);const t=h[1].replace(/\s*\(latest\)\s*$/i,'').trim();html+='<h3>'+esc(t)+(t.replace(/^v/i,'')==APPV?' <small>(this version)</small>':'')+'</h3>';return}
+  const b=line.match(/^(\s*)[-*]\s+(.*)/);
+  if(b){const d=Math.floor(b[1].replace(/\t/g,'  ').length/2);if(d>depth){while(depth<d){html+='<ul><li>';depth++}}else{close(d);html+='</li><li>'}html+=inl(b[2]);return}
+  if(line.trim()){close(-1);html+='<p>'+inl(line.trim())+'</p>'}});
+ close(-1);return html}
+function closeChlDOM(){const o=$('#chl');if(o)o.hidden=true;document.documentElement.classList.remove('nosc')}
+function openChangelog(){
+ let o=$('#chl');
+ if(!o){o=document.createElement('div');o.id='chl';o.hidden=true;
+  o.innerHTML='<div class="chp" role="dialog" aria-modal="true" aria-labelledby="chlt"><div class="chh"><h2 id="chlt">Changelog</h2><button id="chlx" aria-label="Close changelog">×</button></div><div class="chb" id="chlb"></div></div>';
+  document.body.appendChild(o);
+  o.addEventListener('click',e=>{if(e.target===o||e.target.closest('#chlx'))back(closeChlDOM)})}
+ const src=($('#chlog')||{}).textContent||'',full=EDITION=='private'?'https://github.com/Pixeledberry/TickedOff-Private#changelog':'https://github.com/Pixeledberry/TickedOff#changelog';
+ $('#chlb').innerHTML=(mdLite(src)||'<p>The changelog isn’t available.</p>')+'<p class="chfull"><a href="'+full+'" target="_blank" rel="noopener">See older updates on GitHub</a></p>';
+ o.hidden=false;document.documentElement.classList.add('nosc');$('#chlb').scrollTop=0;setTimeout(()=>{try{$('#chlx').focus()}catch(e){}},30)}
+$('#mchl').onclick=()=>{closeDrawerDOM();stopScan();swapTop('chl',closeChlDOM);openChangelog()};
+document.addEventListener('keydown',e=>{const o=$('#chl');if(e.key=='Escape'&&o&&!o.hidden)back(closeChlDOM)});
 $('#t4').onclick=()=>{stopScan();tab(4);if(!rs.open)rlist()};
 initRecipeUI();drawOcr();rlist();rfavDraw();shopBadge();favSub('p');lists();drawAl();
 </script>

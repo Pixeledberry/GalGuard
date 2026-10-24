@@ -37,7 +37,11 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 
 ## Changelog
 
-### v3.8.1 (latest)
+### v3.8.2 (latest)
+- **"Don’t remind me" for updates.** The update notice now has a **Don’t remind me** button next to **Not now**. It turns off automatic update reminders for good. **Menu → Check for updates** still checks when you tap it, and the notice it shows has a button to turn reminders back on.
+- **In-app changelog.** **Menu → Show Changelog** (under Check for updates) opens a window with the last 5 updates and a link to GitHub for older ones. Close it with the × button, by tapping outside the window, or with your phone’s back button. Scrolling inside it only scrolls the window.
+
+### v3.8.1
 - **The ingredient box scrolls instead of stretching.** The box where you paste or type an ingredient list can no longer be resized by dragging. It grows with the text up to a set height, then scrolls on its own. Scrolling inside it moves only the box, not the rest of the app.
 - **New "Always ignore" box** in "My settings", under "Always flag yellow / avoid". Add your own ingredients (comma separated) and they are never flagged; they show in grey as ignored, the same way an ignored sensitivity does. Your "Always flag red" list still wins if an ingredient is in both. It only affects the alpha-gal flags: anything set in **My allergies** is still flagged. The list is included in Export/Import Settings, and older backups still import.
 
@@ -86,11 +90,6 @@ It runs as a single static web page (`index.html`, no build step, no backend) an
 ### v3.4
 - **The app is now called TickedOff** (it was GalGuard), with a new icon: a dark shield on mint with a tick that cuts through it. The web page, the Android and iPhone apps, the file names and these notes all use the new name. Nothing else changes for you: the Android and iPhone apps keep the same internal ID, so they still **update over your existing install and keep your data**. Backups made in the old GalGuard app still import.
 - **Repository name:** the web address is now `https://pixeledberry.github.io/TickedOff/` (rename the GitHub repository to TickedOff to match). GitHub redirects the old repository address, but the old web address `.../GalGuard/` stops working, so use Export Settings on the old page and Import Settings on the new one to move your data.
-
-### v3.3
-- **Clear history button restyled.** It now uses the same color as the other main buttons (white in dark mode) and in every theme.
-- **"Are you sure?" before clearing history.** Pressing "Clear history" now asks "Clear your whole history?" with **Yes, clear history** and **Cancel**.
-- **Themes: HIGH CONTRAST and LOW CONTRAST.** The "Masculine" and "Feminine" groups are renamed. **HIGH CONTRAST** keeps the five dark-and-bold colors (Midnight Navy, Steel Blue, Forest, Graphite Amber, Deep Ocean) but they now use pure white or black text, brighter accents and stronger borders. **LOW CONTRAST** keeps the five rose/lavender/peach/orchid/berry colors as soft pastels (Rose Quartz, Lavender Mist, Peach Blush, Orchid Haze, Berry Sorbet). The two former dark ones, Orchid Night and Berry Dusk, are now light pastels. If you had one of these themes selected, it stays selected.
 
 ## Features
 
@@ -190,6 +189,8 @@ Plant-based look-alikes are **not** flagged (including anything labeled dairy-fr
 - **Web version:** when a newer version is published, a banner offers a **Reload**.
 - **Android and Apple apps:** they check GitHub for a newer release (at most every 12 hours, or any time from **Menu → Check for updates**). On Android (public version), **Update** downloads the new version and opens the installer for you. On Apple, and in the private Android version, the notice links to the release so you can install it.
 - **Not now** hides the notice for 3 days. Nothing is ever blocked.
+- **Don’t remind me** turns update reminders off. **Menu → Check for updates** still works, and lets you turn reminders back on.
+- **Menu → Show Changelog** shows what changed in the last 5 updates.
 
 ## How favorites and settings are stored
 
